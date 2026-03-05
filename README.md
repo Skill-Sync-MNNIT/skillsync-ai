@@ -159,8 +159,8 @@ Copy `.env.example` to `.env` and fill in these values:
 
 | Member | Role | Module Ownership |
 |--------|------|-----------------|
-| **Vivek Sharma** | Dev 1 – Project Lead | Node.js Backend: Auth, Profile, Resume, DB setup, CI/CD |
-| **TBD** | Dev 2 – AI/ML Engineer | Python FastAPI: Embeddings, Search, Ranking, Moderation |
+| **Yugank** | Dev 1 – Project Lead | Node.js Backend: Auth, Profile, Resume, DB setup, CI/CD |
+| **Vivek Sharma** | Dev 2 – AI/ML Engineer | Python FastAPI: Embeddings, Search, Ranking, Moderation |
 | **TBD** | Dev 3 – Backend Services | Node.js: Jobs, Notifications, Ban System |
 | **TBD** | Dev 4 – Frontend Engineer | React: All pages, Axios integration, Role-based UI |
 
