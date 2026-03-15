@@ -7,6 +7,9 @@ name = "skillsync-ai-service"
 version = "1.0.0"
 description = "SkillSync AI – Python FastAPI + LangChain microservice"
 requires-python = ">=3.11"
+dependencies = [
+    "pydantic-settings>=2.0",
+]
 
 # ── Black (code formatter) ────────────────────────────────────────────────────
 [tool.black]
