@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     gemini_api_key: str
     pinecone_api_key: str
     pinecone_index: str = "mnnit-student-embeddings"
-    embedding_model: str = "models/text-embedding-004"
+    embedding_model: str = "gemini-embedding-001"
     llm_model: str = "gemini-1.5-flash"
     top_k_results: int = 10
 
