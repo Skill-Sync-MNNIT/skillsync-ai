@@ -5,6 +5,10 @@
   Note: text-embedding-004 was an old SDK alias. The new google-genai SDK
   uses gemini-embedding-001, which lives on v1beta (the default endpoint).
 """
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 from google import genai
 from config import settings
 
