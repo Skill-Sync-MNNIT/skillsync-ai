@@ -3,6 +3,9 @@ Pinecone connection test – run once to verify setup, then delete.
 Usage: python test_pinecone.py
 """
 
+import sys, os, time
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from pinecone import Pinecone
 from config import settings
 
@@ -32,6 +35,8 @@ def test_pinecone_connection():
     dummy_vector = [0.01] * 3072
     index.upsert(vectors=[{"id": "test-user-001", "values": dummy_vector, "metadata": {"branch": "CSE", "year": 3}}])
     print("   ✅ Dummy upsert OK")
+
+    time.sleep(5) 
 
     result = index.query(vector=dummy_vector, top_k=1, include_metadata=True)
     assert result["matches"][0]["id"] == "test-user-001"
