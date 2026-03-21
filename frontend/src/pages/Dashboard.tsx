@@ -1,11 +1,26 @@
 import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card.tsx';
 import { Briefcase, Bell, TrendingUp, Users } from 'lucide-react';
+import { useEffect } from 'react';
+import api from '../services/api.ts';
 
 export const Dashboard = () => {
   const { user } = useAuthStore();
 
-  if (!user) return null;
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await api.get('/api/dashboard'); 
+        console.log("Dashboard API:", res.data);
+      } catch (err) {
+        console.error("Dashboard API Error:", err);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -80,7 +95,7 @@ export const Dashboard = () => {
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
            {/* Section 1 */}
-           <Card className="h-full min-h-[400px]">
+           <Card className="h-full min-h-400">
              <CardHeader>
                <CardTitle>Recent Activity</CardTitle>
              </CardHeader>

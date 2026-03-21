@@ -2,7 +2,7 @@ import { logoutService } from '../../services/logout.service.js';
 
 export const logout = async (req, res) => {
   try {
-    const token = req.cookies.refreshToken;
+    const token = req.cookies?.refreshToken;
 
     await logoutService(token);
 

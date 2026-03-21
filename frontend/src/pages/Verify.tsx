@@ -26,7 +26,7 @@ export const Verify = () => {
   useEffect(() => {
     if (!email) {
       // If we landed here without an email in state, redirect back to register
-      navigate('/register', { replace: true });
+      navigate('/auth/register', { replace: true });
     }
   }, [email, navigate]);
 
@@ -39,28 +39,33 @@ export const Verify = () => {
   });
 
   const onSubmit = async (data: VerifyForm) => {
-    if (!email) return;
-    
-    setIsLoading(true);
-    setApiError(null);
-    try {
-      const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
-      
-      if (response.status === 200) {
-        // Assume API returns 200 OK
-        // Send them to login to actually authenticate and get their JWT now that they are verified
-        navigate('/login', { replace: true });
-      }
-    } catch (error: any) {
-      if (error.response?.data?.error) {
-         setApiError(error.response.data.error);
-      } else {
-        setApiError('Invalid or expired OTP. Please try again.');
-      }
-    } finally {
-      setIsLoading(false);
+  if(!email) {
+    console.log("No email found");
+    return;
+  }
+
+  setIsLoading(true);
+  setApiError(null);
+
+  try {
+    const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
+
+    console.log("API response", response);
+
+    if (response.status === 200) {
+       navigate('/auth/login', { replace: true });
     }
-  };
+
+  } catch (error: any) {
+    if (error.response?.data?.error) {
+      setApiError(error.response.data.error);
+    } else {
+      setApiError('Invalid or expired OTP. Please try again.');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -103,7 +108,7 @@ export const Verify = () => {
           
           <div className="text-sm text-center">
              <span className="text-slate-600">Entered the wrong email? </span>
-            <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link to="/auth/register" className="font-medium text-primary-600 hover:text-primary-500">
               Go back
             </Link>
           </div>

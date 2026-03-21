@@ -7,6 +7,7 @@ import { LogIn } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
+import api from '../services/api';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -30,30 +31,33 @@ export const Login = () => {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    setIsLoading(true);
-    setApiError(null);
-    try {
-      // TODO: MOCK — Replace with real API call when backend is ready
-      // const response = await api.post('/auth/login', data);
-      await new Promise(resolve => setTimeout(resolve, 500)); // simulate network delay
+  setIsLoading(true);
+  setApiError(null);
 
-      const mockUser = {
-        _id: 'mock-user-001',
-        email: data.email,
-        role: 'student' as const,
-        isVerified: true,
-        isActive: true,
-      };
-      const mockToken = 'mock-jwt-token-for-dev';
+  try {
+    const response = await api.post('/auth/login', data);
 
-      login(mockUser, mockToken);
-      navigate('/dashboard');
-    } catch {
-      setApiError('Invalid email or password. Please try again.');
-    } finally {
-      setIsLoading(false);
+    const { user, token } = response.data;
+
+    if (!user || !token) {
+      throw new Error('Invalid email or password. Please try again.');
     }
-  };
+
+    login(user, token);
+
+    console.log("➡️ Redirecting to dashboard");
+    navigate('/dashboard');
+
+  } catch (error: any) {
+    if (error.response?.data?.message) {
+      setApiError(error.response.data.message);
+    } else {
+      setApiError('Invalid email or password. Please try again.');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -106,7 +110,7 @@ export const Login = () => {
           
           <div className="text-sm text-center">
              <span className="text-slate-600">Don't have an account? </span>
-            <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link to="/auth/register" className="font-medium text-primary-600 hover:text-primary-500">
               Register here
             </Link>
           </div>

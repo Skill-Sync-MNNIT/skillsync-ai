@@ -71,6 +71,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+userSchema.index({ otpExpiresAt: 1 }, { expireAfterSeconds: 0 });
+
 const User = mongoose.model('User', userSchema);
 
 export default User;

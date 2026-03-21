@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';  
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
@@ -33,18 +33,30 @@ export const Register = () => {
     }
   });
 
-  const onSubmit = async (_data: RegisterForm) => {
-    setIsLoading(true);
-    setApiError(null);
-    try {
-      // TODO: MOCK — Replace with real API call when backend is ready
-      // const response = await api.post('/auth/register', data);
-      await new Promise(resolve => setTimeout(resolve, 500)); // simulate network delay
+  const onSubmit = async (data: RegisterForm) => {
+  setIsLoading(true);
+  setApiError(null);
 
-      // Mock: skip OTP and go straight to login
-      navigate('/login', { state: { registered: true } });
-    } catch {
-      setApiError('Registration failed. Please try again.');
+  try {
+      const response = await fetch("http://localhost:5000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      console.log(result.message);
+
+      if (!response.ok) {
+        throw new Error(result.message || "Something went wrong");
+      }
+
+      navigate('/auth/verify-otp', { state: { email: data.email } });
+    } catch (err: any) {
+      setApiError(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +126,7 @@ export const Register = () => {
           
           <div className="text-sm text-center">
              <span className="text-slate-600">Already have an account? </span>
-            <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link to="/auth/login" className="font-medium text-primary-600 hover:text-primary-500">
               Sign In
             </Link>
           </div>
