@@ -29,10 +29,10 @@ function App() {
       <div className="min-h-screen font-sans bg-slate-50 text-slate-900">
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify" element={<Verify />} />
+          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/register" element={<Register />} />
+          <Route path="/auth/verify-otp" element={<Verify />} />
 
           {/* Protected Routes */}
           <Route element={<PrivateRoute />}>

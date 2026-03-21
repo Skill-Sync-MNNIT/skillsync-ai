@@ -14,7 +14,7 @@ export const Navbar = () => {
       await api.post('/auth/logout').catch(() => {});
     } finally {
       logout();
-      navigate('/login', { replace: true });
+      navigate('/auth/login', { replace: true });
     }
   };
 

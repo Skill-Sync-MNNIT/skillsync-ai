@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { sendOTPEmail } from '../utils/email.js';
 
 // register service
-export const registerService = async (email, password) => {
+export const registerService = async (email, password, role) => {
   if (!email || !password) throw new Error('Email and password required');
 
   const emailLower = email.toLowerCase();
@@ -23,12 +23,16 @@ export const registerService = async (email, password) => {
 
   await User.create({
     email: emailLower,
+    role: role,
     passwordHash,
     otpHash,
     otpExpiresAt: Date.now() + 10 * 60 * 1000,
   });
 
-  await sendOTPEmail(emailLower, otp);
+  const name = emailLower.split('@')[0].split('.')[0];
+  const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+  await sendOTPEmail(emailLower, otp, formattedName);
 
   return { message: 'OTP sent to email' };
 };
@@ -37,7 +41,7 @@ export const registerService = async (email, password) => {
 export const loginService = async (email, password) => {
   const user = await User.findOne({ email });
 
-  if (!user) throw new Error('Invalid credentials');
+  if (!user) throw new Error('User not found');
 
   if (!user.isVerified) throw new Error('Please verify your email first');
 
@@ -59,5 +63,5 @@ export const loginService = async (email, password) => {
 
   await user.save();
 
-  return { accessToken, refreshToken };
+  return { accessToken, refreshToken, user };
 };

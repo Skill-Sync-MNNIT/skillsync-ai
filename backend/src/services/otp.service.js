@@ -17,8 +17,8 @@ export const verifyOTPService = async (email, otp) => {
   if (!valid) throw new Error('Invalid OTP');
 
   user.isVerified = true;
-  user.otpHash = null;
-  user.otpExpiresAt = null;
+  user.otpHash = undefined;
+  user.otpExpiresAt = undefined;
 
   await user.save();
 
