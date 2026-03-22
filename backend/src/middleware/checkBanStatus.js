@@ -1,8 +1,8 @@
-import User from '../models/User.js';
+import { findUserById } from '../repositories/index.js';
 
 export const checkBanStatus = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await findUserById(req.user.id);
 
     if (!user) return res.status(404).json({ message: 'User not found' });
 
