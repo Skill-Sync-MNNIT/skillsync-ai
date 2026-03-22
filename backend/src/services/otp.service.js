@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
-import User from '../models/User.js';
+import { findUserByEmail, markUserVerified } from '../repositories/index.js';
 
 export const verifyOTPService = async (email, otp) => {
-  const user = await User.findOne({ email });
+  const user = await findUserByEmail(email);
 
   if (!user) throw new Error('User not found');
 
@@ -16,11 +16,7 @@ export const verifyOTPService = async (email, otp) => {
 
   if (!valid) throw new Error('Invalid OTP');
 
-  user.isVerified = true;
-  user.otpHash = undefined;
-  user.otpExpiresAt = undefined;
-
-  await user.save();
+  await markUserVerified(user._id);
 
   return true;
 };

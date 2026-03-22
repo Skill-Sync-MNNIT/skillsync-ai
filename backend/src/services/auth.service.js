@@ -1,8 +1,8 @@
-import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import { sendOTPEmail } from '../utils/email.js';
+import { findUserByEmail, createUser, updateRefreshToken } from '../repositories/index.js';
 
 // register service
 export const registerService = async (email, password, role) => {
@@ -12,7 +12,7 @@ export const registerService = async (email, password, role) => {
 
   if (!emailLower.endsWith('@mnnit.ac.in')) throw new Error('Only MNNIT emails allowed');
 
-  const existing = await User.findOne({ email: emailLower });
+  const existing = await findUserByEmail(emailLower);
 
   if (existing) throw new Error('User already exists');
 
@@ -21,7 +21,7 @@ export const registerService = async (email, password, role) => {
   const otp = String(Math.floor(100000 + Math.random() * 900000));
   const otpHash = await bcrypt.hash(otp, 10);
 
-  await User.create({
+  await createUser({
     email: emailLower,
     role: role,
     passwordHash,
@@ -39,7 +39,7 @@ export const registerService = async (email, password, role) => {
 
 // login service
 export const loginService = async (email, password) => {
-  const user = await User.findOne({ email });
+  const user = await findUserByEmail(email);
 
   if (!user) throw new Error('User not found');
 
@@ -59,9 +59,7 @@ export const loginService = async (email, password) => {
     expiresIn: '7d',
   });
 
-  user.refreshToken = refreshToken;
-
-  await user.save();
+  await updateRefreshToken(user._id, refreshToken);
 
   return { accessToken, refreshToken, user };
 };

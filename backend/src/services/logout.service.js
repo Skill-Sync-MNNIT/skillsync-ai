@@ -1,12 +1,11 @@
-import User from '../models/User.js';
+import { findUserByRefreshToken, updateRefreshToken } from '../repositories/index.js';
 
 export const logoutService = async (token) => {
   if (!token) return;
 
-  const user = await User.findOne({ refreshToken: token });
+  const user = await findUserByRefreshToken(token);
 
   if (user) {
-    user.refreshToken = null;
-    await user.save();
+    await updateRefreshToken(user._id, null);
   }
 };
