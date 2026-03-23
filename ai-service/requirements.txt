@@ -10,3 +10,5 @@ pydantic
 pydantic-settings
 httpx
 python-multipart
+langchain-text-splitters
+numpy
