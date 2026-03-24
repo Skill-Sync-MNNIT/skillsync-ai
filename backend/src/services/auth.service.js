@@ -52,11 +52,11 @@ export const loginService = async (email, password) => {
   if (!match) throw new Error('Invalid credentials');
 
   const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: '15m',
+    expiresIn: process.env.JWT_TOKEN_EXPIRES_IN,
   });
 
   const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '7d',
+    expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
   });
 
   await updateRefreshToken(user._id, refreshToken);
