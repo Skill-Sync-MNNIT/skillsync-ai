@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import embed
-
+from routers import search
 
 app = FastAPI(
     title="SkillSync AI Service",
@@ -23,3 +23,4 @@ def health_check():
     return {"status": "ok", "service": "skillsync-ai"}
 
 app.include_router(embed.router, prefix="/embed", tags=["Embeddings"])
+app.include_router(search.router, prefix="/search", tags=["Search & Ranking"])
