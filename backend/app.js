@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 // import errorHandler from "./src/middleware/errorHandler";
 import authRoutes from './src/routes/auth.routes.js';
 import dashboardRoutes from './src/routes/protected.routes.js';
+import profileRoutes from './src/routes/profile.routes.js';
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.use(limiter);
 app.use('/auth', authRoutes); // later proper structure of this file
 
 app.use('/api', dashboardRoutes);
+
+app.use('/profile', profileRoutes);
 
 app.get('/', (req, res) => {
   res.send('SkillSync Backend Running');
