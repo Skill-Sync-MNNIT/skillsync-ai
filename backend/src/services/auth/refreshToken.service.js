@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
-import { findUserById } from '../repositories/index.js';
+import { findUserById } from '../../repositories/index.js';
 
+// POST /auth/refresh-token
 export const refreshTokenService = async (token) => {
   if (!token) throw new Error('No token provided');
 

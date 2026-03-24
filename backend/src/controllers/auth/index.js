@@ -1,5 +1,5 @@
-export { register } from './register.js';
-export { verifyOTP } from './verifyOTP.js';
-export { login } from './login.js';
-export { refreshToken } from './refreshToken.js';
-export { logout } from './logout.js';
+export * from './register.js';
+export * from './verifyOTP.js';
+export * from './login.js';
+export * from './refreshToken.js';
+export * from './logout.js';

@@ -1,4 +1,4 @@
-import { refreshTokenService } from '../../services/token.service.js';
+import { refreshTokenService } from '../../services/auth/index.js';
 
 export const refreshToken = async (req, res) => {
   try {
