@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -46,8 +46,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Refresh failed (e.g., refresh token expired)
         useAuthStore.getState().logout();
-        // Option: Redirect to login or let the app handle it via state
-        window.location.href = '/auth/login';
         return Promise.reject(refreshError);
       }
     }
