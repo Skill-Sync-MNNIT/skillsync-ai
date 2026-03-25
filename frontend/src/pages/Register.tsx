@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import api from '../services/api';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address').refine(e => e.endsWith('@mnnit.ac.in') || !e.includes('mnnit'), { message: "Students must use @mnnit.ac.in. Alumni/Profs can use any valid email if approved."}),
@@ -38,25 +39,17 @@ export const Register = () => {
   setApiError(null);
 
   try {
-      const response = await fetch("http://localhost:5000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      console.log(result.message);
-
-      if (!response.ok) {
-        throw new Error(result.message || "Something went wrong");
-      }
+      await api.post('/auth/register', data);
 
       navigate('/auth/verify-otp', { state: { email: data.email } });
     } catch (err: any) {
-      setApiError(err.message || "Registration failed");
+      if (err.response?.data?.message) {
+        setApiError(err.response.data.message);
+      } else if (err.response?.data?.error) {
+        setApiError(err.response.data.error);
+      } else {
+        setApiError(err.message || "Registration failed");
+      }
     } finally {
       setIsLoading(false);
     }

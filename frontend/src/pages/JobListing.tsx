@@ -33,7 +33,30 @@ export const JobListing = () => {
       try {
         const endpoint = activeTab === 'all' ? '/jobs' : '/jobs/me';
         // Fallback simulated fetch if endpoints not ready
-        const response = await api.get(endpoint).catch(() => ({ data: { jobs: [] } }));
+        const response = await api.get(endpoint).catch(() => ({ 
+          data: { 
+            jobs: [
+              {
+                _id: 'job-1',
+                title: 'Software Engineer Intern - ML',
+                description: 'Looking for a strong student with Python and ML experience.',
+                requiredSkills: ['Python', 'Machine Learning', 'TensorFlow'],
+                deadline: new Date(Date.now() + 864000000).toISOString(),
+                status: 'active',
+                postedBy: { name: 'Dr. Smith (Professor)', email: 'smith@mnnit.ac.in' }
+              },
+              {
+                _id: 'job-2',
+                title: 'Frontend Developer',
+                description: 'React developer needed for startup project.',
+                requiredSkills: ['React', 'TypeScript', 'Tailwind'],
+                deadline: new Date(Date.now() + 432000000).toISOString(),
+                status: 'active',
+                postedBy: { name: 'Alumni Corp', email: 'alumni@tech.com' }
+              }
+            ] 
+          } 
+        }));
         setJobs(response.data.jobs || []);
       } catch (error) {
         console.error('Failed to fetch jobs', error);
