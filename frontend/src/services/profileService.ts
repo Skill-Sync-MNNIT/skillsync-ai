@@ -18,7 +18,7 @@ export const profileService = {
    */
   fetchProfile: async (userId: string): Promise<StudentProfileData> => {
     const response = await api.get(`/profile/${userId}`);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -26,7 +26,7 @@ export const profileService = {
    */
   updateProfile: async (data: { branch: string; year: number; skills: string[] }) => {
     const response = await api.put('/profile', data);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -38,7 +38,7 @@ export const profileService = {
     const response = await api.post('/profile/resume', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -46,7 +46,7 @@ export const profileService = {
    */
   getResumeUrl: async (userId: string): Promise<string> => {
     const response = await api.get(`/profile/resume/${userId}`);
-    return response.data.signedUrl;
+    return response.data.data.signedUrl;
   },
 
   /**
@@ -54,6 +54,6 @@ export const profileService = {
    */
   deleteProfile: async () => {
     const response = await api.delete('/profile');
-    return response.data;
+    return response.data.data;
   },
 };
