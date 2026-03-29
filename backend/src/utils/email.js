@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { otpTemplate } from './otpTemplate.js';
+import { passwordResetTemplate } from './passwordResetTemplate.js';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -34,5 +35,22 @@ export const sendOTPEmail = async (email, otp, name = 'User') => {
   } catch (error) {
     console.error('Failed to send OTP email', error);
     // throw new Error("Failed to send OTP email");
+  }
+};
+
+export const sendPasswordResetEmail = async (email, otp, name = 'User') => {
+  try {
+    const safeName = name?.trim() || 'User';
+    const firstName = safeName.split(' ')[0];
+
+    await transporter.sendMail({
+      from: `"SkillSync" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Password Reset Code • SkillSync',
+      text: `Hi ${firstName}, your SkillSync password reset code is ${otp}. It expires in 10 minutes.`,
+      html: passwordResetTemplate(otp, firstName),
+    });
+  } catch (error) {
+    console.error('Failed to send password reset email', error);
   }
 };

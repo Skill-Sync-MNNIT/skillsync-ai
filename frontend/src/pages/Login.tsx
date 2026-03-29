@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -20,6 +20,7 @@ export const Login = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuthStore();
 
   const {
@@ -45,8 +46,11 @@ export const Login = () => {
 
     login(user, token);
 
-    console.log("➡️ Redirecting to dashboard");
-    navigate('/dashboard');
+    // Redirect to original page if coming from auth modal, otherwise dashboard
+    const redirectTo = searchParams.get('redirect') || '/dashboard';
+    const pendingQuery = searchParams.get('q');
+    const finalUrl = pendingQuery ? `${redirectTo}?q=${encodeURIComponent(pendingQuery)}` : redirectTo;
+    navigate(finalUrl);
 
   } catch (error: any) {
     if (error.response?.data?.message) {
@@ -90,6 +94,15 @@ export const Login = () => {
               error={errors.password?.message}
               {...register('password')}
             />
+          </div>
+
+          <div className="flex justify-end -mt-1">
+            <Link
+              to="/auth/forgot-password"
+              className="text-sm text-slate-500 hover:text-primary-600 transition-colors"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           {apiError && (

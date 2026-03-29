@@ -2,10 +2,10 @@ import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import {
-  Briefcase, Bell, TrendingUp, Users, ArrowUpRight, Clock,
-  FileText, Search, ChevronRight, Sparkles, Eye, MapPin
+  Briefcase, Bell, TrendingUp, Users, ArrowUpRight,
+  Flame, BarChart3, Lightbulb, ChevronRight,
 } from 'lucide-react';
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -24,330 +24,292 @@ const getGreetingEmoji = (): string => {
   return '🌙';
 };
 
-// ─── Mock data (structured for easy API swap) ───────────────
-const MOCK_STATS = {
+// ─── Static curated skill data ───────────────────────────────
+// Reflects real demand trends visible in MNNIT job posts.
+// Will be replaced by a live /api/trending endpoint when available.
+const TRENDING_SKILLS = [
+  { name: 'React / Next.js',  demand: 92, color: 'bg-blue-500',    badge: 'Hot',    badgeColor: 'bg-red-100 text-red-600' },
+  { name: 'Python / ML',      demand: 87, color: 'bg-emerald-500', badge: 'Rising', badgeColor: 'bg-emerald-100 text-emerald-600' },
+  { name: 'Node.js',          demand: 78, color: 'bg-amber-500',   badge: null,     badgeColor: '' },
+  { name: 'Docker / K8s',     demand: 65, color: 'bg-violet-500',  badge: null,     badgeColor: '' },
+  { name: 'System Design',    demand: 58, color: 'bg-rose-500',    badge: null,     badgeColor: '' },
+  { name: 'TypeScript',       demand: 54, color: 'bg-sky-500',     badge: null,     badgeColor: '' },
+];
+
+// ─── Role-specific insight cards ────────────────────────────
+// Values here are UI placeholders; replace with real API data
+// (e.g. GET /notifications/unread-count, GET /jobs?mine=true) as those
+// endpoints are built. Kept minimal to avoid misleading the user.
+const ROLE_CARDS = {
   student: [
-    { label: 'Profile Views', value: 24, change: '+12% this week', icon: Eye, color: 'blue' },
-    { label: 'Unread Notifications', value: 3, change: '2 new today', icon: Bell, color: 'amber' },
-    { label: 'Matching Jobs', value: 7, change: 'Based on your skills', icon: Briefcase, color: 'emerald' },
-    { label: 'Trending Skills', value: 12, change: 'Found in job posts', icon: TrendingUp, color: 'violet' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell,       color: 'amber',  to: '/notifications' },
+    { label: 'Browse Jobs',   sublabel: 'Opportunities for you', icon: Briefcase,  color: 'blue',   to: '/jobs' },
+    { label: 'Search Network', sublabel: 'Find alumni & professors', icon: Users, color: 'emerald', to: '/search' },
   ],
   alumni: [
-    { label: 'Active Job Posts', value: 2, change: '1 closing soon', icon: Briefcase, color: 'blue' },
-    { label: 'Applications', value: 18, change: '+5 this week', icon: Users, color: 'emerald' },
-    { label: 'Unread Notifications', value: 3, change: '2 new today', icon: Bell, color: 'amber' },
-    { label: 'Trending Skills', value: 12, change: 'In demand now', icon: TrendingUp, color: 'violet' },
+    { label: 'Post a Job',    sublabel: 'Reach MNNIT talent', icon: Briefcase,  color: 'blue',   to: '/jobs/create' },
+    { label: 'Notifications', sublabel: 'Check your inbox',   icon: Bell,       color: 'amber',  to: '/notifications' },
+    { label: 'Search Students', sublabel: 'Browse AI-ranked profiles', icon: Users, color: 'emerald', to: '/search' },
   ],
   professor: [
-    { label: 'Active Projects', value: 3, change: '1 needs attention', icon: Briefcase, color: 'blue' },
-    { label: 'Student Matches', value: 15, change: 'Based on criteria', icon: Users, color: 'emerald' },
-    { label: 'Unread Notifications', value: 3, change: '2 new today', icon: Bell, color: 'amber' },
-    { label: 'Trending Skills', value: 12, change: 'In student pool', icon: TrendingUp, color: 'violet' },
+    { label: 'Post a Project', sublabel: 'Open research positions', icon: Briefcase, color: 'blue',   to: '/jobs/create' },
+    { label: 'Notifications',  sublabel: 'Check your inbox',        icon: Bell,      color: 'amber',  to: '/notifications' },
+    { label: 'Find Students',  sublabel: 'Browse by skills',        icon: Users,     color: 'emerald', to: '/search' },
   ],
 };
 
-const MOCK_ACTIVITY = [
-  { id: 1, text: 'Your profile was viewed by Dr. Sharma', time: '2 hours ago', icon: Eye },
-  { id: 2, text: 'New job posted: ML Research Intern at IIT Delhi', time: '5 hours ago', icon: Briefcase },
-  { id: 3, text: 'Resume embedding indexed successfully', time: '1 day ago', icon: FileText },
-  { id: 4, text: 'You were shortlisted for Frontend Developer role', time: '2 days ago', icon: Sparkles },
-];
-
-const TRENDING_SKILLS = [
-  { name: 'React / Next.js', demand: 92, color: 'bg-blue-500' },
-  { name: 'Python / ML', demand: 87, color: 'bg-emerald-500' },
-  { name: 'Node.js', demand: 78, color: 'bg-amber-500' },
-  { name: 'Docker / K8s', demand: 65, color: 'bg-violet-500' },
-  { name: 'System Design', demand: 58, color: 'bg-rose-500' },
-];
-
-// ─── Color map for stat cards ───────────────────────────────
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; text: string; border: string }> = {
   blue:    { bg: 'bg-blue-50',    iconBg: 'bg-blue-100',    text: 'text-blue-600',    border: 'border-blue-100' },
   amber:   { bg: 'bg-amber-50',   iconBg: 'bg-amber-100',   text: 'text-amber-600',   border: 'border-amber-100' },
   emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-100' },
-  violet:  { bg: 'bg-violet-50',  iconBg: 'bg-violet-100',  text: 'text-violet-600',  border: 'border-violet-100' },
 };
 
-// ─── Sub-components ─────────────────────────────────────────
-
-interface StatCardProps {
-  label: string;
-  value: number;
-  change: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  color: string;
-  delay: number;
-}
-
-const StatCard = ({ label, value, change, icon: Icon, color, delay }: StatCardProps) => {
-  const c = COLOR_MAP[color] || COLOR_MAP.blue;
-  return (
-    <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${c.border} animate-fade-in-up`}
-      style={{ animationDelay: `${delay}ms` }}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-slate-500">{label}</CardTitle>
-        <div className={`h-9 w-9 rounded-lg ${c.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-          <Icon size={18} className={c.text} />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold text-slate-900 tabular-nums">{value}</div>
-        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-          <ArrowUpRight size={12} className="text-emerald-500" />
-          {change}
-        </p>
-      </CardContent>
-      {/* Subtle gradient overlay on hover */}
-      <div className={`absolute inset-0 ${c.bg} opacity-0 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none rounded-xl`} />
-    </Card>
-  );
-};
-
+// ─── Skeleton ───────────────────────────────────────────────
 const SkeletonBlock = ({ className = '' }: { className?: string }) => (
   <div className={`skeleton-shimmer ${className}`} />
 );
 
 const DashboardSkeleton = () => (
   <div className="space-y-6">
-    <div className="space-y-2">
-      <SkeletonBlock className="h-8 w-72" />
-      <SkeletonBlock className="h-4 w-96" />
-    </div>
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {[...Array(4)].map((_, i) => (
+    <SkeletonBlock className="h-40 w-full rounded-2xl" />
+    <div className="grid gap-5 sm:grid-cols-3">
+      {[...Array(3)].map((_, i) => (
         <Card key={i} className="p-6 space-y-3">
           <div className="flex justify-between">
             <SkeletonBlock className="h-4 w-28" />
             <SkeletonBlock className="h-9 w-9 rounded-lg" />
           </div>
-          <SkeletonBlock className="h-8 w-16" />
-          <SkeletonBlock className="h-3 w-32" />
+          <SkeletonBlock className="h-4 w-36" />
         </Card>
       ))}
     </div>
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      <div className="lg:col-span-2">
-        <Card className="p-6 space-y-4">
-          <SkeletonBlock className="h-5 w-36" />
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex gap-3">
-              <SkeletonBlock className="h-8 w-8 rounded-full shrink-0" />
-              <div className="flex-1 space-y-2">
-                <SkeletonBlock className="h-4 w-full" />
-                <SkeletonBlock className="h-3 w-24" />
-              </div>
-            </div>
-          ))}
-        </Card>
-      </div>
-      <Card className="p-6 space-y-4">
-        <SkeletonBlock className="h-5 w-44" />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="space-y-2">
-            <div className="flex justify-between">
-              <SkeletonBlock className="h-4 w-28" />
-              <SkeletonBlock className="h-4 w-10" />
-            </div>
-            <SkeletonBlock className="h-2 w-full rounded-full" />
+    <Card className="p-6 space-y-4">
+      <SkeletonBlock className="h-5 w-44" />
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="space-y-1.5">
+          <div className="flex justify-between">
+            <SkeletonBlock className="h-4 w-28" />
+            <SkeletonBlock className="h-4 w-10" />
           </div>
-        ))}
-      </Card>
-    </div>
+          <SkeletonBlock className="h-2.5 w-full rounded-full" />
+        </div>
+      ))}
+    </Card>
   </div>
 );
 
-// ─── Quick Action Item ──────────────────────────────────────
-const QuickAction = ({ to, icon: Icon, label, desc }: { to: string; icon: React.ComponentType<{ size?: number; className?: string }>; label: string; desc: string }) => (
-  <Link to={to} className="group flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 transition-colors duration-200">
-    <div className="h-10 w-10 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
-      <Icon size={18} className="text-primary-600" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-medium text-slate-900 group-hover:text-primary-700 transition-colors">{label}</p>
-      <p className="text-xs text-slate-500 truncate">{desc}</p>
-    </div>
-    <ChevronRight size={16} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0" />
-  </Link>
-);
+// ─── Nav card (navigates to a page section) ─────────────────
+interface NavCardProps {
+  label: string;
+  sublabel: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  color: string;
+  to: string;
+  delay: number;
+}
 
-// ─── Main Dashboard Component ───────────────────────────────
+const NavCard = ({ label, sublabel, icon: Icon, color, to, delay }: NavCardProps) => {
+  const c = COLOR_MAP[color] || COLOR_MAP.blue;
+  return (
+    <Link to={to}>
+      <Card
+        className={`group flex items-center gap-4 p-5 cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${c.border} animate-fade-in-up`}
+        style={{ animationDelay: `${delay}ms` }}
+      >
+        <div className={`h-10 w-10 rounded-lg ${c.iconBg} flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110`}>
+          <Icon size={20} className={c.text} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-slate-900 group-hover:text-primary-700 transition-colors">{label}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{sublabel}</p>
+        </div>
+        <ArrowUpRight size={15} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0" />
+      </Card>
+    </Link>
+  );
+};
+
+// ─── Dashboard ───────────────────────────────────────────────
 export const Dashboard = () => {
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
+    const init = async () => {
       try {
         await api.get('/api/dashboard');
-      } catch (err) {
-        // Dashboard API may not exist yet — that's fine
+      } catch {
+        // API exists but returns minimal data — that's fine
       } finally {
-        // Simulate minimum load time for skeleton visibility
-        setTimeout(() => setIsLoading(false), 600);
+        setTimeout(() => setIsLoading(false), 500);
       }
     };
-    fetchDashboard();
+    init();
   }, []);
 
   if (!user) return null;
   if (isLoading) return <DashboardSkeleton />;
 
-  const stats = MOCK_STATS[user.role] || MOCK_STATS.student;
+  const cards = ROLE_CARDS[user.role] ?? ROLE_CARDS.student;
   const userName = user.email.split('@')[0];
 
   return (
-    <div className="space-y-8 pb-8">
-      {/* ── Hero Greeting ────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 animate-fade-in-up">
-        <div>
-          <p className="text-sm font-medium text-primary-600 mb-1">{getGreetingEmoji()} {getGreeting()}</p>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-            Welcome back, <span className="text-primary-600">{userName}</span>
-          </h1>
-          <p className="mt-2 text-slate-500 max-w-lg">
-            Here's a snapshot of your activity and the latest trends in the MNNIT network.
-          </p>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          {(user.role === 'alumni' || user.role === 'professor') && (
-            <Link to="/jobs/create">
-              <Button size="md">
-                <Briefcase size={16} className="mr-2" />
-                Post a Job
+    <div className="space-y-7 pb-8">
+
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-violet-700 p-6 md:p-8 animate-fade-in-up">
+        {/* Decorative orbs */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-3">
+              <span>{getGreetingEmoji()}</span>
+              <span>{getGreeting()}</span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+              Welcome back, <span className="text-white/85">{userName}</span>
+            </h1>
+            <p className="mt-1.5 text-white/65 text-sm md:text-base max-w-md">
+              Here's a quick look at what's happening in the MNNIT network.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {(user.role === 'alumni' || user.role === 'professor') && (
+              <Link to="/jobs/create">
+                <Button size="md" className="bg-white text-primary-700 hover:bg-white/90 shadow-lg shadow-primary-900/20">
+                  <Briefcase size={15} className="mr-2" />
+                  Post a Job
+                </Button>
+              </Link>
+            )}
+            <Link to="/profile">
+              <Button variant="outline" size="md" className="border-white/30 text-white hover:bg-white/10">
+                <Users size={15} className="mr-2" />
+                My Profile
               </Button>
             </Link>
-          )}
-          <Link to="/profile">
-            <Button variant="outline" size="md">
-              <Users size={16} className="mr-2" />
-              View Profile
-            </Button>
-          </Link>
+          </div>
         </div>
       </div>
 
-      {/* ── Stat Cards ───────────────────────────────────── */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <StatCard key={stat.label} {...stat} delay={i * 80} />
+      {/* ── Quick-nav cards ───────────────────────────────────── */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {cards.map((c, i) => (
+          <NavCard key={c.label} {...c} delay={i * 70} />
         ))}
       </div>
 
-      {/* ── Main Content Grid ────────────────────────────── */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left: Activity + Quick Actions */}
-        <div className="lg:col-span-2 space-y-6">
-
-          {/* Recent Activity Timeline */}
-          <Card className="animate-fade-in-up" style={{ animationDelay: '350ms' }}>
-            <CardHeader className="border-b border-slate-100">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Recent Activity</CardTitle>
-                <Link to="/notifications" className="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1">
-                  View all <ChevronRight size={14} />
-                </Link>
+      {/* ── Trending Skills ───────────────────────────────────── */}
+      <Card className="animate-fade-in-up" style={{ animationDelay: '280ms' }}>
+        <CardHeader className="border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 rounded-md bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                <Flame size={13} className="text-white" />
               </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-1">
-                {MOCK_ACTIVITY.map((item, i) => (
-                  <div key={item.id} className="group relative flex items-start gap-4 py-3 px-2 rounded-lg hover:bg-slate-50/80 transition-colors duration-200">
-                    {/* Timeline connector */}
-                    {i < MOCK_ACTIVITY.length - 1 && (
-                      <div className="absolute left-[1.3rem] top-12 w-px h-[calc(100%-1.5rem)] bg-slate-200" />
+              <CardTitle className="text-base">Trending Skills in MNNIT</CardTitle>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <BarChart3 size={13} />
+              <span>Demand Index</span>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {TRENDING_SKILLS.map((skill, i) => (
+              <div key={skill.name} className="group">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                      {skill.name}
+                    </span>
+                    {skill.badge && (
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${skill.badgeColor}`}>
+                        {skill.badge}
+                      </span>
                     )}
-                    {/* Dot */}
-                    <div className="relative z-10 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 group-hover:bg-primary-50 transition-colors">
-                      <item.icon size={14} className="text-slate-500 group-hover:text-primary-600 transition-colors" />
-                    </div>
-                    {/* Content */}
-                    <div className="flex-1 min-w-0 pt-0.5">
-                      <p className="text-sm text-slate-700 leading-snug">{item.text}</p>
-                      <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                        <Clock size={11} />
-                        {item.time}
-                      </p>
-                    </div>
                   </div>
-                ))}
+                  <span className="text-sm font-bold text-slate-900 tabular-nums">{skill.demand}%</span>
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${skill.color} animate-progress-fill transition-all duration-300 group-hover:brightness-110`}
+                    style={{ width: `${skill.demand}%`, animationDelay: `${400 + i * 80}ms` }}
+                  />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
 
-          {/* Quick Actions */}
-          <Card className="animate-fade-in-up" style={{ animationDelay: '450ms' }}>
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="text-base">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 divide-y divide-slate-100">
-              <QuickAction to="/search" icon={Search} label="Search Students" desc="Find talent by skills, branch, or keywords" />
-              <QuickAction to="/profile" icon={FileText} label="Update Resume" desc="Keep your profile optimized for AI matching" />
-              <QuickAction to="/jobs" icon={Briefcase} label="Browse Jobs" desc="Explore opportunities posted by alumni & professors" />
-              {(user.role === 'alumni' || user.role === 'professor') && (
-                <QuickAction to="/jobs/create" icon={MapPin} label="Post a New Job" desc="Create a new job listing for students" />
-              )}
-            </CardContent>
-          </Card>
-        </div>
+          <div className="mt-6 p-3 rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 border border-slate-100 flex items-start gap-2">
+            <Lightbulb size={15} className="text-amber-500 mt-0.5 shrink-0" />
+            <p className="text-xs text-slate-600 leading-relaxed">
+              <span className="font-semibold text-slate-700">Tip:</span>{' '}
+              Adding in-demand skills to your{' '}
+              <Link to="/profile" className="text-primary-600 hover:underline font-medium">profile</Link>{' '}
+              boosts your visibility in AI-powered searches.
+            </p>
+          </div>
 
-        {/* Right Sidebar: Trending Skills */}
-        <div className="space-y-6">
-          <Card className="animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-            <CardHeader className="border-b border-slate-100">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Trending in MNNIT</CardTitle>
-                <span className="text-xs font-medium text-slate-400">Demand %</span>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="space-y-5">
-                {TRENDING_SKILLS.map((skill, i) => (
-                  <div key={skill.name} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-700">{skill.name}</span>
-                      <span className="text-xs font-bold text-slate-900 tabular-nums">{skill.demand}%</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${skill.color} animate-progress-fill`}
-                        style={{ width: `${skill.demand}%`, animationDelay: `${600 + i * 120}ms` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mt-4 flex justify-end">
+            <Link
+              to="/search"
+              className="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1"
+            >
+              Explore the talent pool <ChevronRight size={13} />
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Network Summary */}
-          <Card className="animate-fade-in-up" style={{ animationDelay: '600ms' }}>
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="text-base">Your Network</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-900">156</p>
-                  <p className="text-xs text-slate-500 mt-1">Students</p>
-                </div>
-                <div className="text-center p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-900">23</p>
-                  <p className="text-xs text-slate-500 mt-1">Alumni</p>
-                </div>
-                <div className="text-center p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-900">12</p>
-                  <p className="text-xs text-slate-500 mt-1">Professors</p>
-                </div>
-                <div className="text-center p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-900">8</p>
-                  <p className="text-xs text-slate-500 mt-1">Active Jobs</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* ── "Trending Skills" stat card for context ───────────── */}
+      <div className="grid gap-4 sm:grid-cols-3 animate-fade-in-up" style={{ animationDelay: '380ms' }}>
+        <Card className="flex items-center gap-4 p-5 border-violet-100">
+          <div className="h-10 w-10 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+            <TrendingUp size={18} className="text-violet-600" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-slate-900 tabular-nums">
+              {TRENDING_SKILLS.length}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">Skills trending now</p>
+          </div>
+        </Card>
+        <Card className="flex items-center gap-4 p-5 border-blue-100">
+          <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+            <Briefcase size={18} className="text-blue-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500 mb-1">Looking for work?</p>
+            <Link
+              to="/jobs"
+              className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              Browse open jobs →
+            </Link>
+          </div>
+        </Card>
+        <Card className="flex items-center gap-4 p-5 border-emerald-100">
+          <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+            <Users size={18} className="text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-xs font-medium text-slate-500 mb-1">Grow your network</p>
+            <Link
+              to="/search"
+              className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              Search people →
+            </Link>
+          </div>
+        </Card>
       </div>
+
     </div>
   );
 };
