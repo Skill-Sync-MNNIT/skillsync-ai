@@ -12,3 +12,5 @@ httpx
 python-multipart
 langchain-text-splitters
 numpy
+schedule
+cloudinary
