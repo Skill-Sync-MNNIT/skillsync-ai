@@ -13,4 +13,10 @@ class Settings(BaseSettings):
     llm_model: str = "gemini-1.5-flash"
     top_k_results: int = 10
 
+    backend_url: str = "http://localhost:5000"
+    internal_secret: str = ""
+    cloudinary_cloud_name: str = ""
+    cloudinary_api_key: str = ""
+    cloudinary_api_secret: str = ""    
+
 settings = Settings()
