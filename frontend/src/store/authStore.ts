@@ -7,6 +7,7 @@ interface User {
   role: 'student' | 'professor' | 'alumni';
   isVerified: boolean;
   isActive: boolean;
+  name?: string;
 }
 
 interface AuthState {
@@ -14,6 +15,7 @@ interface AuthState {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  updateUser: (patch: Partial<User>) => void;
   isAuthenticated: () => boolean;
 }
 
@@ -29,6 +31,11 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         set({ user: null, token: null });
+      },
+
+      updateUser: (patch) => {
+        const current = get().user;
+        if (current) set({ user: { ...current, ...patch } });
       },
 
       isAuthenticated: () => !!get().token,

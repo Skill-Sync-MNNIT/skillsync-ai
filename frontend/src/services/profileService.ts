@@ -1,13 +1,12 @@
 import api from './api';
 
 export interface StudentProfileData {
+  _id?: string;
   userId: string;
   name?: string;
-  email: string;
-  role: string;
-  branch: string;
-  year: number;
-  skills: string[];
+  branch?: string;
+  year?: number;
+  skills?: string[];
   embeddingStatus?: 'pending' | 'processing' | 'indexed' | 'failed';
   resumeStorageKey?: string;
 }
@@ -24,7 +23,12 @@ export const profileService = {
   /**
    * Update the current user's profile details.
    */
-  updateProfile: async (data: { branch: string; year: number; skills: string[] }) => {
+  updateProfile: async (data: {
+    name?: string;
+    branch?: string;
+    year?: number;
+    skills?: string[];
+  }) => {
     const response = await api.put('/profile', data);
     return response.data.data;
   },
