@@ -1,23 +1,33 @@
 import bcrypt from 'bcrypt';
-import { findUserByEmail, markUserVerified } from '../../repositories/index.js';
+import { findUserByEmail, createUser } from '../../repositories/index.js';
+import redis from '../../config/redis.js';
 
 // POST /auth/verify-otp
 export const verifyOTPService = async (email, otp) => {
-  const user = await findUserByEmail(email);
+  const emailLower = email.toLowerCase();
 
-  if (!user) throw new Error('User not found');
+  const existingUser = await findUserByEmail(emailLower);
 
-  if (user.isVerified) throw new Error('User already verified');
+  if (existingUser) throw new Error('User already verified and registered');
 
-  if (!user.otpHash) throw new Error('OTP not requested');
+  const payloadStr = await redis.get(`register:${emailLower}`);
 
-  if (user.otpExpiresAt < Date.now()) throw new Error('OTP expired');
+  if (!payloadStr) throw new Error('OTP expired or not requested');
 
-  const valid = await bcrypt.compare(otp, user.otpHash);
+  const payload = JSON.parse(payloadStr);
+
+  const valid = await bcrypt.compare(otp, payload.otpHash);
 
   if (!valid) throw new Error('Invalid OTP');
 
-  await markUserVerified(user._id);
+  await createUser({
+    email: emailLower,
+    passwordHash: payload.passwordHash,
+    role: payload.role,
+    isVerified: true,
+  });
+
+  await redis.del(`register:${emailLower}`);
 
   return true;
 };
