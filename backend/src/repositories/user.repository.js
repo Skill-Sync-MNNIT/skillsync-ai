@@ -50,22 +50,6 @@ export const updateUserById = async (id, update) => {
 };
 
 /**
- * Mark a user as verified and clear their OTP fields.
- * @param {string} id
- * @returns {Promise<User|null>}
- */
-export const markUserVerified = async (id) => {
-  return await User.findByIdAndUpdate(
-    id,
-    {
-      $set: { isVerified: true },
-      $unset: { otpHash: '', otpExpiresAt: '' },
-    },
-    { returnDocument: 'after' }
-  );
-};
-
-/**
  * Store (or clear) a refresh token on the user document.
  * @param {string} id
  * @param {string|null} token - Pass null to clear.
@@ -73,17 +57,6 @@ export const markUserVerified = async (id) => {
  */
 export const updateRefreshToken = async (id, token) => {
   return await User.findByIdAndUpdate(id, { refreshToken: token }, { returnDocument: 'after' });
-};
-
-/**
- * Set OTP hash and expiry on a user document.
- * @param {string} id
- * @param {string} otpHash
- * @param {Date}   otpExpiresAt
- * @returns {Promise<User|null>}
- */
-export const setUserOtp = async (id, otpHash, otpExpiresAt) => {
-  return await User.findByIdAndUpdate(id, { otpHash, otpExpiresAt }, { returnDocument: 'after' });
 };
 
 // ─── Delete ───────────────────────────────────────────────────────────────────

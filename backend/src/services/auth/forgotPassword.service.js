@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
+import redis from '../../config/redis.js';
 import { sendPasswordResetEmail } from '../../utils/email.js';
-import { findUserByEmail, setUserOtp } from '../../repositories/index.js';
+import { findUserByEmail } from '../../repositories/index.js';
 
 // POST /auth/forgot-password
 export const forgotPasswordService = async (email) => {
@@ -14,14 +15,11 @@ export const forgotPasswordService = async (email) => {
 
   if (!user.isVerified) throw new Error('Account is not verified. Please verify your email first.');
 
-  // Generate 6-digit OTP
   const otp = String(Math.floor(100000 + Math.random() * 900000));
   const otpHash = await bcrypt.hash(otp, 10);
 
-  // Store OTP on user (reuses existing otpHash/otpExpiresAt fields)
-  await setUserOtp(user._id, otpHash, Date.now() + 10 * 60 * 1000);
+  await redis.set(`forgot-password:${emailLower}`, otpHash, 'EX', 10 * 60);
 
-  // Send password-reset email
   const name = emailLower.split('@')[0].split('.')[0];
   const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
 
