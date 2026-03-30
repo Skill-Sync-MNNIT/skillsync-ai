@@ -3,3 +3,5 @@ export * from './verifyOTP.js';
 export * from './login.js';
 export * from './refreshToken.js';
 export * from './logout.js';
+export * from './forgotPassword.js';
+export * from './resetPassword.js';

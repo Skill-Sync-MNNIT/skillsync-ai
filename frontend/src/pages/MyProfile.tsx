@@ -5,89 +5,83 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import {
   UploadCloud, X, AlertTriangle, Edit2, Loader2, CheckCircle2,
-  FileText, Trash2, Mail, GraduationCap, Calendar, Cpu,
-  Shield, Sparkles, User, Save, XCircle, ArrowUpRight
+  FileText, Trash2, Cpu, Save, XCircle, User, Shield, Mail,
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import type { StudentProfileData } from '../services/profileService';
 
-// ─── Skeleton loader (same pattern as Dashboard) ────────────
+// ─── Skeleton ───────────────────────────────────────────────
 const SkeletonBlock = ({ className = '' }: { className?: string }) => (
   <div className={`skeleton-shimmer ${className}`} />
 );
 
 const ProfileSkeleton = () => (
-  <div className="space-y-8 max-w-5xl mx-auto">
+  <div className="max-w-2xl mx-auto space-y-5 pb-12">
     <div className="space-y-2">
-      <SkeletonBlock className="h-8 w-56" />
-      <SkeletonBlock className="h-4 w-80" />
+      <SkeletonBlock className="h-7 w-48" />
+      <SkeletonBlock className="h-4 w-72" />
     </div>
-    {/* Stat row */}
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {[...Array(4)].map((_, i) => (
-        <Card key={i} className="p-6 space-y-3">
-          <div className="flex justify-between">
-            <SkeletonBlock className="h-4 w-24" />
-            <SkeletonBlock className="h-9 w-9 rounded-lg" />
-          </div>
-          <SkeletonBlock className="h-6 w-20" />
-          <SkeletonBlock className="h-3 w-32" />
-        </Card>
-      ))}
-    </div>
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div className="lg:col-span-2 space-y-6">
-        <Card className="p-6 space-y-4">
-          <SkeletonBlock className="h-5 w-40" />
-          {[...Array(4)].map((_, i) => (
-            <SkeletonBlock key={i} className="h-10 w-full" />
-          ))}
-        </Card>
-      </div>
-      <Card className="p-6 space-y-4">
-        <SkeletonBlock className="h-5 w-32" />
-        <SkeletonBlock className="h-32 w-full rounded-lg" />
+    {[...Array(4)].map((_, i) => (
+      <Card key={i} className="p-6 space-y-4">
+        <SkeletonBlock className="h-5 w-36" />
+        <SkeletonBlock className="h-10 w-full" />
         <SkeletonBlock className="h-10 w-full" />
       </Card>
+    ))}
+  </div>
+);
+
+// ─── Inline feedback banner ─────────────────────────────────
+const FeedbackBanner = ({ type, text }: { type: 'success' | 'error'; text: string }) => (
+  <div
+    className={`flex items-center gap-2 text-sm p-3 rounded-lg border animate-fade-in ${
+      type === 'success'
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        : 'bg-red-50 text-red-700 border-red-200'
+    }`}
+  >
+    {type === 'success' ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
+    <span>{text}</span>
+  </div>
+);
+
+// ─── Section header ─────────────────────────────────────────
+const SectionHeader = ({
+  icon: Icon,
+  title,
+  subtitle,
+  iconBg,
+  iconColor,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  title: string;
+  subtitle?: string;
+  iconBg: string;
+  iconColor: string;
+}) => (
+  <div className="flex items-center gap-3">
+    <div className={`h-9 w-9 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
+      <Icon size={18} className={iconColor} />
+    </div>
+    <div>
+      <CardTitle className="text-base">{title}</CardTitle>
+      {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
     </div>
   </div>
 );
 
-// ─── Color map (same as Dashboard) ──────────────────────────
-const COLOR_MAP: Record<string, { iconBg: string; text: string; border: string }> = {
-  blue:    { iconBg: 'bg-blue-100',    text: 'text-blue-600',    border: 'border-blue-100' },
-  amber:   { iconBg: 'bg-amber-100',   text: 'text-amber-600',   border: 'border-amber-100' },
-  emerald: { iconBg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-100' },
-  violet:  { iconBg: 'bg-violet-100',  text: 'text-violet-600',  border: 'border-violet-100' },
-  rose:    { iconBg: 'bg-rose-100',    text: 'text-rose-600',    border: 'border-rose-100' },
-};
+// ─── Read-only field ────────────────────────────────────────
+const ReadField = ({ label, value }: { label: string; value: string }) => (
+  <div>
+    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</p>
+    <p className="text-sm font-medium text-slate-900 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+      {value}
+    </p>
+  </div>
+);
 
-// ─── Stat overview card ─────────────────────────────────────
-interface MiniStatProps {
-  label: string;
-  value: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  color: string;
-  delay: number;
-}
-
-const MiniStat = ({ label, value, icon: Icon, color, delay }: MiniStatProps) => {
-  const c = COLOR_MAP[color] || COLOR_MAP.blue;
-  return (
-    <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${c.border} animate-fade-in-up`}
-      style={{ animationDelay: `${delay}ms` }}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-slate-500">{label}</CardTitle>
-        <div className={`h-9 w-9 rounded-lg ${c.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-          <Icon size={18} className={c.text} />
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-slate-900">{value}</div>
-      </CardContent>
-    </Card>
-  );
-};
+// ─── Branch options (mirrors backend enum) ──────────────────
+const BRANCHES = ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT'] as const;
 
 // ─── Main Component ─────────────────────────────────────────
 export const MyProfile = () => {
@@ -96,148 +90,151 @@ export const MyProfile = () => {
 
   const [profileData, setProfileData] = useState<StudentProfileData | null>(null);
 
-  // UI State
+  // Edit state
   const [isEditing, setIsEditing] = useState(false);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [newSkill, setNewSkill] = useState('');
   const [branch, setBranch] = useState('');
   const [year, setYear] = useState('');
+  const [skills, setSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState('');
 
-  // Loading & Feedback States
+  // Loading / feedback
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isSavingDetails, setIsSavingDetails] = useState(false);
-  const [detailsMessage, setDetailsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Resume
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Danger zone
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Polling
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Embedding poll
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    fetchProfile(user._id);
-    return () => stopPolling();
+    loadProfile(user._id);
+    return () => stopPoll();
   }, [user]);
 
-  // ─── API Logic (unchanged) ──────────────────────────────
-  const fetchProfile = async (userId: string) => {
+  // ─── API ─────────────────────────────────────────────────
+  const loadProfile = async (userId: string) => {
     try {
       const data = await profileService.fetchProfile(userId);
       setProfileData(data);
       if (!isEditing) {
         setBranch(data.branch || '');
-        setYear(data.year ? data.year.toString() : '');
+        setYear(data.year ? String(data.year) : '');
         setSkills(data.skills || []);
       }
-      if (data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing') {
-        startPolling(userId);
-      } else {
-        stopPolling();
-      }
-    } catch (err) {
-      console.error('Failed to fetch profile:', err);
+      const inProgress = data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing';
+      inProgress ? startPoll(userId) : stopPoll();
+    } catch {
+      // profile may not exist yet
     } finally {
       setIsLoadingProfile(false);
     }
   };
 
-  const startPolling = (userId: string) => {
-    if (pollIntervalRef.current) return;
-    pollIntervalRef.current = setInterval(async () => {
+  const startPoll = (userId: string) => {
+    if (pollRef.current) return;
+    pollRef.current = setInterval(async () => {
       try {
         const data = await profileService.fetchProfile(userId);
         setProfileData(data);
-        if (data.embeddingStatus === 'indexed' || data.embeddingStatus === 'failed') stopPolling();
+        if (data.embeddingStatus === 'indexed' || data.embeddingStatus === 'failed') stopPoll();
       } catch { /* silent */ }
     }, 4000);
   };
 
-  const stopPolling = () => {
-    if (pollIntervalRef.current) { clearInterval(pollIntervalRef.current); pollIntervalRef.current = null; }
+  const stopPoll = () => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   };
 
-  const handleSaveDetails = async () => {
-    setIsSavingDetails(true);
-    setDetailsMessage(null);
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveMsg(null);
     try {
-      const updated = await profileService.updateProfile({ branch: branch.toUpperCase(), year: parseInt(year), skills });
-      setProfileData((prev) => prev ? { ...prev, branch: updated.branch || branch, year: updated.year || parseInt(year), skills } : prev);
-      setDetailsMessage({ type: 'success', text: 'Profile details saved successfully.' });
+      const updated = await profileService.updateProfile({
+        branch: branch.toUpperCase(),
+        year: parseInt(year),
+        skills,
+      });
+      setProfileData((prev) =>
+        prev ? { ...prev, branch: updated.branch || branch, year: updated.year || parseInt(year), skills } : prev
+      );
+      setSaveMsg({ type: 'success', text: 'Profile saved successfully.' });
       setIsEditing(false);
     } catch (err: any) {
-      setDetailsMessage({ type: 'error', text: err.response?.data?.error || err.response?.data?.message || 'Failed to save details.' });
+      setSaveMsg({ type: 'error', text: err.response?.data?.message || 'Failed to save.' });
     } finally {
-      setIsSavingDetails(false);
+      setIsSaving(false);
     }
   };
 
   const cancelEdit = () => {
     setIsEditing(false);
-    setDetailsMessage(null);
+    setSaveMsg(null);
     if (profileData) {
       setBranch(profileData.branch || '');
-      setYear(profileData.year ? profileData.year.toString() : '');
+      setYear(profileData.year ? String(profileData.year) : '');
       setSkills(profileData.skills || []);
     }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type === 'application/pdf') { setSelectedFile(file); setUploadMessage(null); }
-      else { setUploadMessage({ type: 'error', text: 'Please select a valid PDF file.' }); }
-    }
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.type === 'application/pdf') { setSelectedFile(f); setUploadMsg(null); }
+    else setUploadMsg({ type: 'error', text: 'Please select a valid PDF file.' });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file?.type === 'application/pdf') { setSelectedFile(file); setUploadMessage(null); }
-    else { setUploadMessage({ type: 'error', text: 'Please drop a valid PDF file.' }); }
+    const f = e.dataTransfer.files[0];
+    if (f?.type === 'application/pdf') { setSelectedFile(f); setUploadMsg(null); }
+    else setUploadMsg({ type: 'error', text: 'Please drop a valid PDF file.' });
   };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
     setIsUploading(true);
-    setUploadMessage(null);
+    setUploadMsg(null);
     try {
       await profileService.uploadResume(selectedFile);
-      setUploadMessage({ type: 'success', text: 'Resume uploaded! AI extraction started.' });
+      setUploadMsg({ type: 'success', text: 'Resume uploaded! AI indexing started.' });
       setSelectedFile(null);
-      if (user) fetchProfile(user._id);
+      if (user) loadProfile(user._id);
     } catch (err: any) {
-      setUploadMessage({ type: 'error', text: err.response?.data?.error || err.response?.data?.message || 'Failed to upload resume.' });
+      setUploadMsg({ type: 'error', text: err.response?.data?.message || 'Upload failed.' });
     } finally {
       setIsUploading(false);
     }
   };
 
   const addSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newSkill.trim() !== '') {
+    if (e.key === 'Enter' && newSkill.trim()) {
       e.preventDefault();
       if (!skills.includes(newSkill.trim())) setSkills([...skills, newSkill.trim()]);
       setNewSkill('');
     }
   };
 
-  const removeSkill = (s: string) => setSkills(skills.filter((sk) => sk !== s));
+  const removeSkill = (s: string) => setSkills(skills.filter((x) => x !== s));
 
-  const handleSoftDelete = async () => {
+  const handleDeactivate = async () => {
     setIsDeleting(true);
     try {
       await profileService.deleteProfile();
       logout();
     } catch {
-      alert('Failed to delete account.');
-      setIsDeleting(false);
       setShowDeleteConfirm(false);
+      setIsDeleting(false);
     }
   };
 
@@ -245,350 +242,375 @@ export const MyProfile = () => {
   if (isLoadingProfile) return <ProfileSkeleton />;
 
   const userName = user.email.split('@')[0];
+  const isStudent = user.role === 'student';
 
-  // Profile quick-stats
-  const profileStats: MiniStatProps[] = [
-    { label: 'Email', value: userName, icon: Mail, color: 'blue', delay: 0 },
-    { label: 'Role', value: user.role.charAt(0).toUpperCase() + user.role.slice(1), icon: Shield, color: 'violet', delay: 80 },
-    ...(user.role === 'student' ? [
-      { label: 'Branch', value: profileData?.branch || '—', icon: GraduationCap, color: 'emerald', delay: 160 },
-      { label: 'Year', value: profileData?.year?.toString() || '—', icon: Calendar, color: 'amber', delay: 240 },
-    ] : []),
-  ];
+  // ─── Embedding status badge ──────────────────────────────
+  const EmbeddingBadge = () => {
+    const s = profileData?.embeddingStatus;
+    if (s === 'indexed')
+      return (
+        <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
+          <CheckCircle2 size={11} /> Indexed
+        </span>
+      );
+    if (s === 'pending' || s === 'processing')
+      return (
+        <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-200">
+          <Loader2 size={11} className="animate-spin" /> Processing
+        </span>
+      );
+    if (s === 'failed')
+      return (
+        <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-red-200">
+          <AlertTriangle size={11} /> Failed
+        </span>
+      );
+    return null;
+  };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+    <div className="max-w-2xl mx-auto space-y-5 pb-12">
 
-      {/* ── Hero Header (Dashboard-style) ──────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 animate-fade-in-up">
+      {/* ── Page header ─────────────────────────────────────── */}
+      <div className="flex items-end justify-between gap-4 animate-fade-in-up">
         <div>
-          <p className="text-sm font-medium text-primary-600 mb-1 flex items-center gap-1.5">
-            <User size={14} /> Profile Settings
-          </p>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-            Hi, <span className="text-primary-600">{userName}</span>
+          <p className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-1">My Profile</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            {userName}
           </h1>
-          <p className="mt-2 text-slate-500 max-w-lg">
-            Manage your account details, skills pipeline, and resume for AI-powered matching.
+          <p className="mt-1 text-sm text-slate-500">
+            Manage your account details, skills, and resume.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          {user.role === 'student' && !isEditing && (
-            <Button onClick={() => setIsEditing(true)}>
-              <Edit2 size={16} className="mr-2" /> Edit Profile
-            </Button>
-          )}
-          {isEditing && (
-            <>
-              <Button onClick={handleSaveDetails} isLoading={isSavingDetails}>
-                <Save size={16} className="mr-2" /> Save Changes
+
+        {/* Edit / Save controls — student only */}
+        {isStudent && (
+          <div className="flex items-center gap-2 shrink-0">
+            {isEditing ? (
+              <>
+                <Button size="sm" onClick={handleSave} isLoading={isSaving}>
+                  <Save size={14} className="mr-1.5" /> Save
+                </Button>
+                <Button size="sm" variant="outline" onClick={cancelEdit} disabled={isSaving}>
+                  <XCircle size={14} className="mr-1.5" /> Cancel
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+                <Edit2 size={14} className="mr-1.5" /> Edit Profile
               </Button>
-              <Button variant="outline" onClick={cancelEdit} disabled={isSavingDetails}>
-                <XCircle size={16} className="mr-2" /> Cancel
-              </Button>
-            </>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Feedback toast */}
-      {detailsMessage && (
-        <div className={`animate-fade-in-up text-sm p-4 rounded-xl border flex items-center gap-2 ${detailsMessage.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-          {detailsMessage.type === 'success' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
-          {detailsMessage.text}
-        </div>
+      {/* Save feedback */}
+      {saveMsg && <FeedbackBanner {...saveMsg} />}
+
+      {/* ── Account Information ─────────────────────────────── */}
+      <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '80ms' }}>
+        <CardHeader className="border-b border-slate-100">
+          <SectionHeader
+            icon={User}
+            title="Account Information"
+            subtitle="Core identity — not editable"
+            iconBg="bg-blue-50"
+            iconColor="text-blue-600"
+          />
+        </CardHeader>
+        <CardContent className="pt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ReadField label="Email Address" value={user.email} />
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Role</p>
+              <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+                <Shield size={14} className="text-violet-500 shrink-0" />
+                <span className="text-sm font-medium text-slate-900 capitalize">{user.role}</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Account Status</p>
+              <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+                <Mail size={14} className="text-emerald-500 shrink-0" />
+                <span className="text-sm font-medium text-slate-900">
+                  {user.isVerified ? 'Verified' : 'Unverified'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Profile Details (student only, editable) ─────────── */}
+      {isStudent && (
+        <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '150ms' }}>
+          <CardHeader className="border-b border-slate-100">
+            <SectionHeader
+              icon={User}
+              title="Academic Details"
+              subtitle="Visible to alumni and professors"
+              iconBg="bg-primary-50"
+              iconColor="text-primary-600"
+            />
+          </CardHeader>
+          <CardContent className="pt-5">
+            {isEditing ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Branch
+                  </label>
+                  <select
+                    value={branch}
+                    onChange={(e) => setBranch(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Select branch</option>
+                    {BRANCHES.map((b) => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                </div>
+                <Input
+                  id="year"
+                  label="Year"
+                  type="number"
+                  min={1}
+                  max={4}
+                  placeholder="1 – 4"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ReadField
+                  label="Branch"
+                  value={profileData?.branch || '—'}
+                />
+                <ReadField
+                  label="Year"
+                  value={profileData?.year ? `Year ${profileData.year}` : '—'}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
-      {/* ── Quick Stats Row (Dashboard pattern) ────────────── */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {profileStats.map((stat) => (
-          <MiniStat key={stat.label} {...stat} />
-        ))}
-      </div>
+      {/* ── Skills (student only) ────────────────────────────── */}
+      {isStudent && (
+        <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '220ms' }}>
+          <CardHeader className="border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                icon={Cpu}
+                title="Skills"
+                subtitle="Powers your AI-search ranking"
+                iconBg="bg-violet-50"
+                iconColor="text-violet-600"
+              />
+              {skills.length > 0 && (
+                <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-100">
+                  {skills.length} skill{skills.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="pt-5">
+            {skills.length === 0 && !isEditing && (
+              <p className="text-sm text-slate-400 py-4 text-center italic">
+                No skills listed. Click "Edit Profile" to add some.
+              </p>
+            )}
 
-      {/* ── Main Content Grid ──────────────────────────────── */}
-      <div className="grid gap-6 lg:grid-cols-3">
-
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
-
-          {/* Account Details Card */}
-          <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '300ms' }}>
-            <CardHeader className="border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <User size={18} className="text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-base">Account Information</CardTitle>
-                  <p className="text-xs text-slate-500 mt-0.5">Your core identity on SkillSync</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                {/* Email — always static */}
-                <div className="group">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email Address</p>
-                  <p className="text-sm text-slate-900 font-medium bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 transition-colors group-hover:border-slate-200">{user.email}</p>
-                </div>
-                {/* Role — always static */}
-                <div className="group">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Role</p>
-                  <p className="text-sm text-slate-900 font-medium bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 capitalize transition-colors group-hover:border-slate-200">{user.role}</p>
-                </div>
-
-                {/* Branch & Year — editable for students */}
-                {user.role === 'student' && (
-                  <>
-                    {isEditing ? (
-                      <>
-                        <div>
-                          <Input id="branch" label="Branch" placeholder="e.g. CSE" value={branch} onChange={(e) => setBranch(e.target.value)} />
-                        </div>
-                        <div>
-                          <Input id="year" label="Year" type="number" min="1" max="5" placeholder="e.g. 3" value={year} onChange={(e) => setYear(e.target.value)} />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="group">
-                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Branch</p>
-                          <p className="text-sm text-slate-900 font-medium bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 transition-colors group-hover:border-slate-200">
-                            {profileData?.branch || <span className="text-slate-400 italic">Not specified</span>}
-                          </p>
-                        </div>
-                        <div className="group">
-                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Year</p>
-                          <p className="text-sm text-slate-900 font-medium bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100 transition-colors group-hover:border-slate-200">
-                            {profileData?.year || <span className="text-slate-400 italic">Not specified</span>}
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Skills Card */}
-          {user.role === 'student' && (
-            <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '400ms' }}>
-              <CardHeader className="border-b border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-violet-100 flex items-center justify-center">
-                      <Cpu size={18} className="text-violet-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">Skills Pipeline</CardTitle>
-                      <p className="text-xs text-slate-500 mt-0.5">Boosts your semantic search ranking</p>
-                    </div>
-                  </div>
-                  {skills.length > 0 && (
-                    <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-100">
-                      {skills.length} skill{skills.length !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {/* Skill chips */}
-                <div className="flex flex-wrap gap-2">
-                  {skills.length === 0 && !isEditing && (
-                    <div className="w-full text-center py-8">
-                      <Sparkles className="mx-auto h-8 w-8 text-slate-300 mb-3" />
-                      <p className="text-sm text-slate-400">No skills listed yet.</p>
-                      <p className="text-xs text-slate-400 mt-1">Click "Edit Profile" or upload a resume to get started.</p>
-                    </div>
-                  )}
-                  {skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                        isEditing
-                          ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
-                          : 'bg-slate-100 text-slate-700 border border-transparent hover:bg-slate-200'
-                      }`}
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <span
+                  key={skill}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
+                    isEditing
+                      ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
+                      : 'bg-slate-100 text-slate-700'
+                  }`}
+                >
+                  {skill}
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => removeSkill(skill)}
+                      className="h-4 w-4 rounded-full flex items-center justify-center text-violet-400 hover:text-white hover:bg-violet-500 transition-all"
                     >
-                      {skill}
-                      {isEditing && (
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="ml-0.5 h-4 w-4 rounded-full flex items-center justify-center text-violet-400 hover:text-white hover:bg-violet-500 transition-all duration-200"
-                        >
-                          <X size={12} />
-                        </button>
-                      )}
-                    </span>
-                  ))}
+                      <X size={11} />
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+
+            {isEditing && (
+              <div className="mt-4 pt-4 border-t border-slate-100">
+                <Input
+                  label="Add a skill"
+                  placeholder="Type and press Enter (e.g. PyTorch)"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={addSkill}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Resume (student only) ───────────────────────────── */}
+      {isStudent && (
+        <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '290ms' }}>
+          <CardHeader className="border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                icon={FileText}
+                title="Resume"
+                subtitle="Upload a PDF — AI will index it automatically"
+                iconBg="bg-emerald-50"
+                iconColor="text-emerald-600"
+              />
+              <EmbeddingBadge />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-5 space-y-4">
+
+            {/* Processing state */}
+            {(profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') ? (
+              <div className="flex flex-col items-center py-8 text-center">
+                <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
+                  <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
                 </div>
-
-                {isEditing && (
-                  <div className="mt-6 pt-5 border-t border-slate-100">
-                    <Input
-                      label="Add a skill"
-                      placeholder="Type a skill and press Enter (e.g., PyTorch)"
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      onKeyDown={addSkill}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-
-          {/* Resume Brain Card */}
-          {user.role === 'student' && (
-            <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '350ms' }}>
-              <CardHeader className="border-b border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <FileText size={18} className="text-emerald-600" />
-                    </div>
-                    <CardTitle className="text-base">Resume Brain</CardTitle>
-                  </div>
-                  {/* Status badge */}
-                  {profileData?.embeddingStatus === 'indexed' && (
-                    <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-green-200">
-                      <CheckCircle2 size={12} /> Indexed
-                    </span>
-                  )}
-                  {(profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') && (
-                    <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-amber-200">
-                      <Loader2 size={12} className="animate-spin" /> Processing
-                    </span>
-                  )}
-                  {profileData?.embeddingStatus === 'failed' && (
-                    <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full border border-red-200">
-                      <AlertTriangle size={12} /> Failed
-                    </span>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {/* Processing state */}
-                {(profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') ? (
-                  <div className="text-center py-8">
-                    <div className="h-16 w-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                      <Cpu size={28} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
-                    </div>
-                    <h3 className="text-sm font-semibold text-slate-900">AI is analyzing your resume</h3>
-                    <p className="mt-1 text-xs text-slate-500 max-w-[200px] mx-auto">Extracting structure, LaTeX paths, and technical depth.</p>
+                <p className="text-sm font-semibold text-slate-900">AI is analyzing your resume</p>
+                <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                  Extracting technical skills, experience, and structure. This takes a moment.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Current resume status */}
+                {profileData?.resumeStorageKey ? (
+                  <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                    <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                    <p className="text-sm text-emerald-800 font-medium">Resume active and indexed</p>
                   </div>
                 ) : (
-                  <>
-                    {/* Active resume indicator */}
-                    {profileData?.resumeStorageKey ? (
-                      <div className="mb-5 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
-                        <CheckCircle2 className="mx-auto h-7 w-7 text-green-500 mb-2" />
-                        <h4 className="text-sm font-semibold text-green-900">Resume is active</h4>
-                        <p className="text-xs text-green-700 mt-1 flex items-center justify-center gap-1">
-                          <ArrowUpRight size={12} /> Optimized for Semantic AI Search
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="mb-5 p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
-                        <FileText className="mx-auto h-7 w-7 text-slate-300 mb-2" />
-                        <h4 className="text-sm font-semibold text-slate-700">No Resume Found</h4>
-                        <p className="text-xs text-slate-500 mt-1">Upload a PDF to enable Semantic Matches.</p>
-                      </div>
-                    )}
-
-                    {/* Upload zone with drag-and-drop */}
-                    <div
-                      className={`border-2 border-dashed rounded-xl px-4 py-8 text-center transition-all duration-200 cursor-pointer ${
-                        isDragging
-                          ? 'border-primary-400 bg-primary-50/50'
-                          : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <UploadCloud className={`mx-auto h-8 w-8 mb-3 transition-colors ${isDragging ? 'text-primary-500' : 'text-slate-400'}`} />
-                      <p className="text-sm font-medium text-slate-700">
-                        {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">PDF only · LaTeX supported · Max 5MB</p>
-                      <input type="file" className="sr-only" accept=".pdf" ref={fileInputRef} onChange={handleFileChange} />
-                    </div>
-
-                    {/* Selected file bar */}
-                    {selectedFile && (
-                      <div className="mt-4 flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm animate-fade-in-up">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <FileText size={16} className="text-primary-500 shrink-0" />
-                          <span className="text-sm font-medium text-slate-700 truncate">{selectedFile.name}</span>
-                        </div>
-                        <Button size="sm" onClick={(e) => { e.stopPropagation(); handleUpload(); }} isLoading={isUploading} className="shrink-0 ml-3">
-                          Upload
-                        </Button>
-                      </div>
-                    )}
-
-                    {/* Upload feedback */}
-                    {uploadMessage && (
-                      <div className={`mt-3 text-sm p-3 rounded-lg border flex items-center gap-2 animate-fade-in-up ${
-                        uploadMessage.type === 'success' ? 'text-green-700 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200'
-                      }`}>
-                        {uploadMessage.type === 'success' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
-                        {uploadMessage.text}
-                      </div>
-                    )}
-                  </>
+                  <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                    <FileText size={15} className="text-slate-400 shrink-0" />
+                    <p className="text-sm text-slate-600">No resume uploaded yet</p>
+                  </div>
                 )}
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Danger Zone */}
-          <Card className="animate-fade-in-up border-red-100 overflow-hidden" style={{ animationDelay: '500ms' }}>
-            <CardHeader className="border-b border-red-100">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-red-100 flex items-center justify-center">
-                  <Trash2 size={18} className="text-red-600" />
+                {/* Drop zone */}
+                <div
+                  className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${
+                    isDragging
+                      ? 'border-primary-400 bg-primary-50/50'
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <UploadCloud
+                    className={`mx-auto h-7 w-7 mb-2 transition-colors ${isDragging ? 'text-primary-500' : 'text-slate-400'}`}
+                  />
+                  <p className="text-sm font-medium text-slate-700">
+                    {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">PDF only · Max 5 MB</p>
+                  <input
+                    type="file"
+                    className="sr-only"
+                    accept=".pdf"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
                 </div>
-                <div>
-                  <CardTitle className="text-base text-red-800">Danger Zone</CardTitle>
-                  <p className="text-xs text-red-400 mt-0.5">Irreversible actions</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                Deactivate your account to temporarily hide your profile from search results and recruiters.
-              </p>
-              {!showDeleteConfirm ? (
-                <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(true)} className="w-full border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300">
-                  <Trash2 size={14} className="mr-2" /> Deactivate Profile
-                </Button>
-              ) : (
-                <div className="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200 animate-fade-in-up">
-                  <p className="text-sm font-medium text-red-800">Are you sure? This will hide your profile.</p>
-                  <div className="flex gap-2">
-                    <Button variant="danger" size="sm" onClick={handleSoftDelete} isLoading={isDeleting} className="flex-1">
-                      Yes, Deactivate
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting} className="flex-1">
-                      Cancel
+
+                {/* Selected file */}
+                {selectedFile && (
+                  <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText size={15} className="text-primary-500 shrink-0" />
+                      <span className="text-sm font-medium text-slate-700 truncate">{selectedFile.name}</span>
+                    </div>
+                    <Button
+                      size="sm"
+                      isLoading={isUploading}
+                      onClick={(e) => { e.stopPropagation(); handleUpload(); }}
+                      className="ml-3 shrink-0"
+                    >
+                      Upload
                     </Button>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+                )}
+
+                {uploadMsg && <FeedbackBanner {...uploadMsg} />}
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Danger Zone ─────────────────────────────────────── */}
+      <Card className="animate-fade-in-up border-red-100 overflow-hidden" style={{ animationDelay: '360ms' }}>
+        <CardHeader className="border-b border-red-100">
+          <SectionHeader
+            icon={Trash2}
+            title="Danger Zone"
+            subtitle="This action hides your profile from all searches"
+            iconBg="bg-red-50"
+            iconColor="text-red-600"
+          />
+        </CardHeader>
+        <CardContent className="pt-5">
+          {!showDeleteConfirm ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDeleteConfirm(true)}
+              className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+            >
+              <Trash2 size={14} className="mr-2" />
+              Deactivate Account
+            </Button>
+          ) : (
+            <div className="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200 animate-fade-in">
+              <p className="text-sm font-medium text-red-800">
+                Are you sure? Your profile will be hidden from the network immediately.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={handleDeactivate}
+                  isLoading={isDeleting}
+                  className="flex-1"
+                >
+                  Yes, Deactivate
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
     </div>
   );
 };

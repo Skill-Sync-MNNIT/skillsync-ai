@@ -3,6 +3,8 @@ import PrivateRoute from './components/PrivateRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Verify } from './pages/Verify';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { HomeLayout } from './layouts/HomeLayout';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
 import { MyProfile } from './pages/MyProfile';
@@ -19,7 +21,7 @@ const NotFound = () => (
     <h1 className="text-8xl font-black text-slate-200">404</h1>
     <h2 className="mt-4 text-2xl font-bold text-slate-900">Page Not Found</h2>
     <p className="mt-2 text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
-    <a href="/dashboard" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Dashboard</a>
+    <a href="/" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Home</a>
   </div>
 );
 
@@ -28,11 +30,16 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen font-sans bg-slate-50 text-slate-900">
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/auth/login" replace />} />
+          {/* Public: AI Search Home Page */}
+          <Route element={<HomeLayout />}>
+            <Route path="/" element={<Search />} />
+          </Route>
+
+          {/* Auth Routes */}
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/verify-otp" element={<Verify />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected Routes */}
           <Route element={<PrivateRoute />}>
@@ -51,7 +58,7 @@ function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>
