@@ -45,22 +45,6 @@ const userSchema = new mongoose.Schema(
       default: 0,
     },
 
-    skillPreferences: [
-      {
-        type: String,
-      },
-    ],
-
-    otpHash: {
-      type: String,
-      default: null,
-    },
-
-    otpExpiresAt: {
-      type: Date,
-      default: null,
-    },
-
     refreshToken: {
       type: String,
       default: null,
@@ -70,8 +54,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-userSchema.index({ otpExpiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const User = mongoose.model('User', userSchema);
 
