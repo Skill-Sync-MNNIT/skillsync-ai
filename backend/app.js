@@ -4,11 +4,12 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 
-// import errorHandler from "./src/middleware/errorHandler";
+import errorHandler from './src/middleware/errorHandler.js';
 import authRoutes from './src/routes/auth.routes.js';
 import dashboardRoutes from './src/routes/protected.routes.js';
 import profileRoutes from './src/routes/profile.routes.js';
 import internalRoutes from './src/routes/internal.routes.js';
+import searchRoutes from './src/routes/search.routes.js';
 
 const app = express();
 
@@ -21,8 +22,6 @@ app.use(
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
-
-// app.use(errorHandler);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -39,6 +38,8 @@ app.use('/profile', profileRoutes);
 
 app.use('/internal', internalRoutes);
 
+app.use('/search', searchRoutes);
+
 app.get('/', (req, res) => {
   res.send('SkillSync Backend Running');
 });
@@ -46,5 +47,7 @@ app.get('/', (req, res) => {
 app.all('/{*any}', (req, res) => {
   res.status(404).send('Page Not Found');
 });
+
+app.use(errorHandler);
 
 export default app;

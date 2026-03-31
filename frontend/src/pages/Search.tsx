@@ -9,14 +9,15 @@ import { Button } from '../components/ui/Button';
 import { AuthModal } from '../components/AuthModal';
 import { useAuthStore } from '../store/authStore';
 import { profileService } from '../services/profileService';
+import { searchService } from '../services/searchService';
 
 // ─── Types ──────────────────────────────────────────────────
 interface SearchResult {
   userId: string;
   name: string;
   email: string;
-  branch: string;
-  year: number;
+  branch: string | null;
+  year: number | null;
   matchScore: number;
   explanation: string;
   matchedSkills: string[];
@@ -31,32 +32,6 @@ const getScoreColor = (score: number) => {
   return { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200', bar: 'bg-slate-400', label: 'Low Match' };
 };
 
-// ─── Mock data ──────────────────────────────────────────────
-const MOCK_RESULTS: SearchResult[] = [
-  {
-    userId: 'mock-1', name: 'Priya Sharma', email: 'priya@mnnit.ac.in', branch: 'CSE', year: 3, matchScore: 96,
-    explanation: 'Exceptional match — strong React, Node.js, and TypeScript proficiency with enterprise internship experience at a top-tier firm.',
-    matchedSkills: ['React', 'Node.js', 'TypeScript', 'MongoDB', 'Docker'],
-    detailedReasoning: 'This candidate\'s resume shows 2 full-stack projects using the exact tech stack requested. Their internship at TechCorp involved building a React dashboard with Node.js microservices. Resume embedding similarity: 0.96.',
-  },
-  {
-    userId: 'mock-2', name: 'Arjun Patel', email: 'arjun@mnnit.ac.in', branch: 'IT', year: 4, matchScore: 84,
-    explanation: 'Strong frontend expertise with React and emerging full-stack capabilities. Open-source contributor with solid problem-solving skills.',
-    matchedSkills: ['React', 'JavaScript', 'Tailwind CSS', 'Git'],
-    detailedReasoning: 'Candidate has 3 open-source React projects with significant GitHub activity. While backend experience is limited to academic projects, their frontend depth and rapid learning trajectory make them a strong fit. Resume embedding similarity: 0.84.',
-  },
-  {
-    userId: 'mock-3', name: 'Neha Gupta', email: 'neha@mnnit.ac.in', branch: 'ECE', year: 3, matchScore: 71,
-    explanation: 'Cross-disciplinary candidate with Python ML background transitioning into web development. Shows strong analytical skills.',
-    matchedSkills: ['Python', 'Machine Learning', 'JavaScript'],
-    detailedReasoning: 'While primarily focused on ML/AI, this candidate has recently completed a full-stack web course and built a Flask + React prototype. Their ML expertise could add unique value to data-intensive applications. Resume embedding similarity: 0.71.',
-  },
-  {
-    userId: 'mock-4', name: 'Rahul Verma', email: 'rahul@mnnit.ac.in', branch: 'CSE', year: 2, matchScore: 52,
-    explanation: 'Early-career student with foundational web knowledge. Shows enthusiasm through hackathon participation.',
-    matchedSkills: ['HTML/CSS', 'JavaScript'],
-  },
-];
 
 const SUGGESTION_CHIPS = [
   'React developer with Node.js',
@@ -261,11 +236,11 @@ export const Search = () => {
     setHasSearched(true);
     setSubmittedQuery(searchQuery);
     try {
-      // Mock — swap with real API when /search endpoint is ready
-      await new Promise((resolve) => setTimeout(resolve, 1800));
-      setResults([...MOCK_RESULTS]);
+      const data = await searchService.search({ query: searchQuery });
+      setResults(data);
     } catch (error) {
       console.error('Search failed:', error);
+      setResults([]);
     } finally {
       setIsLoading(false);
     }
