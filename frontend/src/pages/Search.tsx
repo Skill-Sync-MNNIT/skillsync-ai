@@ -228,6 +228,7 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
 
 // ─── Main Search Component ──────────────────────────────────
 export const Search = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   const [query, setQuery] = useState('');
@@ -274,9 +275,9 @@ export const Search = () => {
     e?.preventDefault();
     if (!query.trim()) return;
 
-    // Auth gate: if not authenticated, show modal
+    // Auth gate: if not authenticated, redirect to login
     if (!isAuthenticated()) {
-      setShowAuthModal(true);
+      navigate(`/auth/login?q=${encodeURIComponent(query.trim())}`);
       return;
     }
 
