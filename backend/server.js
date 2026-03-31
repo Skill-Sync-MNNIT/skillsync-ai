@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import app from './app.js';
 import connectDB from './src/config/db.js';
-import './src/workers/embedding.worker.js';
 import { initFacultyScraperJob } from './src/jobs/facultyScraperJob.js';
 
 await connectDB();
