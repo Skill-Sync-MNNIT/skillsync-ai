@@ -4,8 +4,10 @@ export interface StudentProfileData {
   _id?: string;
   userId: string;
   name?: string;
+  course?: string;
   branch?: string;
   year?: number;
+  cpi?: number;
   skills?: string[];
   embeddingStatus?: 'pending' | 'processing' | 'indexed' | 'failed';
   resumeStorageKey?: string;
@@ -25,8 +27,10 @@ export const profileService = {
    */
   updateProfile: async (data: {
     name?: string;
+    course?: string;
     branch?: string;
     year?: number;
+    cpi?: number;
     skills?: string[];
   }) => {
     const response = await api.put('/profile', data);

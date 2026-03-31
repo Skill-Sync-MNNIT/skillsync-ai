@@ -185,12 +185,6 @@ export const Dashboard = () => {
                 </Button>
               </Link>
             )}
-            <Link to="/profile">
-              <Button variant="outline" size="md" className="border-white/30 text-white hover:bg-white/10">
-                <Users size={15} className="mr-2" />
-                My Profile
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

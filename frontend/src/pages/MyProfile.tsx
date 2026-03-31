@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import {
   UploadCloud, X, AlertTriangle, Edit2, Loader2, CheckCircle2,
-  FileText, Trash2, Cpu, Save, XCircle, User, Shield, Mail,
+  FileText, Trash2, Cpu, Save, XCircle, User, Shield,
   AtSign,
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
@@ -41,11 +41,10 @@ const ProfileSkeleton = () => (
 // ─── Inline feedback banner ─────────────────────────────────
 const FeedbackBanner = ({ type, text }: { type: 'success' | 'error'; text: string }) => (
   <div
-    className={`flex items-center gap-2 text-sm p-3 rounded-lg border animate-fade-in ${
-      type === 'success'
+    className={`flex items-center gap-2 text-sm p-3 rounded-lg border animate-fade-in ${type === 'success'
         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
         : 'bg-red-50 text-red-700 border-red-200'
-    }`}
+      }`}
   >
     {type === 'success' ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
     <span>{text}</span>
@@ -96,8 +95,10 @@ const SectionHeader = ({
   </div>
 );
 
-// ─── Branch options (mirrors backend enum) ──────────────────
-const BRANCHES = ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT'] as const;
+// ─── Constants ──────────────────────────────────────────────
+const BRANCHES = ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT', 'NA'] as const;
+const COURSES = ['B.Tech', 'M.Tech', 'MCA'] as const;
+
 
 // ─── Main Component ─────────────────────────────────────────
 export const MyProfile = () => {
@@ -111,8 +112,10 @@ export const MyProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState('');
-  const [branch, setBranch] = useState('');
+  const [course, setCourse] = useState('B.Tech');
+  const [branch, setBranch] = useState('CSE');
   const [year, setYear] = useState('');
+  const [cpi, setCpi] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
 
@@ -142,9 +145,12 @@ export const MyProfile = () => {
 
   // ─── Sync edit fields from loaded data ──────────────────
   const syncEditFields = (data: StudentProfileData) => {
-    setName(data.name || user?.name || '');
-    setBranch(data.branch || '');
+    // Falls back to existing name -> auth name -> email prefix
+    setName(data.name || user?.name || user?.email.split('@')[0] || '');
+    setCourse(data.course || 'B.Tech');
+    setBranch(data.branch || 'CSE');
     setYear(data.year ? String(data.year) : '');
+    setCpi(data.cpi ? String(data.cpi) : '');
     setSkills(data.skills || []);
   };
 
@@ -199,8 +205,10 @@ export const MyProfile = () => {
     };
 
     if (isStudent) {
-      if (branch) payload.branch = branch.toUpperCase();
+      if (course) payload.course = course;
+      if (branch) payload.branch = branch.toUpperCase() as any;
       if (year) payload.year = parseInt(year, 10);
+      if (cpi) payload.cpi = parseFloat(cpi);
       payload.skills = skills;
     }
 
@@ -323,20 +331,17 @@ export const MyProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5 pb-12">
+    <div className="max-w-2xl mx-auto space-y-5 pt-0 pb-12 px-4 sm:px-0">
 
       {/* ── Page header ─────────────────────────────────────── */}
-      <div className="flex items-start justify-between gap-4 animate-fade-in-up">
-        <div>
-          <p className="text-xs font-semibold text-primary-600 uppercase tracking-wider mb-1">
+      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 pb-5 mb-2">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <User size={20} className="text-blue-600" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-blue-700 uppercase">
             My Profile
-          </p>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            {displayName}
           </h1>
-          <p className="mt-1 text-sm text-slate-500 capitalize">
-            {user.role} · {user.email}
-          </p>
         </div>
 
         {/* ── Universal edit/save controls ─────────────────── */}
@@ -361,7 +366,7 @@ export const MyProfile = () => {
       {/* Save feedback */}
       {saveMsg && <FeedbackBanner {...saveMsg} />}
 
-      {/* ── Account Information (always read-only) ───────────── */}
+      {/* ── Account Information (Name is editable) ───────────── */}
       <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '60ms' }}>
         <CardHeader className="border-b border-slate-100">
           <SectionHeader
@@ -369,11 +374,32 @@ export const MyProfile = () => {
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
             title="Account Information"
-            subtitle="Managed by SkillSync — cannot be edited"
+            subtitle={isEditing ? 'Update your name and account details' : 'Verified account identity and status'}
           />
         </CardHeader>
         <CardContent className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Name is editable here for ALL roles */}
+            {isEditing ? (
+              <div className="col-span-1">
+                <Input
+                  id="profile-name"
+                  label="Full Name"
+                  placeholder="e.g. Aditya Sharma"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
+                  error={nameError}
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <ReadField
+                label="Full Name"
+                value={displayName}
+                icon={User}
+              />
+            )}
+
             <ReadField
               label="Email Address"
               value={user.email}
@@ -393,57 +419,34 @@ export const MyProfile = () => {
         </CardContent>
       </Card>
 
-      {/* ── Profile Details (editable) ───────────────────────── */}
-      <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '120ms' }}>
-        <CardHeader className="border-b border-slate-100">
-          <SectionHeader
-            icon={User}
-            iconBg="bg-primary-50"
-            iconColor="text-primary-600"
-            title="Profile Details"
-            subtitle={isEditing ? 'Editing — changes save when you click Save' : 'Click "Edit Profile" to make changes'}
-          />
-        </CardHeader>
-        <CardContent className="pt-5 space-y-4">
-
-          {/* Name — ALL roles */}
-          {isEditing ? (
-            <div>
-              <Input
-                id="profile-name"
-                label="Full Name"
-                placeholder="e.g. Aditya Sharma"
-                value={name}
-                onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
-                error={nameError}
-                autoFocus
-              />
-            </div>
-          ) : (
-            <ReadField
-              label="Full Name"
-              value={displayName}
-              icon={User}
+      {/* ── Profile Details (Students only) ───────────────────────── */}
+      {isStudent && (
+        <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '120ms' }}>
+          <CardHeader className="border-b border-slate-100">
+            <SectionHeader
+              icon={FileText}
+              iconBg="bg-primary-50"
+              iconColor="text-primary-600"
+              title="Academic Details"
+              subtitle={isEditing ? 'Editing — changes save when you click Save' : 'Branch, Year and academic information'}
             />
-          )}
-
-          {/* Branch + Year — students only */}
-          {isStudent && (
+          </CardHeader>
+          <CardContent className="pt-5 space-y-4">
+            {/* Academic fields — reordered: Course, Year, Branch, CPI */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {isEditing ? (
                 <>
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                      Branch
+                      Course
                     </label>
                     <select
-                      value={branch}
-                      onChange={(e) => setBranch(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                      value={course}
+                      onChange={(e) => setCourse(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-medium text-slate-700"
                     >
-                      <option value="">Select branch</option>
-                      {BRANCHES.map((b) => (
-                        <option key={b} value={b}>{b}</option>
+                      {COURSES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
                   </div>
@@ -457,20 +460,47 @@ export const MyProfile = () => {
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
                   />
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Branch
+                    </label>
+                    <select
+                      value={branch}
+                      onChange={(e) => setBranch(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-medium text-slate-700"
+                    >
+                      {BRANCHES.map((b) => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <Input
+                    id="profile-cpi"
+                    label="CPI (0 - 10.0)"
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    max={10}
+                    placeholder="e.g. 8.5"
+                    value={cpi}
+                    onChange={(e) => setCpi(e.target.value)}
+                  />
                 </>
               ) : (
                 <>
-                  <ReadField label="Branch" value={profileData?.branch || '—'} />
+                  <ReadField label="Course" value={profileData?.course || '—'} />
                   <ReadField
                     label="Year"
-                    value={profileData?.year ? `Year ${profileData.year}` : '—'}
+                    value={profileData?.year ? String(profileData.year) : '—'}
                   />
+                  <ReadField label="Branch" value={profileData?.branch || 'NA'} />
+                  <ReadField label="CPI" value={profileData?.cpi ? String(profileData.cpi) : '—'} />
                 </>
               )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* ── Skills (students only) ────────────────────────────── */}
       {isStudent && (
@@ -491,7 +521,7 @@ export const MyProfile = () => {
               )}
             </div>
           </CardHeader>
-          <CardContent className="pt-5">
+          <CardContent className="pt-5 space-y-4">
 
             {skills.length === 0 && !isEditing && (
               <p className="text-sm text-slate-400 text-center py-4 italic">
@@ -499,15 +529,26 @@ export const MyProfile = () => {
               </p>
             )}
 
+            {isEditing && (
+              <div className="pt-2">
+                <Input
+                  label="Add a skill"
+                  placeholder="Type a skill and press Enter (e.g. PyTorch)"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyDown={addSkill}
+                />
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <span
                   key={skill}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
-                    isEditing
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${isEditing
                       ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
                       : 'bg-slate-100 text-slate-700'
-                  }`}
+                    }`}
                 >
                   {skill}
                   {isEditing && (
@@ -522,18 +563,6 @@ export const MyProfile = () => {
                 </span>
               ))}
             </div>
-
-            {isEditing && (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <Input
-                  label="Add a skill"
-                  placeholder="Type a skill and press Enter (e.g. PyTorch)"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyDown={addSkill}
-                />
-              </div>
-            )}
           </CardContent>
         </Card>
       )}
@@ -581,11 +610,10 @@ export const MyProfile = () => {
 
                 {/* Drop zone */}
                 <div
-                  className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${
-                    isDragging
+                  className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
                       ? 'border-primary-400 bg-primary-50/50'
                       : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
+                    }`}
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={handleDrop}
