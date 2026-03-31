@@ -9,15 +9,28 @@ const studentProfileSchema = new mongoose.Schema(
       unique: true,
     },
 
+    course: {
+      type: String,
+      default: 'B.Tech',
+    },
+
     branch: {
       type: String,
-      enum: ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT'],
+      enum: ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT', 'NA'],
+      default: 'CSE',
     },
 
     year: {
       type: Number,
       min: 1,
       max: 4,
+    },
+
+    cpi: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: null,
     },
 
     skills: [

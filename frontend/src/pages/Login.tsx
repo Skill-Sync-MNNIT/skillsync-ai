@@ -46,10 +46,12 @@ export const Login = () => {
 
     login(user, token);
 
-    // Redirect to original page if coming from auth modal, otherwise dashboard
-    const redirectTo = searchParams.get('redirect') || '/dashboard';
+    // Redirect to home/search by default, or specific redirect if provided
+    const redirectTo = searchParams.get('redirect') || '/';
     const pendingQuery = searchParams.get('q');
-    const finalUrl = pendingQuery ? `${redirectTo}?q=${encodeURIComponent(pendingQuery)}` : redirectTo;
+    
+    // If there's a pending query, always go to home (search page)
+    const finalUrl = pendingQuery ? `/?q=${encodeURIComponent(pendingQuery)}` : redirectTo;
     navigate(finalUrl);
 
   } catch (error: any) {
