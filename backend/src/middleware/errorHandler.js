@@ -1,12 +1,20 @@
-const errorHandler = (err, req, res, next) => {
-  console.error(err);
+const errorHandler = (err, req, res, _next) => {
+  const status = err.status || 500;
+  const message = err.message || 'Internal Server Error';
 
-  res.status(err.status || 500).json({
+  console.error(`[Error] ${req.method} ${req.path} -> ${status}: ${message}`);
+
+  if (process.env.NODE_ENV === 'development') {
+    console.error(err.stack);
+  }
+
+  res.status(status).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-  });
+    message,
 
-  next();
+    // Only show stack trace in development for security
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+  });
 };
 
-module.exports = errorHandler;
+export default errorHandler;
