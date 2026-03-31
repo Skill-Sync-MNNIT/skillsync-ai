@@ -9,11 +9,28 @@ export const updateProfile = async (userId, data) => {
     throw Object.assign(new Error('No valid fields to update'), { status: 400 });
   }
 
-  const profile = await updateProfileByUserId(userId, validated);
-  if (!profile) throw Object.assign(new Error('Profile not found'), { status: 404 });
+  const { name, ...profileFields } = validated;
 
-  // Reactivate user on update if they were soft-deleted
-  await updateUserById(userId, { isActive: true });
+  //update user document
+  const userUpdate = { isActive: true };
+  if (name !== undefined) userUpdate.name = name;
 
-  return profile;
+  const user = await updateUserById(userId, userUpdate);
+  if (!user) throw Object.assign(new Error('User not found'), { status: 404 });
+
+  let profile = null;
+
+  //update student profile if user is student
+  if (user.role === 'student') {
+    profile = await updateProfileByUserId(userId, profileFields);
+  }
+
+  // Return a merged object for the frontend
+  return {
+    ...profile?._doc,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isVerified: user.isVerified,
+  };
 };

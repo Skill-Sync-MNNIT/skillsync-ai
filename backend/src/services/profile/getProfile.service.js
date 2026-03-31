@@ -1,12 +1,19 @@
-import { findProfileByUserId } from '../../repositories/index.js';
+import { findProfileByUserId, findUserById } from '../../repositories/index.js';
 import { userIdParamSchema } from '../../validators/profile.validator.js';
 
 // GET /profile/:userId
 export const getProfile = async (userId) => {
   userIdParamSchema.parse({ userId });
 
-  const profile = await findProfileByUserId(userId);
-  if (!profile) throw Object.assign(new Error('Profile not found'), { status: 404 });
+  const [user, profile] = await Promise.all([findUserById(userId), findProfileByUserId(userId)]);
 
-  return profile;
+  if (!user) throw Object.assign(new Error('User not found'), { status: 404 });
+
+  return {
+    ...profile?._doc,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isVerified: user.isVerified,
+  };
 };
