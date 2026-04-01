@@ -53,3 +53,17 @@ export const sendPasswordResetEmail = async (email, otp, name = 'User') => {
     // throw new Error("Failed to send password reset email");
   }
 };
+
+export const sendEmail = async ({ to, subject, text, html }) => {
+  try {
+    await transporter.sendMail({
+      from: `"SkillSync" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
+      html,
+    });
+  } catch (error) {
+    console.error('Failed to send generic email', error);
+  }
+};

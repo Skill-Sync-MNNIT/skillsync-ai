@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { findUserByEmail, updateRefreshToken } from '../../repositories/index.js';
+import { BanManager } from '../auth/ban.manager.js';
 
 // POST /auth/login
 export const loginService = async (email, password) => {
@@ -10,7 +11,10 @@ export const loginService = async (email, password) => {
 
   if (!user.isVerified) throw new Error('Please verify your email first');
 
-  if (user.isBanned) throw new Error('User banned');
+  const banCheck = await BanManager.checkActiveBan(user._id);
+  if (banCheck.status === 'permanent' || banCheck.status === 'temporary') {
+    throw new Error(`Account Restricted: ${banCheck.message}`);
+  }
 
   const match = await bcrypt.compare(password, user.passwordHash);
 
