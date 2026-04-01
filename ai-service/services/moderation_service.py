@@ -1,5 +1,5 @@
 import json
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import sys
@@ -22,10 +22,10 @@ MODERATION_PROMPT = PromptTemplate.from_template(
 
 class ModerationService:
     def __init__(self):
-        llm = ChatGoogleGenerativeAI(
-            model = settings.llm_model,
-            google_api_key = settings.gemini_api_key,
-            temperature = 0.1,
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
+            api_key=settings.groq_api_key,
+            temperature=0.1,
         )
         self.chain = MODERATION_PROMPT | llm | StrOutputParser()
 
