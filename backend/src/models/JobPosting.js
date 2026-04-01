@@ -54,6 +54,9 @@ const jobPostingSchema = new mongoose.Schema(
   }
 );
 
+jobPostingSchema.index({ status: 1 });
+jobPostingSchema.index({ deadline: 1 });
+
 const JobPosting = mongoose.model('JobPosting', jobPostingSchema);
 
 export default JobPosting;

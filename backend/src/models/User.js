@@ -54,6 +54,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    skillPreferences: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
   },
   {
     timestamps: true,
