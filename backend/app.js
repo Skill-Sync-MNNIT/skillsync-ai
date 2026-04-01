@@ -10,6 +10,9 @@ import dashboardRoutes from './src/routes/protected.routes.js';
 import profileRoutes from './src/routes/profile.routes.js';
 import internalRoutes from './src/routes/internal.routes.js';
 import searchRoutes from './src/routes/search.routes.js';
+import jobRoutes from './src/routes/jobs.routes.js';
+import notificationRoutes from './src/routes/notification.routes.js';
+import settingsRoutes from './src/routes/settings.routes.js';
 
 const app = express();
 
@@ -39,6 +42,9 @@ app.use('/profile', profileRoutes);
 app.use('/internal', internalRoutes);
 
 app.use('/search', searchRoutes);
+app.use('/jobs', jobRoutes);
+app.use('/notifications', notificationRoutes);
+app.use('/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
   res.send('SkillSync Backend Running');
