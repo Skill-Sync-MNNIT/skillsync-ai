@@ -10,9 +10,10 @@ class Settings(BaseSettings):
     pinecone_api_key: str
     pinecone_index: str = "mnnit-student-embeddings"
     embedding_model: str = "gemini-embedding-001"
-    llm_model: str = "gemini-1.5-flash"
+    llm_model: str = "gemini-2.0-flash-lite"
     top_k_results: int = 10
 
+    groq_api_key: str = ""
     backend_url: str = "http://localhost:5000"
     internal_secret: str = ""
     cloudinary_cloud_name: str = ""
