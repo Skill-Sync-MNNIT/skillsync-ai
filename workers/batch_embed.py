@@ -94,8 +94,9 @@ def job()->None:
 
 if __name__=="__main__":
     job()
-    schedule.every().day.at("19:00").do(job) #19:00 utc is 12:30 am IST
-    print("Scheduler running. Ctrl+C to stop")
+    schedule.every(2).hours.do(job)
+
+    print("Scheduler running (every 2h). Ctrl+C to stop")
     while True:
-        schedule.run_pending() 
-        time.sleep(1) 
+        schedule.run_pending()
+        time.sleep(60)
