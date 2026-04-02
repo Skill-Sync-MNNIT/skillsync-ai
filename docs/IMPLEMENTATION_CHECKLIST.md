@@ -10,10 +10,10 @@
 ## Team Assignment Overview
 
 ```
-Dev 1 – Project Lead & Backend Core (Auth, Profile, DB Setup)
-Dev 2 – AI/ML Engineer (Embeddings, Search, Ranking, Analytics)
-Dev 3 – Backend Services (Jobs, Moderation, Notifications)
-Dev 4 – Frontend Engineer (React UI, all pages, integration)
+Dev 1 – Project Lead & Backend Core   Node.js + Express (Auth, Profile, DB, DevOps)
+Dev 2 – AI/ML Engineer                Python + FastAPI + LangChain (Embeddings, Search, Ranking, Analytics)
+Dev 3 – Backend Services              Node.js (Jobs, Moderation orchestration, Notifications)
+Dev 4 – Frontend Engineer             React + Vite (all pages, API integration)
 ```
 
 ---
@@ -27,18 +27,23 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 - [ ] **0.3** Set up monorepo structure:
   ```
   /skillsync-ai
-    /backend       ← Node.js + Express
-    /frontend      ← React
-    /workers       ← Embedding & cron jobs
+    /backend       ← Node.js + Express  (Dev 1, Dev 3)
+    /ai-service    ← Python + FastAPI + LangChain  (Dev 2)
+    /workers       ← Python cron batch jobs  (Dev 2)
+    /frontend      ← React + Vite  (Dev 4)
     /docs          ← SRS.md, SDD.md, this file
   ```
-- [ ] **0.4** Create `.env.example` with all required variables (no real secrets)
-- [ ] **0.5** Set up shared `ESLint` + `Prettier` config and commit hooks (Husky)
-- [ ] **0.6** Create `docker-compose.yml` for local MongoDB + Redis
-- [ ] **0.7** Set up MongoDB Atlas project and invite all team members
-- [ ] **0.8** Set up Pinecone (or Weaviate) account and share API keys securely
-- [ ] **0.9** Create shared Postman workspace and import API collection
-- [ ] **0.10** Schedule daily 15-min standup and weekly integration session
+- [x] **0.4** `.env.example` created with all free-tier variables (no real secrets committed)
+- [ ] **0.5** Set up `ESLint` + `Prettier` for `/backend` and `/frontend`; `ruff` + `black` for `/ai-service`; Husky pre-commit hooks
+- [x] **0.6** `docker-compose.yml` created — runs MongoDB locally + Python AI service; Redis via Upstash (cloud, free)
+- [ ] **0.7** Create **MongoDB Atlas** free M0 cluster → invite all 4 members → copy connection string to `.env`
+- [ ] **0.8** Create **Pinecone** free account → create index `mnnit-student-embeddings` (dim=768, metric=cosine) → share API key
+- [ ] **0.9** Create **Google AI Studio** account → generate free Gemini API key → share with Dev 2
+- [ ] **0.10** Create **Cloudinary** free account → share `cloud_name`, `api_key`, `api_secret` with Dev 1
+- [ ] **0.11** Create **Upstash** free Redis → share REST URL + token with Dev 1 and Dev 3
+- [ ] **0.12** Create **Gmail App Password** for OTP emails → share with Dev 1
+- [ ] **0.13** Create shared Postman workspace and import API collection skeleton
+- [ ] **0.14** Schedule daily 15-min standup + weekly integration session (every Sunday)
 
 ---
 
@@ -66,7 +71,7 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 - [ ] **1.1.4** Configure `app.js` with middleware stack: CORS, Helmet, JSON parser, rate limiter
 - [ ] **1.1.5** Create `server.js` with graceful shutdown handling
 - [ ] **1.1.6** Connect MongoDB with retry logic and connection pooling
-- [ ] **1.1.7** Set up Redis client (Bull queue + cache)
+- [ ] **1.1.7** Set up Upstash Redis client (`@upstash/redis`) for caching; use Bull with Upstash for job queue
 - [ ] **1.1.8** Create global error handler middleware (standardized error envelope)
 - [ ] **1.1.9** Set up Winston/Pino structured logging
 
@@ -96,11 +101,11 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 
 - [ ] **1.3.1** `GET /profile/:userId` – fetch student profile (auth required)
 - [ ] **1.3.2** `PUT /profile` – update branch, year, manual skill edits
-- [ ] **1.3.3** `POST /profile/resume` – accept PDF upload (multer), validate file type + size limit (5MB)
-- [ ] **1.3.4** Upload PDF to S3/Cloud Storage, store key in `StudentProfile.resumeStorageKey`
-- [ ] **1.3.5** On upload: fire embedding job to Bull queue, set `embeddingStatus: 'pending'`
-- [ ] **1.3.6** `GET /profile/resume/:userId` – generate signed URL (15 min TTL), log download
-- [ ] **1.3.7** `DELETE /profile` – soft delete: set `isActive: false`, remove from vector index
+- [ ] **1.3.3** `POST /profile/resume` – accept PDF upload (multer), validate file type + size (max 5MB)
+- [ ] **1.3.4** Upload PDF to **Cloudinary** (free tier), store public URL + public_id in `StudentProfile.resumeStorageKey`
+- [ ] **1.3.5** On upload: call Python AI service `POST /embed` with PDF, set `embeddingStatus: 'pending'`
+- [ ] **1.3.6** `GET /profile/resume/:userId` – generate **Cloudinary signed URL** (15 min TTL), log download
+- [ ] **1.3.7** `DELETE /profile` – soft delete: set `isActive: false`, call Python AI service `DELETE /embed/:userId`
 - [ ] **1.3.8** Write unit tests for ProfileService
 
 ### Sprint 4 – DevOps & Integration Support (Week 3–4)
@@ -115,73 +120,82 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 
 ---
 
-## Dev 2 – AI/ML Engineer: Embeddings, Search, Ranking, Analytics
+## Dev 2 – AI/ML Engineer: Python FastAPI + LangChain
 
-> **Owns:** Embedding pipeline, vector database, semantic search, ranking, skill analytics
+> **Owns:** `/ai-service` (Python), `/workers` (Python cron). Tech: FastAPI, LangChain, Gemini, Pinecone.
 
-### Sprint 1 – Embedding Infrastructure (Week 1–2)
+### Sprint 1 – Python Project Setup (Week 1)
 
-#### Vector DB Setup
-- [ ] **2.1.1** Create Pinecone index: dimension=1536 (OpenAI) or 768 (HuggingFace), metric=cosine
-- [ ] **2.1.2** Define metadata schema for vectors: `{ userId, branch, year, isActive, skills }`
-- [ ] **2.1.3** Implement `VectorRepository` class: `upsert()`, `annSearch()`, `delete()`, `fetchById()`
-- [ ] **2.1.4** Test vector insert + ANN query with dummy data
+- [ ] **2.0.1** Set up Python virtual environment in `/ai-service`: `python -m venv .venv && source .venv/bin/activate`
+- [ ] **2.0.2** Install dependencies from `requirements.txt`: `pip install -r requirements.txt`
+- [ ] **2.0.3** Verify `main.py` FastAPI app runs: `uvicorn main:app --reload` → `GET /health` returns 200
+- [ ] **2.0.4** Create `/ai-service/services/` folder for business logic
+- [ ] **2.0.5** Create `/ai-service/config.py` using `pydantic-settings` to load all env vars
+- [ ] **2.0.6** Test Pinecone connection: init client, list indexes, confirm `mnnit-student-embeddings` exists
+- [ ] **2.0.7** Test Gemini connection: call `text-embedding-004` with a sample string, print vector shape
+- [ ] **2.0.8** Write `pytest` setup with a basic health check test
 
-#### Embedding Service
-- [ ] **2.1.5** Implement `EmbeddingService`:
-  - `generateEmbeddings(textChunks[])` – call OpenAI `text-embedding-3-small` or HuggingFace
-  - `meanPool(vectors[])` – aggregate chunk embeddings into single vector
-  - `upsertToVectorDB(userId, vector, metadata)`
-  - `deleteFromVectorDB(userId)`
-- [ ] **2.1.6** Implement PDF text extraction util: use `pdf-parse` or `pdfjs-dist`
-- [ ] **2.1.7** Implement text chunker: 512-token windows with 50-token overlap
-- [ ] **2.1.8** Implement `SkillExtractor`: regex + LLM prompt to extract normalized skills from text
-- [ ] **2.1.9** Create Bull job processor for embedding queue:
-  - Listens on `embedding-queue`
-  - Runs: extract → chunk → embed → upsert → update `embeddingStatus` in MongoDB
-- [ ] **2.1.10** Write unit tests for EmbeddingService and SkillExtractor
+### Sprint 2 – Embedding Service (Week 1–2)
 
-### Sprint 2 – Midnight Batch Worker (Week 2)
+#### LangChain + Pinecone Setup
+- [ ] **2.1.1** Create Pinecone index: dimension=768 (`text-embedding-004`), metric=cosine
+- [ ] **2.1.2** Define vector metadata schema: `{ user_id, branch, year, is_active, skills[] }`
+- [ ] **2.1.3** Implement `PineconeRepository` in `services/pinecone_repo.py`:
+  - `upsert(user_id, vector, metadata)`
+  - `ann_search(vector, top_k, filter)` → returns `[(id, score, metadata)]`
+  - `delete(user_id)`
+- [ ] **2.1.4** Test upsert + query with 3 dummy vectors
 
-- [ ] **2.2.1** Create cron job runner in `/workers` (node-cron or Bull repeatable job)
-- [ ] **2.2.2** Cron triggers midnight at 00:00 IST
-- [ ] **2.2.3** Batch query: fetch all users with `embeddingStatus: 'pending'` and `isActive: true`
-- [ ] **2.2.4** Re-run embedding pipeline for each (with rate limiting to avoid API throttle)
-- [ ] **2.2.5** Update `embeddingStatus: 'indexed'` and `lastEmbeddingAt` on success
-- [ ] **2.2.6** Retry failed embeddings up to 3 times, mark `'failed'` after exhaustion
-- [ ] **2.2.7** Write worker integration test with mocked Embedding API
+#### PDF Processing + Embeddings
+- [ ] **2.1.5** Implement `EmbeddingService` in `services/embedding_service.py`:
+  - `extract_text(pdf_bytes)` – use **PyMuPDF** (`fitz`) to extract text from PDF
+  - `chunk_text(text)` – use LangChain `RecursiveCharacterTextSplitter` (chunk=512, overlap=50)
+  - `embed_chunks(chunks[])` – use LangChain `GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")`
+  - `mean_pool(vectors[])` – average chunk embeddings into one vector
+  - `process_and_embed(user_id, pdf_bytes)` – orchestrate full pipeline
+  - `delete_from_vector_db(user_id)` – remove user from Pinecone
+- [ ] **2.1.6** Wire up `POST /embed` router to call `EmbeddingService.process_and_embed()`
+- [ ] **2.1.7** Wire up `DELETE /embed/{user_id}` to call `EmbeddingService.delete_from_vector_db()`
+- [ ] **2.1.8** Write pytest unit tests for `extract_text`, `chunk_text`, `embed_chunks`
 
-### Sprint 3 – Search & Ranking (Week 2–3)
+### Sprint 3 – Midnight Batch Worker (Week 2)
 
-- [ ] **2.3.1** Implement `RankingService.search(query, filters)`:
-  - Step 1: Embed the query text
-  - Step 2: ANN lookup top-50 from Vector DB with `isActive: true` filter
-  - Step 3: Apply branch/year metadata filters post-ANN
-  - Step 4: Sort by cosine similarity DESC
-  - Step 5: Take top-10
-  - Step 6: Fetch full profiles from MongoDB for each result
-- [ ] **2.3.2** `POST /search` – wire up controller, apply auth middleware
-- [ ] **2.3.3** Implement Redis query cache: cache query embedding for 5 min (hash query text as key)
-- [ ] **2.3.4** Implement `ExplanationEngine`:
-  - Build prompt from candidate profile + original query
-  - Call LLM API (GPT-4-mini or Gemini Flash)
-  - Parse and return 1–2 line explanation
-- [ ] **2.3.5** Parallelize LLM calls for top-10 results using `Promise.all()`
-- [ ] **2.3.6** `GET /search/:userId/detail` – return matched skills breakdown + explanation
-- [ ] **2.3.7** Enforce end-to-end latency < 2s; add timeout fallback if LLM is slow (skip explanation)
-- [ ] **2.3.8** Write integration tests for search endpoint
+- [ ] **2.2.1** Create `/workers/batch_embed.py` Python cron script
+- [ ] **2.2.2** Script calls Node.js API `GET /internal/pending-embeddings` to get list of user IDs
+- [ ] **2.2.3** For each user: download their Cloudinary PDF URL → run embedding pipeline
+- [ ] **2.2.4** Rate limit: process max 10 users/minute to stay within Gemini free tier
+- [ ] **2.2.5** On success: call Node.js `PATCH /internal/embedding-status` to mark `indexed`
+- [ ] **2.2.6** Retry up to 3 times on failure; mark `failed` after exhaustion
+- [ ] **2.2.7** Schedule with `python-cron` or host cron tab at 00:00 IST
 
-### Sprint 4 – Skill Analytics (Week 3)
+### Sprint 4 – Search & Ranking (Week 2–3)
 
-- [ ] **2.4.1** Create `JobPostings` Mongoose model (coordinate with Dev 3 for schema)
-- [ ] **2.4.2** Create `SkillAnalyticsService.computeTrending()`:
-  - Query all jobs with `createdAt >= 6 months ago`
-  - Aggregate `requiredSkills[]` across all postings
-  - Count skill frequency
-  - Sort and pick top-15 as trending
-- [ ] **2.4.3** `GET /analytics/trending-skills` – call service, cache result in Redis (1 hr TTL)
-- [ ] **2.4.4** Invalidate cache on every new job post (hook into Dev 3's job creation flow)
-- [ ] **2.4.5** Write unit tests for SkillAnalyticsService
+- [ ] **2.3.1** Implement `RankingService` in `services/ranking_service.py`:
+  - `search(query, branch, year, top_k)` pipeline:
+    - Step 1: Embed query → `GoogleGenerativeAIEmbeddings`
+    - Step 2: ANN search Pinecone top-50 with `is_active=True` filter
+    - Step 3: Post-filter by `branch`/`year` metadata
+    - Step 4: Sort by cosine score DESC → take top `top_k`
+    - Step 5: Generate explanations via Gemini Flash (parallel with `asyncio.gather`)
+  - `get_detail(user_id, query)` – detailed matched skills breakdown
+- [ ] **2.3.2** Implement `ExplanationEngine` in `services/explanation_engine.py`:
+  - LangChain `PromptTemplate` + `ChatGoogleGenerativeAI(model="gemini-1.5-flash")`
+  - `StringOutputParser` → returns 1–2 line string
+  - Timeout: if LLM > 1.5s, skip explanation and return empty string
+- [ ] **2.3.3** Wire up `POST /search` and `GET /search/{user_id}/detail` routers
+- [ ] **2.3.4** Write integration tests for search with 5 indexed test vectors
+
+### Sprint 5 – Moderation & Analytics (Week 3)
+
+- [ ] **2.4.1** Implement `ModerationService` in `services/moderation_service.py`:
+  - LangChain chain: `PromptTemplate` → `ChatGoogleGenerativeAI` → `JsonOutputParser`
+  - Returns `{ passed: bool, violation_type: str|None, confidence: float }`
+- [ ] **2.4.2** Wire up `POST /moderate` router
+- [ ] **2.4.3** Implement `AnalyticsService.compute_trending(job_skills[][])` in `services/analytics_service.py`:
+  - Count frequency of each skill across all job lists
+  - Return top-15 sorted by count with `is_trending: bool`
+- [ ] **2.4.4** Wire up `GET /analytics/trending` router
+- [ ] **2.4.5** Write unit tests for moderation and analytics services
 
 ---
 
@@ -211,20 +225,18 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 
 ### Sprint 3 – AI Moderation Module (Week 2)
 
-- [ ] **3.3.1** Create Bull queue processor for `moderation-queue`
-- [ ] **3.3.2** Implement `ModerationService.scanJobPost(content)`:
-  - Build prompt for LLM: check for offensive language, spam, malicious links
-  - Parse LLM JSON response: `{ passed, violationType, confidence }`
-  - Optionally run URL safety check (Google Safe Browsing API)
-- [ ] **3.3.3** Implement `BanManager`:
+- [ ] **3.3.1** After job save: call **Python AI service** `POST /moderate` with `{ job_id, title, description }`
+- [ ] **3.3.2** Handle response `{ passed, violation_type, confidence }` from Python service:
+  - If passed: update job `status: 'active'`, trigger notification engine
+  - If failed: update job `status: 'rejected'`, call `BanManager`
+- [ ] **3.3.3** Implement `BanManager` in Node.js:
   - `applyViolationPolicy(userId)`:
-    - If `violationCount === 0`: set `banUntil = now + 3 days`, increment `violationCount`
-    - If `violationCount >= 1`: set `isBanned = true` (lifetime)
-  - `checkActiveBan(userId)`: returns ban status and remaining ban time
-- [ ] **3.3.4** On moderation pass: update job `status: 'active'`, trigger notification engine
-- [ ] **3.3.5** On moderation fail: update job `status: 'rejected'`, call BanManager, send email to alumni
-- [ ] **3.3.6** Integrate ban check into login and job-post routes (middleware from Dev 1)
-- [ ] **3.3.7** Write unit tests for ModerationService and BanManager
+    - If `violationCount === 0`: set `banUntil = now + 3 days`, `violationCount++`
+    - If `violationCount >= 1`: set `isBanned = true` (lifetime ban)
+  - `checkActiveBan(userId)`: returns ban status + remaining time
+- [ ] **3.3.4** On moderation fail: send email to alumni (Nodemailer + Gmail SMTP)
+- [ ] **3.3.5** Integrate ban check into login and job-post routes (middleware from Dev 1)
+- [ ] **3.3.6** Write unit tests for BanManager (mock the Python AI service call)
 
 ### Sprint 4 – Notification Module (Week 2–3)
 
@@ -404,17 +416,20 @@ Dev 4 – Frontend Engineer (React UI, all pages, integration)
 
 ## Quick Reference: Who Owns What
 
-| Module | Owner | Key Files |
-|--------|-------|-----------|
-| Auth (register, login, JWT) | **Dev 1** | `AuthController`, `AuthService`, `OTPService` |
-| User Profile & Resume Upload | **Dev 1** | `ProfileService`, `ResumeService`, `StorageService` |
-| MongoDB Models & Indexes | **Dev 1** (with Dev 3) | `User`, `StudentProfile`, `DownloadLog` models |
-| Embedding Pipeline & Vector DB | **Dev 2** | `EmbeddingService`, `VectorRepository`, embedding worker |
-| Semantic Search & Ranking | **Dev 2** | `RankingService`, `ExplanationEngine` |
-| Skill Analytics | **Dev 2** | `SkillAnalyticsService` |
-| Job Posting Lifecycle | **Dev 3** | `JobService`, `JobController`, expiry cron |
-| AI Moderation & Ban System | **Dev 3** | `ModerationService`, `BanManager` |
-| Notifications Engine | **Dev 3** | `NotificationEngine`, `NotificationController` |
-| React Frontend (all pages) | **Dev 4** | All `/frontend/src/pages/**` |
-| CI/CD & Deployment | **Dev 1 + Dev 4** | GitHub Actions, Dockerfile |
-| Integration Testing | **All** | `/tests/integration/**` |
+| Module | Owner | Language | Key Files |
+|--------|-------|----------|-----------|
+| Auth (register, login, JWT) | **Dev 1** | Node.js | `AuthController`, `AuthService`, `OTPService` |
+| User Profile & Resume Upload | **Dev 1** | Node.js | `ProfileService`, `ResumeService` (Cloudinary) |
+| MongoDB Models & Indexes | **Dev 1** (with Dev 3) | Node.js | `User`, `StudentProfile`, `DownloadLog` models |
+| Python AI Microservice setup | **Dev 2** | Python | `main.py`, `Dockerfile`, `requirements.txt` |
+| PDF Parsing + Embedding Pipeline | **Dev 2** | Python | `services/embedding_service.py`, PyMuPDF, LangChain |
+| Semantic Search & Ranking | **Dev 2** | Python | `services/ranking_service.py`, `services/explanation_engine.py` |
+| AI Moderation (LLM check) | **Dev 2** | Python | `services/moderation_service.py` |
+| Skill Analytics | **Dev 2** | Python | `services/analytics_service.py` |
+| Midnight Batch Worker | **Dev 2** | Python | `/workers/batch_embed.py` |
+| Job Posting Lifecycle | **Dev 3** | Node.js | `JobService`, `JobController`, expiry cron |
+| Moderation Orchestration & Ban | **Dev 3** | Node.js | `BanManager` (calls Dev 2's Python service) |
+| Notifications Engine | **Dev 3** | Node.js | `NotificationEngine`, `NotificationController` |
+| React Frontend (all pages) | **Dev 4** | React | All `/frontend/src/pages/**` |
+| CI/CD & Deployment | **Dev 1 + Dev 4** | — | GitHub Actions, Dockerfiles |
+| Integration Testing | **All** | — | `/tests/integration/**` |

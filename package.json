@@ -1,0 +1,68 @@
+{
+  "name": "skill-sync-mnnit",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "type": "module",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "nodemon backend/server.js",
+    "start": "node backend/server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Skill-Sync-MNNIT/skillsync-ai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Skill-Sync-MNNIT/skillsync-ai/issues"
+  },
+  "homepage": "https://github.com/Skill-Sync-MNNIT/skillsync-ai#readme",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "globals": "^17.4.0",
+    "husky": "^9.1.7",
+    "jest": "^30.3.0",
+    "lint-staged": "^16.3.2",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.1"
+  },
+  "lint-staged": {
+    "backend/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "frontend/**/*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bullmq": "^5.71.0",
+    "cheerio": "^1.2.0",
+    "cloudinary": "^2.9.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.10.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.0",
+    "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.2",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  }
+}
