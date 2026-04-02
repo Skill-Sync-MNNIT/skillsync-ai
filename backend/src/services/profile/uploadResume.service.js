@@ -29,23 +29,21 @@ export const uploadResume = async (userId, fileBuffer) => {
   const profile = await setResumeStorageKey(userId, uploadResult.public_id);
   if (!profile) throw Object.assign(new Error('Profile not found'), { status: 404 });
 
-  // Fire embedding job (call Python AI service)
+  // Fire embedding job immediately (fire-and-forget)
   try {
     const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
-    await fetch(`${aiServiceUrl}/embed`, {
+    fetch(`${aiServiceUrl}/embed/from-key`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: userId,
-        pdf_url: uploadResult.secure_url,
+        user_id: userId.toString(),
+        storage_key: uploadResult.public_id,
       }),
-    });
-  } catch (err) {
-    // AI service might not be running – that's OK, batch worker will pick it up
-    console.warn(
-      'AI embedding service call failed (will be retried by batch worker):',
-      err.message
+    }).catch((err) =>
+      console.warn('AI embedding service call failed (batch worker will retry):', err.message)
     );
+  } catch (err) {
+    console.warn('AI embedding service call failed (batch worker will retry):', err.message);
   }
 
   return {
