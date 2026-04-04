@@ -21,6 +21,13 @@ class ExplanationEngine:
             api_key=settings.groq_api_key,
             temperature=0.3,
         )
+        if getattr(settings, "groq_api_key_2", ""):
+            f_llm = ChatGroq(
+                model="llama-3.3-70b-versatile",
+                api_key=settings.groq_api_key_2,
+                temperature=0.3,
+            )
+            llm = llm.with_fallbacks([f_llm])
         self.chain=PROMPT | llm | StrOutputParser()
 
     async def explain(self, query: str, skills: list[str]) -> str:
