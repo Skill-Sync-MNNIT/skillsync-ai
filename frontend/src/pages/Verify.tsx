@@ -68,15 +68,15 @@ export const Verify = () => {
 };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <ShieldCheck size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Verify Email</h2>
-          <p className="mt-2 text-sm text-slate-600">
-            We sent a 6-digit code to <span className="font-semibold text-slate-900">{email}</span>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Verify Email</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            We sent a 6-digit code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
           </p>
         </div>
 
@@ -107,8 +107,8 @@ export const Verify = () => {
           </div>
           
           <div className="text-sm text-center">
-             <span className="text-slate-600">Entered the wrong email? </span>
-            <Link to="/auth/register" className="font-medium text-primary-600 hover:text-primary-500">
+             <span className="text-slate-600 dark:text-slate-400">Entered the wrong email? </span>
+            <Link to="/auth/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Go back
             </Link>
           </div>

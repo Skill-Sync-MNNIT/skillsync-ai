@@ -66,14 +66,14 @@ export const Login = () => {
 };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <LogIn size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Sign in to SkillSync</h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Sign in to SkillSync</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             Exclusive academic networking for MNNIT
           </p>
         </div>
@@ -101,7 +101,7 @@ export const Login = () => {
           <div className="flex justify-end -mt-1">
             <Link
               to="/auth/forgot-password"
-              className="text-sm text-slate-500 hover:text-primary-600 transition-colors"
+              className="text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               Forgot password?
             </Link>
@@ -124,8 +124,8 @@ export const Login = () => {
           </div>
           
           <div className="text-sm text-center">
-             <span className="text-slate-600">Don't have an account? </span>
-            <Link to="/auth/register" className="font-medium text-primary-600 hover:text-primary-500">
+             <span className="text-slate-600 dark:text-slate-400">Don't have an account? </span>
+            <Link to="/auth/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Register here
             </Link>
           </div>
