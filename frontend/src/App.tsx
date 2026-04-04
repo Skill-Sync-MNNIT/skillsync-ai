@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Player } from '@lottiefiles/react-lottie-player';
 import PrivateRoute from './components/PrivateRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -18,7 +19,14 @@ import { Settings } from './pages/Settings';
 
 const NotFound = () => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center text-center px-4">
-    <h1 className="text-8xl font-black text-slate-200">404</h1>
+    <div className="w-full max-w-sm mb-4 mix-blend-multiply dark:mix-blend-screen opacity-90">
+      <Player
+        autoplay
+        loop
+        src="https://assets3.lottiefiles.com/packages/lf20_suhe7qtm.json"
+        style={{ height: '250px', width: '100%' }}
+      />
+    </div>
     <h2 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">Page Not Found</h2>
     <p className="mt-2 text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
     <a href="/" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Home</a>

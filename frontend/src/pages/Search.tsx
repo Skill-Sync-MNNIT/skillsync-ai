@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Player } from '@lottiefiles/react-lottie-player';
 import {
   Search as SearchIcon, Sparkles, Brain, Zap, GraduationCap,
   Calendar, ChevronDown, ChevronUp, Download, Eye, ArrowRight, RotateCcw,
@@ -44,22 +45,16 @@ const SUGGESTION_CHIPS = [
 
 // ─── Typing Indicator ───────────────────────────────────────
 const TypingIndicator = () => (
-  <div className="flex items-center gap-3 p-5 animate-fade-in">
-    <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-      <Brain size={16} className="text-primary-600" />
+  <div className="flex items-center gap-3 p-5 animate-fade-in bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
+    <div className="h-16 w-16 -ml-4 -my-4 flex items-center justify-center shrink-0">
+      <Player
+        autoplay
+        loop
+        src="https://assets5.lottiefiles.com/packages/lf20_a2chheio.json"
+        style={{ height: '100%', width: '100%' }}
+      />
     </div>
-    <div className="flex items-center gap-2">
-      <div className="flex gap-1">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="h-2 w-2 rounded-full bg-primary-400 animate-typing-dot"
-            style={{ animationDelay: `${i * 200}ms` }}
-          />
-        ))}
-      </div>
-      <span className="text-sm text-slate-400 ml-2">Analyzing profiles…</span>
-    </div>
+    <span className="text-sm font-medium text-primary-700 dark:text-primary-400">AI is hunting for the perfect match...</span>
   </div>
 );
 
@@ -284,7 +279,10 @@ export const Search = () => {
     setQuery(e.target.value);
     const el = e.target;
     el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    const nextHeight = Math.min(el.scrollHeight, 120);
+    el.style.height = nextHeight + 'px';
+    // Only show scrollbar if we hit the max height constraint
+    el.style.overflowY = el.scrollHeight > 120 ? 'auto' : 'hidden';
   };
 
   // ─── IDLE STATE ─────────────────────────────────────────────
@@ -314,8 +312,8 @@ export const Search = () => {
               <div className="relative flex items-end bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg shadow-slate-200/50 dark:shadow-none focus-within:border-primary-300 dark:focus-within:border-primary-500 transition-all duration-300">
                 <textarea
                   ref={inputRef}
-                  className="flex-1 resize-none bg-transparent px-5 py-4 text-base text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none min-h-[56px] max-h-[120px]"
-                  placeholder="Describe the ideal candidate, e.g. 'React developer with backend experience in Node.js'..."
+                  className="flex-1 resize-none overflow-hidden bg-transparent px-5 py-4 text-base text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none min-h-[56px] max-h-[120px] scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700"
+                  placeholder="Describe your ideal candidate (e.g. 'React developer')..."
                   value={query}
                   onChange={handleTextareaInput}
                   onKeyDown={handleKeyDown}
