@@ -19,7 +19,7 @@ import { Settings } from './pages/Settings';
 const NotFound = () => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center text-center px-4">
     <h1 className="text-8xl font-black text-slate-200">404</h1>
-    <h2 className="mt-4 text-2xl font-bold text-slate-900">Page Not Found</h2>
+    <h2 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">Page Not Found</h2>
     <p className="mt-2 text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
     <a href="/" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Home</a>
   </div>
@@ -28,7 +28,7 @@ const NotFound = () => (
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen font-sans bg-slate-50 text-slate-900">
+      <div className="min-h-screen font-sans bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-200">
         <Routes>
           {/* Public: AI Search Home Page */}
           <Route element={<HomeLayout />}>
