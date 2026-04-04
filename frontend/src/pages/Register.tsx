@@ -56,14 +56,14 @@ export const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <UserPlus size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Create Account</h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
             Join the MNNIT academic talent network
           </p>
         </div>
@@ -80,12 +80,12 @@ export const Register = () => {
             />
             
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 I am a...
               </label>
               <select
                 id="role"
-                className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="flex h-10 w-full rounded-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 {...register('role')}
               >
                 <option value="student">Student</option>
@@ -118,8 +118,8 @@ export const Register = () => {
           </div>
           
           <div className="text-sm text-center">
-             <span className="text-slate-600">Already have an account? </span>
-            <Link to="/auth/login" className="font-medium text-primary-600 hover:text-primary-500">
+             <span className="text-slate-600 dark:text-slate-400">Already have an account? </span>
+            <Link to="/auth/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
               Sign In
             </Link>
           </div>

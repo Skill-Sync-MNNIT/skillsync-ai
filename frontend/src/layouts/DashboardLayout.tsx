@@ -3,7 +3,7 @@ import { Navbar } from '../components/Navbar';
 
 export const DashboardLayout = () => {
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-200">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 pb-20">
         <Outlet />

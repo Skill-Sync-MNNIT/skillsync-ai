@@ -589,7 +589,7 @@ export const MyProfile = () => {
                 <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
                   <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
                 </div>
-                <p className="text-sm font-semibold text-slate-900">AI is analyzing your resume</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">AI is analyzing your resume</p>
                 <p className="text-xs text-slate-500 mt-1 max-w-xs">
                   Extracting skills, experience, and structure. This takes a moment.
                 </p>

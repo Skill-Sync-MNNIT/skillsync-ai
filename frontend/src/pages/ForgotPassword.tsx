@@ -50,7 +50,7 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
               flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-all duration-300
               ${currentStep >= step.num
                 ? 'bg-primary-600 text-white shadow-md shadow-primary-200'
-                : 'bg-slate-100 text-slate-400'
+                : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-300'
               }
             `}
           >
@@ -62,7 +62,7 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
           </div>
           <span
             className={`text-xs font-medium transition-colors duration-300 ${
-              currentStep >= step.num ? 'text-primary-600' : 'text-slate-400'
+              currentStep >= step.num ? 'text-primary-600' : 'text-slate-400 dark:text-slate-300'
             }`}
           >
             {step.label}
@@ -70,7 +70,7 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
           {i < steps.length - 1 && (
             <div
               className={`w-8 h-0.5 rounded-full transition-colors duration-500 ${
-                currentStep > step.num ? 'bg-primary-500' : 'bg-slate-200'
+                currentStep > step.num ? 'bg-primary-500' : 'bg-slate-200 dark:bg-slate-600'
               }`}
             />
           )}
@@ -176,7 +176,7 @@ export const ForgotPassword = () => {
       title: 'Enter Verification Code',
       subtitle: (
         <>
-          We sent a 6-digit code to <span className="font-semibold text-slate-900">{email}</span>
+          We sent a 6-digit code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
         </>
       ),
     },
@@ -191,8 +191,8 @@ export const ForgotPassword = () => {
   const current = stepConfig[step];
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-6 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
         
         {/* Step Indicator */}
         <StepIndicator currentStep={step} />
@@ -202,8 +202,8 @@ export const ForgotPassword = () => {
           <div className={`mx-auto h-12 w-12 ${current.iconBg} rounded-full flex items-center justify-center mb-4 shadow-inner`}>
             {current.icon}
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{current.title}</h2>
-          <p className="mt-2 text-sm text-slate-600">{current.subtitle}</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{current.title}</h2>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{current.subtitle}</p>
         </div>
 
         {/* Success banner */}
@@ -259,7 +259,7 @@ export const ForgotPassword = () => {
             <button
               type="button"
               onClick={() => { setStep(1); setApiError(null); setSuccessMessage(null); }}
-              className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 hover:text-primary-600 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               <ArrowLeft size={14} />
               Use a different email
@@ -294,8 +294,8 @@ export const ForgotPassword = () => {
 
         {/* Bottom link */}
         <div className="text-sm text-center pt-2">
-          <span className="text-slate-600">Remember your password? </span>
-          <Link to="/auth/login" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+          <span className="text-slate-600 dark:text-slate-400">Remember your password? </span>
+          <Link to="/auth/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 transition-colors">
             Sign In
           </Link>
         </div>

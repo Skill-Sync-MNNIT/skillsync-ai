@@ -71,8 +71,8 @@ export const JobListing = () => {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Job Board</h1>
-          <p className="mt-1 text-slate-500">Discover exclusive opportunities posted by MNNIT Alumni & Professors.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Job Board</h1>
+          <p className="mt-1 text-slate-500 dark:text-slate-400">Discover exclusive opportunities posted by MNNIT Alumni & Professors.</p>
         </div>
         
         {(user?.role === 'alumni' || user?.role === 'professor') && (
@@ -90,8 +90,8 @@ export const JobListing = () => {
               onClick={() => setActiveTab('all')}
               className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                 activeTab === 'all'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:border-slate-700'
               }`}
             >
               All Active Jobs
@@ -100,8 +100,8 @@ export const JobListing = () => {
               onClick={() => setActiveTab('my-jobs')}
               className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                 activeTab === 'my-jobs'
-                  ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                  : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:border-slate-700'
               }`}
             >
               My Posted Jobs
@@ -113,14 +113,14 @@ export const JobListing = () => {
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map(i => (
-             <div key={i} className="h-48 bg-slate-200 rounded-xl animate-pulse"></div>
+             <div key={i} className="h-48 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse"></div>
           ))}
         </div>
       ) : jobs.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
-           <Briefcase className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-           <h3 className="text-lg font-medium text-slate-900">No jobs found</h3>
-           <p className="mt-1 text-slate-500">
+        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+           <Briefcase className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" />
+           <h3 className="text-lg font-medium text-slate-900 dark:text-white">No jobs found</h3>
+           <p className="mt-1 text-slate-500 dark:text-slate-400">
               {activeTab === 'my-jobs' ? "You haven't posted any jobs yet." : "There are currently no active job postings."}
            </p>
         </div>
@@ -131,28 +131,28 @@ export const JobListing = () => {
               <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
-                     <h3 className="font-bold text-lg text-slate-900 line-clamp-2">{job.title}</h3>
+                     <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2">{job.title}</h3>
                      {activeTab === 'my-jobs' && (
-                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'active' ? 'bg-green-100 text-green-700' : job.status === 'pending_moderation' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : job.status === 'pending_moderation' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
                            {job.status.replace('_', ' ')}
                         </span>
                      )}
                   </div>
-                  <p className="text-sm font-medium text-primary-600 mb-4">{job.postedBy?.name || job.postedBy?.email.split('@')[0]}</p>
+                  <p className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-4">{job.postedBy?.name || job.postedBy?.email.split('@')[0]}</p>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
                     {job.requiredSkills.slice(0, 4).map(skill => (
-                      <span key={skill} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-medium">
+                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
                         {skill}
                       </span>
                     ))}
                     {job.requiredSkills.length > 4 && (
-                       <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
+                       <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
                     )}
                   </div>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <div className="flex items-center">
                     <Calendar size={14} className="mr-1.5" />
                     Due {new Date(job.deadline).toLocaleDateString()}

@@ -59,9 +59,9 @@ const ROLE_CARDS = {
 };
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; text: string; border: string }> = {
-  blue:    { bg: 'bg-blue-50',    iconBg: 'bg-blue-100',    text: 'text-blue-600',    border: 'border-blue-100' },
-  amber:   { bg: 'bg-amber-50',   iconBg: 'bg-amber-100',   text: 'text-amber-600',   border: 'border-amber-100' },
-  emerald: { bg: 'bg-emerald-50', iconBg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-100' },
+  blue:    { bg: 'bg-blue-50 dark:bg-blue-950/50',    iconBg: 'bg-blue-100 dark:bg-blue-900/50',    text: 'text-blue-600 dark:text-blue-400',    border: 'border-blue-100 dark:border-blue-900/30' },
+  amber:   { bg: 'bg-amber-50 dark:bg-amber-950/50',   iconBg: 'bg-amber-100 dark:bg-amber-900/50',   text: 'text-amber-600 dark:text-amber-400',   border: 'border-amber-100 dark:border-amber-900/30' },
+  emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/50', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
 };
 
 // ─── Skeleton ───────────────────────────────────────────────
@@ -120,10 +120,10 @@ const NavCard = ({ label, sublabel, icon: Icon, color, to, delay }: NavCardProps
           <Icon size={20} className={c.text} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-900 group-hover:text-primary-700 transition-colors">{label}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{sublabel}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 group-hover:text-primary-700 transition-colors">{label}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sublabel}</p>
         </div>
-        <ArrowUpRight size={15} className="text-slate-300 group-hover:text-primary-500 transition-colors shrink-0" />
+        <ArrowUpRight size={15} className="text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors shrink-0" />
       </Card>
     </Link>
   );
@@ -198,7 +198,7 @@ export const Dashboard = () => {
 
       {/* ── Trending Skills ───────────────────────────────────── */}
       <Card className="animate-fade-in-up" style={{ animationDelay: '280ms' }}>
-        <CardHeader className="border-b border-slate-100">
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded-md bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
@@ -219,18 +219,18 @@ export const Dashboard = () => {
               <div key={skill.name} className="group">
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                       {skill.name}
                     </span>
                     {skill.badge && (
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${skill.badgeColor}`}>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${skill.badgeColor} dark:bg-opacity-20`}>
                         {skill.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-sm font-bold text-slate-900 tabular-nums">{skill.demand}%</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{skill.demand}%</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${skill.color} animate-progress-fill transition-all duration-300 group-hover:brightness-110`}
                     style={{ width: `${skill.demand}%`, animationDelay: `${400 + i * 80}ms` }}
@@ -240,10 +240,10 @@ export const Dashboard = () => {
             ))}
           </div>
 
-          <div className="mt-6 p-3 rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 border border-slate-100 flex items-start gap-2">
+          <div className="mt-6 p-3 rounded-xl bg-gradient-to-r from-slate-50 dark:from-slate-900 to-blue-50/50 dark:to-blue-900/10 border border-slate-100 dark:border-slate-800 flex items-start gap-2">
             <Lightbulb size={15} className="text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-xs text-slate-600 leading-relaxed">
-              <span className="font-semibold text-slate-700">Tip:</span>{' '}
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Tip:</span>{' '}
               Adding in-demand skills to your{' '}
               <Link to="/profile" className="text-primary-600 hover:underline font-medium">profile</Link>{' '}
               boosts your visibility in AI-powered searches.
@@ -263,19 +263,19 @@ export const Dashboard = () => {
 
       {/* ── "Trending Skills" stat card for context ───────────── */}
       <div className="grid gap-4 sm:grid-cols-3 animate-fade-in-up" style={{ animationDelay: '380ms' }}>
-        <Card className="flex items-center gap-4 p-5 border-violet-100">
-          <div className="h-10 w-10 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
+        <Card className="flex items-center gap-4 p-5 border-violet-100 dark:border-violet-900/30">
+          <div className="h-10 w-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
             <TrendingUp size={18} className="text-violet-600" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-slate-900 tabular-nums">
+            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">
               {TRENDING_SKILLS.length}
             </p>
             <p className="text-xs text-slate-500 mt-0.5">Skills trending now</p>
           </div>
         </Card>
-        <Card className="flex items-center gap-4 p-5 border-blue-100">
-          <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+        <Card className="flex items-center gap-4 p-5 border-blue-100 dark:border-blue-900/30">
+          <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
             <Briefcase size={18} className="text-blue-600" />
           </div>
           <div>
@@ -288,8 +288,8 @@ export const Dashboard = () => {
             </Link>
           </div>
         </Card>
-        <Card className="flex items-center gap-4 p-5 border-emerald-100">
-          <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+        <Card className="flex items-center gap-4 p-5 border-emerald-100 dark:border-emerald-900/30">
+          <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
             <Users size={18} className="text-emerald-600" />
           </div>
           <div>

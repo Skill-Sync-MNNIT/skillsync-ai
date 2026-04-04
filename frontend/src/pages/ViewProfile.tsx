@@ -75,7 +75,7 @@ export const ViewProfile = () => {
             <User size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{profile.email.split('@')[0]}</h1>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{profile.email.split('@')[0]}</h1>
             <p className="text-slate-500 flex items-center gap-2 mt-1">
               {profile.branch} &bull; Year {profile.year}
             </p>
