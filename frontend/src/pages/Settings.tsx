@@ -68,7 +68,7 @@ export const Settings = () => {
         <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
            <Sliders size={20} />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Account Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Account Settings</h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -121,11 +121,11 @@ export const Settings = () => {
                <div className="space-y-4">
                   <div>
                     <label className="text-xs text-slate-500 font-semibold uppercase">Role</label>
-                    <p className="text-sm font-medium text-slate-900 capitalize">{user?.role}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white capitalize">{user?.role}</p>
                   </div>
                   <div>
                     <label className="text-xs text-slate-500 font-semibold uppercase">Email</label>
-                    <p className="text-sm font-medium text-slate-900 truncate">{user?.email}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user?.email}</p>
                   </div>
                   
                   {isBanned && (

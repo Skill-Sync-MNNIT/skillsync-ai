@@ -79,7 +79,7 @@ export const Notifications = () => {
           <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
              <Bell size={20} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Notifications</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h1>
         </div>
         {notifications.some(n => !n.isRead) && (
           <button 
@@ -99,7 +99,7 @@ export const Notifications = () => {
         ) : notifications.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
              <CheckCircle className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-             <h3 className="text-lg font-medium text-slate-900">You're all caught up!</h3>
+             <h3 className="text-lg font-medium text-slate-900 dark:text-white">You're all caught up!</h3>
              <p className="mt-1 text-slate-500">No new notifications right now.</p>
           </div>
         ) : (
@@ -121,7 +121,7 @@ export const Notifications = () => {
                 </div>
                 
                 <div className="flex-1">
-                  <p className={`text-sm sm:text-base ${!notif.isRead ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>
+                  <p className={`text-sm sm:text-base ${!notif.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}>
                     {notif.message}
                   </p>
                   <p className="mt-1 text-xs text-slate-500 font-medium">

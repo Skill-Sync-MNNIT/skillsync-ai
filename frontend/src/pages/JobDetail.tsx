@@ -61,7 +61,7 @@ export const JobDetail = () => {
   if (!job) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16 bg-white rounded-xl border border-slate-200">
-         <h3 className="text-xl font-medium text-slate-900">Job not found</h3>
+         <h3 className="text-xl font-medium text-slate-900 dark:text-white">Job not found</h3>
          <p className="mt-2 text-slate-500 mb-6">This job may have been removed or moderated.</p>
          <Button onClick={() => navigate('/jobs')} variant="outline">Back to Job Board</Button>
       </div>
@@ -85,7 +85,7 @@ export const JobDetail = () => {
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                 <h1 className="text-3xl font-bold text-slate-900">{job.title}</h1>
+                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{job.title}</h1>
                  <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
                    {job.status.replace('_', ' ')}
                  </span>
@@ -96,7 +96,7 @@ export const JobDetail = () => {
                     <User className="h-5 w-5 mr-3 text-slate-400" />
                     <div>
                       <p className="text-xs text-slate-500 font-medium">Posted by</p>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         {job.postedBy.name || job.postedBy.email}
                       </p>
                     </div>
@@ -106,7 +106,7 @@ export const JobDetail = () => {
                     <Calendar className="h-5 w-5 mr-3 text-slate-400" />
                     <div>
                       <p className="text-xs text-slate-500 font-medium">Deadline</p>
-                      <p className={`text-sm font-semibold ${isExpired ? 'text-red-600' : 'text-slate-900'}`}>
+                      <p className={`text-sm font-semibold ${isExpired ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
                         {new Date(job.deadline).toLocaleDateString()} {isExpired && '(Expired)'}
                       </p>
                     </div>
@@ -116,7 +116,7 @@ export const JobDetail = () => {
                     <Clock className="h-5 w-5 mr-3 text-slate-400" />
                     <div>
                       <p className="text-xs text-slate-500 font-medium">Posted On</p>
-                      <p className="text-sm font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         {new Date(job.createdAt || Date.now()).toLocaleDateString()}
                       </p>
                     </div>
@@ -149,14 +149,14 @@ export const JobDetail = () => {
 
           <div className="space-y-8">
             <section>
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Description</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Description</h3>
               <div className="prose prose-slate max-w-none text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">
                 {job.description}
               </div>
             </section>
 
             <section>
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Required Skills</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {job.requiredSkills.map(skill => (
                   <span key={skill} className="px-3 py-1.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-lg text-sm font-semibold shadow-sm">

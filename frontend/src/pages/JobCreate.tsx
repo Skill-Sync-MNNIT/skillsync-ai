@@ -72,7 +72,7 @@ export const JobCreate = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Post a Job</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Post a Job</h1>
         <p className="mt-1 text-slate-500">Create a new opportunity for MNNIT students. All posts are subject to AI moderation.</p>
       </div>
 
