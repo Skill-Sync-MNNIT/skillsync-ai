@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     )
 
     gemini_api_key: str
+    gemini_api_key_2: str = ""
     pinecone_api_key: str
     pinecone_index: str = "mnnit-student-embeddings"
     embedding_model: str = "gemini-embedding-001"
@@ -14,7 +15,8 @@ class Settings(BaseSettings):
     top_k_results: int = 10
 
     groq_api_key: str = ""
-    backend_url: str = "http://localhost:5000"
+    groq_api_key_2: str = ""
+    backend_url: str = "https://skillsync-ai-txfw.onrender.com"
     internal_secret: str = ""
     cloudinary_cloud_name: str = ""
     cloudinary_api_key: str = ""
