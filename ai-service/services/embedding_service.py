@@ -25,6 +25,13 @@ class EmbeddingService:
             google_api_key=settings.gemini_api_key
         )
 
+        self.fallback_embedder = None
+        if getattr(settings, "gemini_api_key_2", ""):
+            self.fallback_embedder = GoogleGenerativeAIEmbeddings(
+                model=settings.embedding_model,
+                google_api_key=settings.gemini_api_key_2
+            )
+
         self.splitter=RecursiveCharacterTextSplitter(
             chunk_size=512,
             chunk_overlap=50,
@@ -39,6 +46,13 @@ class EmbeddingService:
             api_key=settings.groq_api_key,
             temperature=0.1,
         )
+        if getattr(settings, "groq_api_key_2", ""):
+            f_llm = ChatGroq(
+                model="llama-3.3-70b-versatile",
+                api_key=settings.groq_api_key_2,
+                temperature=0.1,
+            )
+            llm = llm.with_fallbacks([f_llm])
         self.skill_chain = SKILL_EXTRACTION_PROMPT | llm | StrOutputParser()
 
     async def extract_skills(self, text: str) -> list[str]:
@@ -64,7 +78,15 @@ class EmbeddingService:
         return self.splitter.split_text(text)
 
     def embed_chunks(self, chunks:list[str]) -> list[list[float]]:
-        return self.embedder.embed_documents(chunks)
+        try:
+            return self.embedder.embed_documents(chunks)
+        except Exception as e:
+            msg = str(e).lower()
+            if "429" in msg or "quota" in msg or "exhausted" in msg:
+                if self.fallback_embedder:
+                    print(f"[EmbeddingService] Primary API key failed ({e}). Using fallback key.")
+                    return self.fallback_embedder.embed_documents(chunks)
+            raise e
 
     def mean_pool(self,vectors: list[list[float]]) -> list[float]:
         if not vectors:

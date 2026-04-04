@@ -94,6 +94,9 @@ def job()->None:
 
 if __name__=="__main__":
     job()
+    if "--once" in sys.argv:
+        sys.exit(0)
+        
     schedule.every(2).hours.do(job)
 
     print("Scheduler running (every 2h). Ctrl+C to stop")
