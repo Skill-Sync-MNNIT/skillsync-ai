@@ -26,4 +26,6 @@ export const jobPostingSchema = z.object({
     .refine((date) => date > new Date(), {
       message: 'Deadline must be in the future',
     }),
+
+  jobLink: z.string().url('Invalid URL format').optional().or(z.literal('')),
 });

@@ -1,38 +1,38 @@
 import express from 'express';
 import { verifyToken } from '../middleware/verifyToken.js';
 import { checkBan } from '../middleware/checkBan.middleware.js';
-import { createJob, listJobs, getJob, withdrawJob } from '../controllers/jobs/job.controller.js';
+import {
+  createJob,
+  listJobs,
+  listMyJobs,
+  getJob,
+  updateJob,
+  withdrawJob,
+} from '../controllers/jobs/job.controller.js';
+import {
+  applyToJob,
+  getApplicationsForJob,
+  updateApplicationStatus,
+} from '../controllers/jobs/application.controller.js';
 
 const router = express.Router();
 
-/**
- * @route   POST /jobs
- * @desc    Create a new job (Alumni/Professor only)
- */
-router.post(
-  '/',
-  verifyToken,
-  checkBan,
-  // Add role middleware if available...
-  createJob
-);
+router.post('/', verifyToken, checkBan, createJob);
 
-/**
- * @route   GET /jobs
- * @desc    List all active jobs (paginated)
- */
 router.get('/', verifyToken, listJobs);
 
-/**
- * @route   GET /jobs/:jobId
- * @desc    Fetch single job with profile info
- */
+router.get('/my', verifyToken, listMyJobs);
+
 router.get('/:jobId', verifyToken, getJob);
 
-/**
- * @route   DELETE /jobs/:jobId
- * @desc    Withdraw job posting (Alumni/Professor who posted it)
- */
+router.patch('/:jobId', verifyToken, checkBan, updateJob);
+
 router.delete('/:jobId', verifyToken, withdrawJob);
+
+router.post('/:jobId/apply', verifyToken, checkBan, applyToJob);
+
+router.get('/:jobId/applications', verifyToken, getApplicationsForJob);
+
+router.patch('/applications/:applicationId/status', verifyToken, updateApplicationStatus);
 
 export default router;
