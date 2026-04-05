@@ -9,41 +9,16 @@ import {
   AtSign,
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
+import api from '../services/api';
 import type { StudentProfileData } from '../services/profileService';
-
-// ─── Skeleton ───────────────────────────────────────────────
-const SkeletonBlock = ({ className = '' }: { className?: string }) => (
-  <div className={`skeleton-shimmer ${className}`} />
-);
-
-const ProfileSkeleton = () => (
-  <div className="max-w-2xl mx-auto space-y-5 pb-12">
-    <div className="flex items-end justify-between">
-      <div className="space-y-2">
-        <SkeletonBlock className="h-4 w-24" />
-        <SkeletonBlock className="h-7 w-40" />
-        <SkeletonBlock className="h-4 w-56" />
-      </div>
-      <SkeletonBlock className="h-9 w-28 rounded-lg" />
-    </div>
-    {[...Array(3)].map((_, i) => (
-      <Card key={i} className="p-6 space-y-4">
-        <SkeletonBlock className="h-5 w-36" />
-        <div className="grid grid-cols-2 gap-4">
-          <SkeletonBlock className="h-10 w-full rounded-lg" />
-          <SkeletonBlock className="h-10 w-full rounded-lg" />
-        </div>
-      </Card>
-    ))}
-  </div>
-);
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 // ─── Inline feedback banner ─────────────────────────────────
 const FeedbackBanner = ({ type, text }: { type: 'success' | 'error'; text: string }) => (
   <div
     className={`flex items-center gap-2 text-sm p-3 rounded-lg border animate-fade-in ${type === 'success'
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-        : 'bg-red-50 text-red-700 border-red-200'
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      : 'bg-red-50 text-red-700 border-red-200'
       }`}
   >
     {type === 'success' ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
@@ -132,7 +107,7 @@ export const MyProfile = () => {
 
   // Danger zone
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
 
   // Embedding poll
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -284,21 +259,31 @@ export const MyProfile = () => {
 
   const removeSkill = (s: string) => setSkills(skills.filter((x) => x !== s));
 
-  // ─── Deactivate ──────────────────────────────────────────
+  // ─── Account Actions ──────────────────────────────────────
   const handleDeactivate = async () => {
+    if (!window.confirm('Are you sure you want to deactivate? You will be logged out.')) return;
     setIsDeleting(true);
     try {
-      await profileService.deleteProfile();
+      await api.patch('/settings/account/deactivate');
       useAuthStore.getState().logout();
     } catch {
-      setShowDeleteConfirm(false);
+      setIsDeleting(false);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await api.delete('/settings/account/delete');
+      useAuthStore.getState().logout();
+    } catch {
       setIsDeleting(false);
     }
   };
 
   // ─── Guards ──────────────────────────────────────────────
   if (!user) return null;
-  if (isLoadingProfile) return <ProfileSkeleton />;
+  if (isLoadingProfile) return <LoadingSpinner fullPage message="Loading your profile data..." />;
 
   const isStudent = user.role === 'student';
 
@@ -546,8 +531,8 @@ export const MyProfile = () => {
                 <span
                   key={skill}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${isEditing
-                      ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
-                      : 'bg-slate-100 text-slate-700'
+                    ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
+                    : 'bg-slate-100 text-slate-700'
                     }`}
                 >
                   {skill}
@@ -611,8 +596,8 @@ export const MyProfile = () => {
                 {/* Drop zone */}
                 <div
                   className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
-                      ? 'border-primary-400 bg-primary-50/50'
-                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'border-primary-400 bg-primary-50/50'
+                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
@@ -661,41 +646,49 @@ export const MyProfile = () => {
 
       {/* ── Danger Zone ─────────────────────────────────────── */}
       <Card className="animate-fade-in-up border-red-100 overflow-hidden" style={{ animationDelay: '300ms' }}>
-        <CardHeader className="border-b border-red-100">
+        <CardHeader className="border-b border-red-100 bg-red-50/30">
           <SectionHeader
             icon={Trash2}
             iconBg="bg-red-50"
             iconColor="text-red-600"
             title="Danger Zone"
-            subtitle="Hides your profile from all searches immediately"
+            subtitle="Manage your account status and data privacy"
           />
         </CardHeader>
-        <CardContent className="pt-5">
-          {!showDeleteConfirm ? (
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {/* Deactivate Option */}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowDeleteConfirm(true)}
-              className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+              onClick={handleDeactivate}
+              isLoading={isDeleting && !deleteConfirm} // Minimal use of state to show loading
+              className="w-full sm:w-auto border-amber-200 text-amber-700 hover:bg-amber-50"
             >
-              <Trash2 size={14} className="mr-2" />
+              <XCircle size={14} className="mr-2" />
               Deactivate Account
             </Button>
-          ) : (
-            <div className="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200 animate-fade-in">
-              <p className="text-sm font-medium text-red-800">
-                Are you sure? Your profile will be hidden from the network.
-              </p>
-              <div className="flex gap-2">
-                <Button variant="danger" size="sm" onClick={handleDeactivate} isLoading={isDeleting} className="flex-1">
-                  Yes, Deactivate
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting} className="flex-1">
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          )}
+
+            {/* Permanent Delete Option */}
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={async () => {
+                if (window.confirm('WARNING: Are you absolutely sure you want to PERMANENTLY delete your account? This will erase all your profile data, job postings, and resumes forever. This action is irreversible.')) {
+                  setDeleteConfirm('DELETE'); // Reusing state for handler check
+                  handlePermanentDelete();
+                }
+              }}
+              isLoading={isDeleting && deleteConfirm === 'DELETE'}
+              className="w-full sm:w-auto"
+            >
+              <Trash2 size={14} className="mr-2" />
+              Delete Account Permanently
+            </Button>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-4 leading-tight italic">
+            * Deactivation hides your profile temporarily. Permanent deletion wipes all your data forever.
+          </p>
         </CardContent>
       </Card>
 
