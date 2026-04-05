@@ -1,5 +1,10 @@
 import bcrypt from 'bcrypt';
-import { findUserByEmail, createUser, findProfessorByEmail } from '../../repositories/index.js';
+import {
+  findUserByEmail,
+  createUser,
+  findProfessorByEmail,
+  createStudentProfile,
+} from '../../repositories/index.js';
 import redis from '../../config/redis.js';
 
 // POST /auth/verify-otp
@@ -32,13 +37,17 @@ export const verifyOTPService = async (email, otp) => {
     name = name.charAt(0).toUpperCase() + name.slice(1);
   }
 
-  await createUser({
+  const user = await createUser({
     email: emailLower,
     name: name,
     passwordHash: payload.passwordHash,
     role: payload.role,
     isVerified: true,
   });
+
+  if (payload.role === 'student') {
+    await createStudentProfile({ userId: user._id });
+  }
 
   await redis.del(`register:${emailLower}`);
 

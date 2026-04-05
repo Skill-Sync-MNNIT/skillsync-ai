@@ -15,9 +15,10 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
 
     aiResponse = await res.json();
   } catch (err) {
-    const error = new Error('AI search service is currently unavailable', { cause: err });
-    error.status = 503;
-    throw error;
+    throw Object.assign(new Error('AI search service is currently unavailable'), {
+      status: 503,
+      cause: err,
+    });
   }
 
   const enriched = await Promise.all(
@@ -30,16 +31,9 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
 
         if (!user || !profile) return null;
 
-        const namePart = user.email.split('@')[0].split('.');
-        const name = namePart
-          .map((p) => p.replace(/[0-9]/g, '').trim())
-          .filter(Boolean)
-          .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-          .join(' ');
-
         return {
           userId: candidate.user_id,
-          name,
+          name: user.name,
           email: user.email,
           branch: profile.branch || candidate.metadata?.branch || null,
           year: profile.year || candidate.metadata?.year || null,
