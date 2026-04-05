@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import { z } from 'zod';
 import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -111,13 +112,13 @@ export const MyProfile = () => {
   // Edit state — universal across ALL roles
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
-  const [nameError, setNameError] = useState('');
   const [course, setCourse] = useState('B.Tech');
   const [branch, setBranch] = useState('CSE');
   const [year, setYear] = useState('');
   const [cpi, setCpi] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Loading / feedback
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -184,17 +185,49 @@ export const MyProfile = () => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   };
 
-  // ─── Validate name ───────────────────────────────────────
-  const validateName = (): boolean => {
-    if (!name.trim()) { setNameError('Name is required.'); return false; }
-    if (name.trim().length > 80) { setNameError('Name must be 80 characters or fewer.'); return false; }
-    setNameError('');
-    return true;
-  };
+  // ─── Validation Schemas ──────────────────────────────────
+  const baseSchema = z.object({
+    name: z.string().trim().min(1, 'Name is required.').max(80, 'Name must be 80 characters or fewer.'),
+  });
+
+  const studentSchema = baseSchema.extend({
+    course: z.string().min(1, 'Course is required.'),
+    branch: z.enum([...BRANCHES] as [string, ...string[]], { message: 'Branch is required.' }),
+    year: z.string().min(1, 'Year is required.').refine(val => {
+      const y = parseInt(val, 10);
+      return !isNaN(y) && y >= 1 && y <= 4;
+    }, 'Year must be between 1 and 4.'),
+    cpi: z.string().min(1, 'CPI is required.').refine(val => {
+      const c = parseFloat(val);
+      return !isNaN(c) && c >= 0 && c <= 10;
+    }, 'CPI must be between 0 and 10.0.'),
+    skills: z.array(z.string()).min(1, 'At least one skill is required.'),
+    hasResume: z.boolean().refine(val => val === true, 'Resume upload is required before saving.'),
+  });
 
   // ─── Save handler ────────────────────────────────────────
   const handleSave = async () => {
-    if (!validateName()) return;
+    setErrors({});
+    
+    // Validate
+    const schema = isStudent ? studentSchema : baseSchema;
+    const dataToValidate = isStudent ? {
+      name, course, branch, year, cpi, skills,
+      hasResume: !!(profileData?.resumeStorageKey || (profileData?.embeddingStatus && profileData?.embeddingStatus !== 'pending'))
+    } : { name };
+
+    const result = schema.safeParse(dataToValidate);
+    if (!result.success) {
+      const formattedErrors: Record<string, string> = {};
+      result.error.issues.forEach(issue => {
+        if (issue.path[0]) {
+          formattedErrors[issue.path[0] as string] = issue.message;
+        }
+      });
+      setErrors(formattedErrors);
+      setSaveMsg({ type: 'error', text: 'Please complete all required fields before saving.' });
+      return;
+    }
 
     setIsSaving(true);
     setSaveMsg(null);
@@ -237,7 +270,7 @@ export const MyProfile = () => {
   const cancelEdit = () => {
     setIsEditing(false);
     setSaveMsg(null);
-    setNameError('');
+    setErrors({});
     if (profileData) syncEditFields(profileData);
   };
 
@@ -387,8 +420,11 @@ export const MyProfile = () => {
                   label="Full Name"
                   placeholder="e.g. Aditya Sharma"
                   value={name}
-                  onChange={(e) => { setName(e.target.value); if (nameError) setNameError(''); }}
-                  error={nameError}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                  }}
+                  error={errors.name}
                   autoFocus
                 />
               </div>
@@ -442,13 +478,19 @@ export const MyProfile = () => {
                     </label>
                     <select
                       value={course}
-                      onChange={(e) => setCourse(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-medium text-slate-700"
+                      onChange={(e) => {
+                        setCourse(e.target.value);
+                        if (errors.course) setErrors(prev => ({ ...prev, course: '' }));
+                      }}
+                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
+                        errors.course ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                      }`}
                     >
                       {COURSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
+                    {errors.course && <p className="mt-1.5 text-sm font-medium text-red-500">{errors.course}</p>}
                   </div>
                   <Input
                     id="profile-year"
@@ -458,7 +500,11 @@ export const MyProfile = () => {
                     max={4}
                     placeholder="1 – 4"
                     value={year}
-                    onChange={(e) => setYear(e.target.value)}
+                    onChange={(e) => {
+                      setYear(e.target.value);
+                      if (errors.year) setErrors(prev => ({ ...prev, year: '' }));
+                    }}
+                    error={errors.year}
                   />
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
@@ -466,13 +512,19 @@ export const MyProfile = () => {
                     </label>
                     <select
                       value={branch}
-                      onChange={(e) => setBranch(e.target.value)}
-                      className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all font-medium text-slate-700"
+                      onChange={(e) => {
+                        setBranch(e.target.value);
+                        if (errors.branch) setErrors(prev => ({ ...prev, branch: '' }));
+                      }}
+                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
+                        errors.branch ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                      }`}
                     >
                       {BRANCHES.map((b) => (
                         <option key={b} value={b}>{b}</option>
                       ))}
                     </select>
+                    {errors.branch && <p className="mt-1.5 text-sm font-medium text-red-500">{errors.branch}</p>}
                   </div>
                   <Input
                     id="profile-cpi"
@@ -483,7 +535,11 @@ export const MyProfile = () => {
                     max={10}
                     placeholder="e.g. 8.5"
                     value={cpi}
-                    onChange={(e) => setCpi(e.target.value)}
+                    onChange={(e) => {
+                      setCpi(e.target.value);
+                      if (errors.cpi) setErrors(prev => ({ ...prev, cpi: '' }));
+                    }}
+                    error={errors.cpi}
                   />
                 </>
               ) : (
@@ -536,7 +592,11 @@ export const MyProfile = () => {
                   placeholder="Type a skill and press Enter (e.g. PyTorch)"
                   value={newSkill}
                   onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyDown={addSkill}
+                  onKeyDown={(e) => {
+                    addSkill(e);
+                    if (e.key === 'Enter' && errors.skills) setErrors(prev => ({ ...prev, skills: '' }));
+                  }}
+                  error={errors.skills}
                 />
               </div>
             )}
@@ -612,11 +672,16 @@ export const MyProfile = () => {
                 <div
                   className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
                       ? 'border-primary-400 bg-primary-50/50'
-                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      : errors.hasResume 
+                        ? 'border-red-400 bg-red-50 hover:bg-red-100 hover:border-red-500'
+                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                   onDragLeave={() => setIsDragging(false)}
-                  onDrop={handleDrop}
+                  onDrop={(e) => {
+                    handleDrop(e);
+                    if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
+                  }}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <UploadCloud
@@ -631,9 +696,13 @@ export const MyProfile = () => {
                     className="sr-only"
                     accept=".pdf"
                     ref={fileInputRef}
-                    onChange={handleFileChange}
+                    onChange={(e) => {
+                      handleFileChange(e);
+                      if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
+                    }}
                   />
                 </div>
+                {errors.hasResume && <p className="text-sm font-medium text-red-500 mt-2">{errors.hasResume}</p>}
 
                 {selectedFile && (
                   <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in">
