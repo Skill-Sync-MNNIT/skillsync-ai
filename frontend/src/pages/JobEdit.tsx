@@ -29,7 +29,6 @@ export const JobEdit = () => {
   const [skillError, setSkillError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [apiError, setApiError] = useState('');
 
   const {
     register,
@@ -95,16 +94,15 @@ export const JobEdit = () => {
     }
 
     setIsSubmitting(true);
-    setApiError('');
     try {
-      await api.patch(`/jobs/${jobId}`, {
+      const response = await api.patch(`/jobs/${jobId}`, {
         ...data,
         requiredSkills: skills,
       });
-      toast('Job updated successfully!', 'success');
+      toast(response.data.message || 'Job updated successfully!', 'success');
       navigate(`/jobs/${jobId}`);
     } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Failed to update job.');
+      toast(error.response?.data?.message || 'Failed to update job.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -207,12 +205,6 @@ export const JobEdit = () => {
                   Updating the title or description will re-submit this job for AI moderation.
                </div>
             </div>
-
-            {apiError && (
-              <div className="rounded-md bg-red-50 p-4 border border-red-200">
-                <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-              </div>
-            )}
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
               <Button type="button" variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mr-3">

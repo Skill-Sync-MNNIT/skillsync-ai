@@ -7,6 +7,7 @@ import { ShieldCheck } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 const verifySchema = z.object({
   otp: z.string().length(6, 'OTP must be exactly 6 digits'),
@@ -15,7 +16,7 @@ const verifySchema = z.object({
 type VerifyForm = z.infer<typeof verifySchema>;
 
 export const Verify = () => {
-  const [apiError, setApiError] = useState<string | null>(null);
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   
   const location = useLocation();
@@ -39,26 +40,18 @@ export const Verify = () => {
   });
 
   const onSubmit = async (data: VerifyForm) => {
-  if(!email) {
-    return;
-  }
-
-  setIsLoading(true);
-  setApiError(null);
+    if (!email) return;
+    setIsLoading(true);
 
   try {
     const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
 
-    if (response.status === 200) {
-       navigate('/auth/login', { replace: true });
-    }
+    toast(response.data.message || 'Email verified. Registration successful!', 'success');
+    navigate('/auth/login', { replace: true });
 
   } catch (error: any) {
-    if (error.response?.data?.error) {
-      setApiError(error.response.data.error);
-    } else {
-      setApiError('Invalid or expired OTP. Please try again.');
-    }
+    const errorMsg = error.response?.data?.error || 'Invalid or expired OTP. Please try again.';
+    toast(errorMsg, 'error');
   } finally {
     setIsLoading(false);
   }
@@ -90,12 +83,6 @@ export const Verify = () => {
               {...register('otp')}
             />
           </div>
-
-          {apiError && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200 animate-in fade-in">
-              <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-            </div>
-          )}
 
           <div>
             <Button type="submit" className="w-full" isLoading={isLoading} size="lg">

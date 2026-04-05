@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -17,7 +18,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export const Login = () => {
-  const [apiError, setApiError] = useState<string | null>(null);
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -33,7 +34,6 @@ export const Login = () => {
 
   const onSubmit = async (data: LoginForm) => {
   setIsLoading(true);
-  setApiError(null);
 
   try {
     const response = await api.post('/auth/login', data);
@@ -45,6 +45,7 @@ export const Login = () => {
     }
 
     login(user, token);
+    toast(response.data.message || 'Welcome back to SkillSync AI!', 'success');
 
     // Redirect to home/search by default, or specific redirect if provided
     const redirectTo = searchParams.get('redirect') || '/';
@@ -55,11 +56,8 @@ export const Login = () => {
     navigate(finalUrl);
 
   } catch (error: any) {
-    if (error.response?.data?.message) {
-      setApiError(error.response.data.message);
-    } else {
-      setApiError('Invalid email or password. Please try again.');
-    }
+    const errorMsg = error.response?.data?.message || 'Invalid email or password. Please try again.';
+    toast(errorMsg, 'error');
   } finally {
     setIsLoading(false);
   }
@@ -106,16 +104,6 @@ export const Login = () => {
               Forgot password?
             </Link>
           </div>
-
-          {apiError && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200 animate-in fade-in">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div>
             <Button type="submit" className="w-full" isLoading={isLoading} size="lg">

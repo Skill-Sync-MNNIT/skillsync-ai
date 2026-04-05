@@ -13,19 +13,7 @@ import { profileService } from '../services/profileService';
 import api from '../services/api';
 import type { StudentProfileData } from '../services/profileService';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-
-// ─── Inline feedback banner ─────────────────────────────────
-const FeedbackBanner = ({ type, text }: { type: 'success' | 'error'; text: string }) => (
-  <div
-    className={`flex items-center gap-2 text-sm p-3 rounded-lg border animate-fade-in ${type === 'success'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-      : 'bg-red-50 text-red-700 border-red-200'
-      }`}
-  >
-    {type === 'success' ? <CheckCircle2 size={15} /> : <AlertTriangle size={15} />}
-    <span>{text}</span>
-  </div>
-);
+import { useToast } from '../context/ToastContext';
 
 // ─── Read-only display field ────────────────────────────────
 const ReadField = ({
@@ -79,6 +67,7 @@ const COURSES = ['B.Tech', 'M.Tech', 'MCA'] as const;
 // ─── Main Component ─────────────────────────────────────────
 export const MyProfile = () => {
   const { user, updateUser } = useAuthStore();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Profile data from backend
@@ -98,12 +87,10 @@ export const MyProfile = () => {
   // Loading / feedback
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Resume
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadMsg, setUploadMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   // Danger zone
@@ -183,7 +170,7 @@ export const MyProfile = () => {
   // ─── Save handler ────────────────────────────────────────
   const handleSave = async () => {
     setErrors({});
-    
+
     // Validate
     const schema = isStudent ? studentSchema : baseSchema;
     const dataToValidate = isStudent ? {
@@ -200,12 +187,11 @@ export const MyProfile = () => {
         }
       });
       setErrors(formattedErrors);
-      setSaveMsg({ type: 'error', text: 'Please complete all required fields before saving.' });
+      toast('Please complete all required fields before saving.', 'error');
       return;
     }
 
     setIsSaving(true);
-    setSaveMsg(null);
 
     // Build payload — only send fields that changed / are relevant to role
     const payload: Parameters<typeof profileService.updateProfile>[0] = {
@@ -229,13 +215,10 @@ export const MyProfile = () => {
       // Patch the Zustand store so the name appears in the nav/dashboard
       updateUser({ name: name.trim() });
 
-      setSaveMsg({ type: 'success', text: 'Profile saved successfully.' });
+      toast('Profile saved successfully.', 'success');
       setIsEditing(false);
     } catch (err: any) {
-      setSaveMsg({
-        type: 'error',
-        text: err.response?.data?.message || 'Failed to save. Please try again.',
-      });
+      toast(err.response?.data?.message || 'Failed to save. Please try again.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -244,7 +227,6 @@ export const MyProfile = () => {
   // ─── Cancel edit ────────────────────────────────────────
   const cancelEdit = () => {
     setIsEditing(false);
-    setSaveMsg(null);
     setErrors({});
     if (profileData) syncEditFields(profileData);
   };
@@ -253,29 +235,28 @@ export const MyProfile = () => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.type === 'application/pdf') { setSelectedFile(f); setUploadMsg(null); }
-    else setUploadMsg({ type: 'error', text: 'Please select a valid PDF file.' });
+    if (f.type === 'application/pdf') { setSelectedFile(f); }
+    else toast('Please select a valid PDF file.', 'error');
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f?.type === 'application/pdf') { setSelectedFile(f); setUploadMsg(null); }
-    else setUploadMsg({ type: 'error', text: 'Please drop a valid PDF file.' });
+    if (f?.type === 'application/pdf') { setSelectedFile(f); }
+    else toast('Please drop a valid PDF file.', 'error');
   };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
     setIsUploading(true);
-    setUploadMsg(null);
     try {
       await profileService.uploadResume(selectedFile);
-      setUploadMsg({ type: 'success', text: 'Resume uploaded! AI indexing started.' });
+      toast('Resume uploaded! AI indexing started.', 'success');
       setSelectedFile(null);
       if (user) loadProfile(user._id);
     } catch (err: any) {
-      setUploadMsg({ type: 'error', text: err.response?.data?.message || 'Upload failed.' });
+      toast(err.response?.data?.message || 'Upload failed.', 'error');
     } finally {
       setIsUploading(false);
     }
@@ -297,9 +278,11 @@ export const MyProfile = () => {
     if (!window.confirm('Are you sure you want to deactivate? You will be logged out.')) return;
     setIsDeleting(true);
     try {
-      await api.patch('/settings/account/deactivate');
+      const response = await api.patch('/settings/account/deactivate');
+      toast(response.data.message || 'Account deactivated. You have been logged out.', 'success');
       useAuthStore.getState().logout();
-    } catch {
+    } catch (error: any) {
+      toast(error.response?.data?.error || 'Failed to deactivate account.', 'error');
       setIsDeleting(false);
     }
   };
@@ -307,9 +290,11 @@ export const MyProfile = () => {
   const handlePermanentDelete = async () => {
     setIsDeleting(true);
     try {
-      await api.delete('/settings/account/delete');
+      const response = await api.delete('/settings/account/delete');
+      toast(response.data.message || 'Account permanently deleted. Goodbye!', 'success');
       useAuthStore.getState().logout();
-    } catch {
+    } catch (error: any) {
+      toast(error.response?.data?.error || 'Failed to delete account.', 'error');
       setIsDeleting(false);
     }
   };
@@ -374,15 +359,12 @@ export const MyProfile = () => {
               </Button>
             </>
           ) : (
-            <Button size="sm" variant="outline" onClick={() => { setIsEditing(true); setSaveMsg(null); }}>
+            <Button size="sm" variant="outline" onClick={() => { setIsEditing(true); }}>
               <Edit2 size={14} className="mr-1.5" /> Edit Profile
             </Button>
           )}
         </div>
       </div>
-
-      {/* Save feedback */}
-      {saveMsg && <FeedbackBanner {...saveMsg} />}
 
       {/* ── Account Information (Name is editable) ───────────── */}
       <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '60ms' }}>
@@ -467,9 +449,8 @@ export const MyProfile = () => {
                         setCourse(e.target.value);
                         if (errors.course) setErrors(prev => ({ ...prev, course: '' }));
                       }}
-                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
-                        errors.course ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
-                      }`}
+                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                        }`}
                     >
                       {COURSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
@@ -501,9 +482,8 @@ export const MyProfile = () => {
                         setBranch(e.target.value);
                         if (errors.branch) setErrors(prev => ({ ...prev, branch: '' }));
                       }}
-                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
-                        errors.branch ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
-                      }`}
+                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                        }`}
                     >
                       {BRANCHES.map((b) => (
                         <option key={b} value={b}>{b}</option>
@@ -703,8 +683,6 @@ export const MyProfile = () => {
                     </Button>
                   </div>
                 )}
-
-                {uploadMsg && <FeedbackBanner {...uploadMsg} />}
               </>
             )}
           </CardContent>

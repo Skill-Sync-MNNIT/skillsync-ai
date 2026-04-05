@@ -7,6 +7,7 @@ import { UserPlus } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address').refine(e => e.endsWith('@mnnit.ac.in') || !e.includes('mnnit'), { message: "Students must use @mnnit.ac.in. Alumni/Profs can use any valid email if approved."}),
@@ -19,7 +20,7 @@ const registerSchema = z.object({
 type RegisterForm = z.infer<typeof registerSchema>;
 
 export const Register = () => {
-  const [apiError, setApiError] = useState<string | null>(null);
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -36,20 +37,14 @@ export const Register = () => {
 
   const onSubmit = async (data: RegisterForm) => {
   setIsLoading(true);
-  setApiError(null);
 
   try {
-      await api.post('/auth/register', data);
-
+      const response = await api.post('/auth/register', data);
+      toast(response.data.message || 'Verification code sent to your email!', 'success');
       navigate('/auth/verify-otp', { state: { email: data.email } });
     } catch (err: any) {
-      if (err.response?.data?.message) {
-        setApiError(err.response.data.message);
-      } else if (err.response?.data?.error) {
-        setApiError(err.response.data.error);
-      } else {
-        setApiError(err.message || "Registration failed");
-      }
+      const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message || "Registration failed";
+      toast(errorMsg, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -104,12 +99,6 @@ export const Register = () => {
               {...register('password')}
             />
           </div>
-
-          {apiError && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200 animate-in fade-in">
-              <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-            </div>
-          )}
 
           <div>
             <Button type="submit" className="w-full" isLoading={isLoading} size="lg">

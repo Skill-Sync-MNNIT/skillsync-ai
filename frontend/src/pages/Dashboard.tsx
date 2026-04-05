@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useToast } from '../context/ToastContext';
 
 // ─── Helpers ────────────────────────────────────────────────
 const getGreeting = (): string => {
@@ -46,25 +47,25 @@ interface TrendingSkill {
 // endpoints are built. Kept minimal to avoid misleading the user.
 const ROLE_CARDS = {
   student: [
-    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell,       color: 'amber',  to: '/notifications' },
-    { label: 'Browse Jobs',   sublabel: 'Opportunities for you', icon: Briefcase,  color: 'blue',   to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
+    { label: 'Browse Jobs', sublabel: 'Opportunities for you', icon: Briefcase, color: 'blue', to: '/jobs' },
     { label: 'Search Network', sublabel: 'Find alumni & professors', icon: Users, color: 'emerald', to: '/search' },
   ],
   alumni: [
-    { label: 'Browse Jobs',   sublabel: 'Explore MNNIT opportunities', icon: Briefcase,  color: 'blue',   to: '/jobs' },
-    { label: 'Notifications', sublabel: 'Check your inbox',   icon: Bell,       color: 'amber',  to: '/notifications' },
+    { label: 'Browse Jobs', sublabel: 'Explore MNNIT opportunities', icon: Briefcase, color: 'blue', to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
     { label: 'Search Students', sublabel: 'Browse AI-ranked profiles', icon: Users, color: 'emerald', to: '/search' },
   ],
   professor: [
-    { label: 'Browse Jobs',   sublabel: 'View all active postings', icon: Briefcase,  color: 'blue',   to: '/jobs' },
-    { label: 'Notifications',  sublabel: 'Check your inbox',        icon: Bell,      color: 'amber',  to: '/notifications' },
-    { label: 'Find Students',  sublabel: 'Browse by skills',        icon: Users,     color: 'emerald', to: '/search' },
+    { label: 'Browse Jobs', sublabel: 'View all active postings', icon: Briefcase, color: 'blue', to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
+    { label: 'Find Students', sublabel: 'Browse by skills', icon: Users, color: 'emerald', to: '/search' },
   ],
 };
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; text: string; border: string }> = {
-  blue:    { bg: 'bg-blue-50 dark:bg-blue-950/50',    iconBg: 'bg-blue-100 dark:bg-blue-900/50',    text: 'text-blue-600 dark:text-blue-400',    border: 'border-blue-100 dark:border-blue-900/30' },
-  amber:   { bg: 'bg-amber-50 dark:bg-amber-950/50',   iconBg: 'bg-amber-100 dark:bg-amber-900/50',   text: 'text-amber-600 dark:text-amber-400',   border: 'border-amber-100 dark:border-amber-900/30' },
+  blue: { bg: 'bg-blue-50 dark:bg-blue-950/50', iconBg: 'bg-blue-100 dark:bg-blue-900/50', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
+  amber: { bg: 'bg-amber-50 dark:bg-amber-950/50', iconBg: 'bg-amber-100 dark:bg-amber-900/50', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' },
   emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/50', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
 };
 
@@ -104,6 +105,7 @@ const NavCard = ({ label, sublabel, icon: Icon, color, to, delay }: NavCardProps
 // ─── Dashboard ───────────────────────────────────────────────
 export const Dashboard = () => {
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const [trendingSkills, setTrendingSkills] = useState<TrendingSkill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -114,6 +116,7 @@ export const Dashboard = () => {
         setTrendingSkills(response.data.trendingSkills || []);
       } catch (error) {
         console.error('Failed to fetch dashboard data', error);
+        toast('Failed to load dashboard insights', 'error');
       } finally {
         setTimeout(() => setIsLoading(false), 500);
       }
@@ -187,7 +190,7 @@ export const Dashboard = () => {
                 const demand = Math.round((skill.count / maxCount) * 100);
                 const badge = i === 0 ? 'Hot' : i === 1 ? 'Rising' : null;
                 const badgeColor = i === 0 ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
-                
+
                 return (
                   <div key={skill.name} className="group">
                     <div className="flex items-center justify-between mb-1.5">

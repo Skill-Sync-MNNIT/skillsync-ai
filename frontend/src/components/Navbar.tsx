@@ -5,10 +5,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from './ui/Button';
 import api from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,7 +31,9 @@ export const Navbar = () => {
     setDropdownOpen(false);
     setMobileMenuOpen(false);
     try {
-      await api.post('/auth/logout').catch(() => {});
+      const response = await api.post('/auth/logout').catch(() => null);
+      const msg = response?.data?.message || 'Logged out successfully';
+      toast(msg, 'success');
     } finally {
       logout();
       navigate('/auth/login', { replace: true });

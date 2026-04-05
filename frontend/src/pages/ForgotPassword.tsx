@@ -7,6 +7,7 @@ import { KeyRound, Mail, ShieldCheck, CheckCircle2, ArrowLeft } from 'lucide-rea
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 // ─── Step 1: Email schema ───────────────────────────────────────────────
 const emailSchema = z.object({
@@ -82,11 +83,10 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
 
 // ─── Main Component ─────────────────────────────────────────────────────
 export const ForgotPassword = () => {
+  const { toast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -108,16 +108,14 @@ export const ForgotPassword = () => {
   // ─── Step 1: Request OTP ────────────────────────────────────────────
   const handleEmailSubmit = async (data: EmailForm) => {
     setIsLoading(true);
-    setApiError(null);
-    setSuccessMessage(null);
 
     try {
-      await api.post('/auth/forgot-password', { email: data.email });
+      const response = await api.post('/auth/forgot-password', { email: data.email });
       setEmail(data.email);
-      setSuccessMessage('A 6-digit reset code has been sent to your email.');
+      toast(response.data.message || 'A 6-digit reset code has been sent to your email.', 'success');
       setStep(2);
     } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Something went wrong. Please try again.');
+      toast(error.response?.data?.message || 'Something went wrong. Please try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -126,16 +124,14 @@ export const ForgotPassword = () => {
   // ─── Step 2: Verify OTP ─────────────────────────────────────────────
   const handleOTPSubmit = async (data: OTPForm) => {
     setIsLoading(true);
-    setApiError(null);
-    setSuccessMessage(null);
 
     try {
-      await api.post('/auth/verify-reset-otp', { email, otp: data.otp });
+      const response = await api.post('/auth/verify-reset-otp', { email, otp: data.otp });
       setOtp(data.otp);
-      setSuccessMessage('Code verified! Set your new password below.');
+      toast(response.data.message || 'Code verified! Set your new password below.', 'success');
       setStep(3);
     } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Invalid or expired code. Please try again.');
+      toast(error.response?.data?.message || 'Invalid or expired code. Please try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -144,19 +140,17 @@ export const ForgotPassword = () => {
   // ─── Step 3: Reset Password ─────────────────────────────────────────
   const handleResetSubmit = async (data: ResetForm) => {
     setIsLoading(true);
-    setApiError(null);
-    setSuccessMessage(null);
 
     try {
-      await api.post('/auth/reset-password', {
+      const response = await api.post('/auth/reset-password', {
         email,
         otp,
         newPassword: data.password,
       });
-      setSuccessMessage('Password reset successfully! Redirecting to login...');
+      toast(response.data.message || 'Password reset successfully!', 'success');
       setTimeout(() => navigate('/auth/login', { replace: true }), 2000);
     } catch (error: any) {
-      setApiError(error.response?.data?.message || 'Failed to reset password. Please try again.');
+      toast(error.response?.data?.message || 'Failed to reset password. Please try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -206,22 +200,7 @@ export const ForgotPassword = () => {
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{current.subtitle}</p>
         </div>
 
-        {/* Success banner */}
-        {successMessage && (
-          <div className="rounded-md bg-emerald-50 p-4 border border-emerald-200 animate-fade-in">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 size={18} className="text-emerald-600 mt-0.5 shrink-0" />
-              <p className="text-sm font-medium text-emerald-800">{successMessage}</p>
-            </div>
-          </div>
-        )}
 
-        {/* Error banner */}
-        {apiError && (
-          <div className="rounded-md bg-red-50 p-4 border border-red-200 animate-fade-in">
-            <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-          </div>
-        )}
 
         {/* ─── Step 1: Email Form ─────────────────────────────────────── */}
         {step === 1 && (
@@ -258,7 +237,7 @@ export const ForgotPassword = () => {
             </Button>
             <button
               type="button"
-              onClick={() => { setStep(1); setApiError(null); setSuccessMessage(null); }}
+              onClick={() => { setStep(1); }}
               className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               <ArrowLeft size={14} />
