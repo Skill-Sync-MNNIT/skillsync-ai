@@ -56,12 +56,4 @@ export const profileService = {
     const response = await api.get(`/profile/resume/${userId}`);
     return response.data.data.signedUrl;
   },
-
-  /**
-   * Delete the current user's profile.
-   */
-  deleteProfile: async () => {
-    const response = await api.delete('/profile');
-    return response.data.data;
-  },
 };

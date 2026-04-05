@@ -2,16 +2,20 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Download, User } from 'lucide-react';
+import { Download, Eye, Cpu } from 'lucide-react';
 import api from '../services/api';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 interface StudentProfile {
   userId: string;
   name: string;
   email: string;
+  course: string;
   branch: string;
   year: number;
+  cpi: number;
   skills: string[];
+  resumeStorageKey?: string;
   matchScore?: number;
   explanation?: string;
   matchedSkills?: string[];
@@ -21,15 +25,21 @@ export const ViewProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isViewing, setIsViewing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await api.get(`/profile/${userId}`);
-        setProfile(response.data);
+        if (response.data && response.data.success) {
+          setProfile(response.data.data);
+        } else {
+          setProfile(null);
+        }
       } catch (error) {
         console.error('Failed to fetch profile', error);
+        setProfile(null);
       } finally {
         setIsLoading(false);
       }
@@ -37,30 +47,46 @@ export const ViewProfile = () => {
     if (userId) fetchProfile();
   }, [userId]);
 
-  const handleDownloadResume = async () => {
+  const handleResumeAction = async (action: 'view' | 'download') => {
     if (!profile) return;
-    setIsDownloading(true);
+    
+    if (action === 'view') setIsViewing(true);
+    else setIsDownloading(true);
+    
     try {
-      const response = await api.get(`/profile/resume/${userId}`);
-      if (response.data.signedUrl) {
-        // Automatically trigger download using a temporary link
+      const response = await api.get(`/profile/resume/${userId}`, {
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const objectUrl = URL.createObjectURL(blob);
+      
+      if (action === 'view') {
+        window.open(objectUrl, '_blank');
+      } else {
         const a = document.createElement('a');
-        a.href = response.data.signedUrl;
-        a.target = '_blank';
-        a.download = `resume-${profile.name || 'student'}.pdf`;
+        a.href = objectUrl;
+        // Filename format: resume-[email-prefix].pdf (keeping dots as requested)
+        const formattedName = profile.email.split('@')[0];
+        a.download = `resume-${formattedName}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
       }
+      
+      // Cleanup: increased timer to 60s to ensure the viewer has time to load
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+      
     } catch (error) {
-      alert('Failed to download resume.');
+      alert(`Failed to ${action} resume. It may not exist.`);
     } finally {
-      setIsDownloading(false);
+      if (action === 'view') setIsViewing(false);
+      else setIsDownloading(false);
     }
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500 animate-pulse">Loading profile...</div>;
+    return <LoadingSpinner fullPage message="Fetching student profile..." />;
   }
 
   if (!profile) {
@@ -68,61 +94,116 @@ export const ViewProfile = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-slate-200 gap-4">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
-            <User size={32} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{profile.email.split('@')[0]}</h1>
-            <p className="text-slate-500 flex items-center gap-2 mt-1">
-              {profile.branch} &bull; Year {profile.year}
-            </p>
-          </div>
-        </div>
-        <Button onClick={handleDownloadResume} isLoading={isDownloading} className="shrink-0">
-          <Download size={18} className="mr-2" />
-          Download Resume
-        </Button>
+    <div className="max-w-3xl mx-auto space-y-6 pb-20">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Student Profile</h1>
+        <p className="mt-1 text-slate-500">Detailed view of the candidate's academic and technical background.</p>
       </div>
 
       {profile.matchScore !== undefined && (
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader className="pb-3 border-b border-green-200/50">
-            <CardTitle className="text-green-800 flex items-center gap-2 text-lg">
-               <span>AI Match Result</span>
-               <span className="bg-green-200 text-green-900 text-sm px-2 py-0.5 rounded-full">{profile.matchScore.toFixed(0)}% Match</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <p className="text-slate-700 italic border-l-4 border-green-300 pl-4 py-1">"{profile.explanation}"</p>
-            {profile.matchedSkills && profile.matchedSkills.length > 0 && (
-              <div className="mt-4">
-                <span className="text-sm font-semibold text-green-800 mr-2">Key Highlights:</span>
-                <span className="text-sm text-slate-600 font-medium">
-                  {profile.matchedSkills.join(', ')}
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-md bg-blue-50 p-4 border border-blue-200 flex">
+           <Cpu className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
+           <div className="ml-3">
+              <h3 className="text-sm font-bold text-blue-800">
+                 AI Evaluation Insight ({profile.matchScore.toFixed(0)}% Match)
+              </h3>
+              <p className="mt-1 text-sm text-blue-700">"{profile.explanation}"</p>
+           </div>
+        </div>
       )}
 
       <Card>
         <CardHeader>
-          <CardTitle>Skills & Technologies</CardTitle>
+          <CardTitle>Profile Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {profile.skills.map((skill) => (
-              <span key={skill} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800">
-                {skill}
-              </span>
-            ))}
-            {profile.skills.length === 0 && (
-              <span className="text-slate-400 text-sm">No skills listed yet.</span>
-            )}
+          <div className="space-y-6">
+            
+            {/* Identity */}
+            <div>
+              <label className="block text-sm font-medium text-slate-500 mb-1">Full Name</label>
+              <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                {profile.name || 'Not Provided'}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-500 mb-1">Email Address</label>
+              <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                {profile.email || 'Not Provided'}
+              </div>
+            </div>
+            
+            {/* Academics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-500 mb-1">Course & Program</label>
+                  <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                    {profile.course || 'Not Provided'}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-500 mb-1">Branch</label>
+                  <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                    {(profile.branch && profile.branch !== 'NA') ? profile.branch : 'Not Provided'}
+                  </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-500 mb-1">Current Year</label>
+                  <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                     {profile.year ? `${profile.year}${profile.year === 1 ? 'st' : profile.year === 2 ? 'nd' : profile.year === 3 ? 'rd' : 'th'} Year` : 'Not Provided'}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-500 mb-1">Academic Performance</label>
+                  <div className="text-base text-slate-900 dark:text-white font-medium bg-slate-50/50 dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                    {profile.cpi || 'Not Provided'} {profile.cpi && <span className="text-slate-400">/ 10 CPI</span>}
+                  </div>
+                </div>
+            </div>
+
+            {/* Skills */}
+            <div>
+              <label className="block text-sm font-medium text-slate-500 mb-2">Technical Skills</label>
+              <div className="flex flex-wrap gap-2">
+                {profile.skills?.length ? (
+                    profile.skills.map(skill => (
+                       <span key={skill} className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                          {skill}
+                       </span>
+                    ))
+                ) : (
+                    <div className="text-slate-400 text-sm italic py-2">Not Provided</div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions: Stacks on mobile, side-by-side on desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => handleResumeAction('view')} 
+                disabled={isDownloading || isViewing}
+                isLoading={isViewing}
+                className="w-full justify-center"
+              >
+                <Eye size={18} className="mr-2" /> View Resume
+              </Button>
+              <Button 
+                type="button"
+                onClick={() => handleResumeAction('download')} 
+                disabled={isViewing || isDownloading}
+                isLoading={isDownloading}
+                className="w-full justify-center"
+              >
+                <Download size={18} className="mr-2" /> Download Resume
+              </Button>
+            </div>
+            
           </div>
         </CardContent>
       </Card>
