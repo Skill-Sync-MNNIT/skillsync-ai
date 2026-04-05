@@ -40,7 +40,6 @@ export const Verify = () => {
 
   const onSubmit = async (data: VerifyForm) => {
   if(!email) {
-    console.log("No email found");
     return;
   }
 
@@ -49,8 +48,6 @@ export const Verify = () => {
 
   try {
     const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
-
-    console.log("API response", response);
 
     if (response.status === 200) {
        navigate('/auth/login', { replace: true });
