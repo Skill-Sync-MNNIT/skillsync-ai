@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { X, ShieldAlert } from 'lucide-react';
+import { X, ShieldAlert, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 const jobSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -19,21 +20,58 @@ const jobSchema = z.object({
 
 type JobForm = z.infer<typeof jobSchema>;
 
-export const JobCreate = () => {
+export const JobEdit = () => {
+  const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [skillError, setSkillError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<JobForm>({
     resolver: zodResolver(jobSchema),
   });
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const response = await api.get(`/jobs/${jobId}`);
+        const job = response.data;
+        
+        // Populate form
+        setValue('title', job.title);
+        setValue('description', job.description);
+        setValue('jobLink', job.jobLink || '');
+        
+        // Format date for input[type="date"]
+        const date = new Date(job.deadline);
+        setValue('deadline', date.toISOString().split('T')[0]);
+        
+        setSkills(job.requiredSkills || []);
+
+        // Edit Lock: Prevent editing if job is already withdrawn or expired
+        if (job.status === 'withdrawn' || job.status === 'expired') {
+          toast('This job is closed and can no longer be edited', 'error');
+          navigate(`/jobs/${jobId}`);
+        }
+      } catch (error) {
+        console.error('Failed to fetch job', error);
+        toast('Failed to load job details', 'error');
+        navigate('/jobs');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (jobId) fetchJob();
+  }, [jobId, setValue, navigate, toast]);
 
   const handleAddSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -57,24 +95,35 @@ export const JobCreate = () => {
 
     setIsSubmitting(true);
     try {
-      const response = await api.post('/jobs', {
+      const response = await api.patch(`/jobs/${jobId}`, {
         ...data,
         requiredSkills: skills,
       });
-      toast(response.data.message || 'Job opportunity posted successfully!', 'success');
-      navigate('/jobs');
+      toast(response.data.message || 'Job updated successfully!', 'success');
+      navigate(`/jobs/${jobId}`);
     } catch (error: any) {
-      toast(error.response?.data?.error || 'Failed to submit job. Please check if your account has any violations.', 'error');
+      toast(error.response?.data?.message || 'Failed to update job.', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (isLoading) {
+    return <LoadingSpinner fullPage message="Fetching job details for editing..." />;
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Post a Job</h1>
-        <p className="mt-1 text-slate-500">Create a new opportunity for MNNIT students. All posts are subject to AI moderation.</p>
+      <button 
+        onClick={() => navigate(`/jobs/${jobId}`)} 
+        className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
+      >
+        <ArrowLeft size={16} className="mr-1" /> Back to Details
+      </button>
+
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Edit Job</h1>
+        <p className="mt-1 text-slate-500">Update your job opportunity. Significant changes will trigger re-moderation.</p>
       </div>
 
       <Card>
@@ -147,25 +196,22 @@ export const JobCreate = () => {
                   error={errors.jobLink?.message}
                   {...register('jobLink')}
                 />
-                <p className="mt-1 text-xs text-slate-500 italic">
-                  Note: If provided, students will be redirected to this link instead of applying through SkillSync AI.
-                </p>
               </div>
             </div>
 
             <div className="rounded-md bg-blue-50 p-4 border border-blue-200 flex mt-6">
                <ShieldAlert className="h-5 w-5 text-blue-400 mt-0.5" />
                <div className="ml-3 text-sm text-blue-700">
-                  By posting this job, you agree to our moderation policies. Content containing spam or offensive language will lead to a 3-day ban, and repeated offenses will result in a permanent ban.
+                  Updating the title or description will re-submit this job for AI moderation.
                </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
-              <Button type="button" variant="ghost" onClick={() => navigate('/jobs')} className="mr-3">
+              <Button type="button" variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mr-3">
                 Cancel
               </Button>
               <Button type="submit" isLoading={isSubmitting}>
-                Submit for Review
+                Save Changes
               </Button>
             </div>
           </form>
@@ -175,4 +221,4 @@ export const JobCreate = () => {
   );
 };
 
-export default JobCreate;
+export default JobEdit;

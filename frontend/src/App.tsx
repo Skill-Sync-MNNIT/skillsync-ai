@@ -14,8 +14,10 @@ import { Search } from './pages/Search';
 import { JobListing } from './pages/JobListing';
 import { JobCreate } from './pages/JobCreate';
 import { JobDetail } from './pages/JobDetail';
+import { JobEdit } from './pages/JobEdit';
 import { Notifications } from './pages/Notifications';
 import { Settings } from './pages/Settings';
+import { ToastProvider } from './context/ToastContext';
 
 const NotFound = () => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center text-center px-4">
@@ -35,41 +37,44 @@ const NotFound = () => (
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen font-sans bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-200">
-        <Routes>
-          {/* Public: AI Search Home Page */}
-          <Route element={<HomeLayout />}>
-            <Route path="/" element={<Search />} />
-          </Route>
-
-          {/* Auth Routes */}
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/verify-otp" element={<Verify />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-
-          {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<MyProfile />} />
-              <Route path="/profile/:userId" element={<ViewProfile />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/jobs" element={<JobListing />} />
-              <Route path="/jobs/create" element={<JobCreate />} />
-              <Route path="/jobs/:jobId" element={<JobDetail />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
+    <ToastProvider>
+      <BrowserRouter>
+        <div className="min-h-screen font-sans bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 transition-colors duration-200">
+          <Routes>
+            {/* Public: AI Search Home Page */}
+            <Route element={<HomeLayout />}>
+              <Route path="/" element={<Search />} />
             </Route>
-          </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+            {/* Auth Routes */}
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/register" element={<Register />} />
+            <Route path="/auth/verify-otp" element={<Verify />} />
+            <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+
+            {/* Protected Routes */}
+            <Route element={<PrivateRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<MyProfile />} />
+                <Route path="/profile/:userId" element={<ViewProfile />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/jobs" element={<JobListing />} />
+                <Route path="/jobs/create" element={<JobCreate />} />
+                <Route path="/jobs/:jobId" element={<JobDetail />} />
+                <Route path="/jobs/:jobId/edit" element={<JobEdit />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Route>
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
 

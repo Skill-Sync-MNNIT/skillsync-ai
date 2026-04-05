@@ -25,6 +25,20 @@ export const listJobs = async (req, res, next) => {
   }
 };
 
+export const listMyJobs = async (req, res, next) => {
+  try {
+    const { page, limit } = req.query;
+    const result = await JobService.listJobsByUser(
+      req.user.id,
+      Number(page) || 1,
+      Number(limit) || 10
+    );
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getJob = async (req, res, next) => {
   try {
     const job = await JobService.getJobById(req.params.jobId);
@@ -34,10 +48,23 @@ export const getJob = async (req, res, next) => {
   }
 };
 
+export const updateJob = async (req, res, next) => {
+  try {
+    const validatedData = jobPostingSchema.partial().parse(req.body);
+    const job = await JobService.updateJob(req.params.jobId, req.user.id, validatedData);
+    res.status(200).json({
+      message: 'Job updated successfully.',
+      status: job.status,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const withdrawJob = async (req, res, next) => {
   try {
     await JobService.withdrawJob(req.params.jobId, req.user.id);
-    res.status(200).json({ message: 'Job status: withdrawn' });
+    res.status(200).json({ message: 'Job closed successfully' });
   } catch (error) {
     next(error);
   }

@@ -5,6 +5,7 @@ import { BanManager } from '../auth/ban.manager.js';
 
 // POST /auth/login
 export const loginService = async (email, password) => {
+  email = email.toLowerCase();
   const user = await findUserByEmail(email);
 
   if (!user) throw new Error('User not found');

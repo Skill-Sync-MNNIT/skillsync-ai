@@ -18,6 +18,11 @@ const jobPostingSchema = new mongoose.Schema(
       required: true,
     },
 
+    jobLink: {
+      type: String,
+      default: null,
+    },
+
     requiredSkills: [
       {
         type: String,

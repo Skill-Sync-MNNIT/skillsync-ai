@@ -1,13 +1,14 @@
 import { useAuthStore } from '../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import {
-  Briefcase, Bell, TrendingUp, Users, ArrowUpRight,
-  Flame, BarChart3, Lightbulb, ChevronRight,
+  Briefcase, Bell, Users, ArrowUpRight,
+  Flame, BarChart3, Lightbulb,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useToast } from '../context/ToastContext';
 
 // ─── Helpers ────────────────────────────────────────────────
 const getGreeting = (): string => {
@@ -24,17 +25,21 @@ const getGreetingEmoji = (): string => {
   return '🌙';
 };
 
-// ─── Static curated skill data ───────────────────────────────
-// Reflects real demand trends visible in MNNIT job posts.
-// Will be replaced by a live /api/trending endpoint when available.
-const TRENDING_SKILLS = [
-  { name: 'React / Next.js',  demand: 92, color: 'bg-blue-500',    badge: 'Hot',    badgeColor: 'bg-red-100 text-red-600' },
-  { name: 'Python / ML',      demand: 87, color: 'bg-emerald-500', badge: 'Rising', badgeColor: 'bg-emerald-100 text-emerald-600' },
-  { name: 'Node.js',          demand: 78, color: 'bg-amber-500',   badge: null,     badgeColor: '' },
-  { name: 'Docker / K8s',     demand: 65, color: 'bg-violet-500',  badge: null,     badgeColor: '' },
-  { name: 'System Design',    demand: 58, color: 'bg-rose-500',    badge: null,     badgeColor: '' },
-  { name: 'TypeScript',       demand: 54, color: 'bg-sky-500',     badge: null,     badgeColor: '' },
+// ─── Constants ───────────────────────────────────────────────
+const SKILL_COLORS = [
+  'bg-blue-500',
+  'bg-emerald-500',
+  'bg-amber-500',
+  'bg-violet-500',
+  'bg-rose-500',
+  'bg-sky-500'
 ];
+
+interface TrendingSkill {
+  name: string;
+  count: number;
+}
+
 
 // ─── Role-specific insight cards ────────────────────────────
 // Values here are UI placeholders; replace with real API data
@@ -42,61 +47,29 @@ const TRENDING_SKILLS = [
 // endpoints are built. Kept minimal to avoid misleading the user.
 const ROLE_CARDS = {
   student: [
-    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell,       color: 'amber',  to: '/notifications' },
-    { label: 'Browse Jobs',   sublabel: 'Opportunities for you', icon: Briefcase,  color: 'blue',   to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
+    { label: 'Browse Jobs', sublabel: 'Opportunities for you', icon: Briefcase, color: 'blue', to: '/jobs' },
     { label: 'Search Network', sublabel: 'Find alumni & professors', icon: Users, color: 'emerald', to: '/search' },
   ],
   alumni: [
-    { label: 'Post a Job',    sublabel: 'Reach MNNIT talent', icon: Briefcase,  color: 'blue',   to: '/jobs/create' },
-    { label: 'Notifications', sublabel: 'Check your inbox',   icon: Bell,       color: 'amber',  to: '/notifications' },
+    { label: 'Browse Jobs', sublabel: 'Explore MNNIT opportunities', icon: Briefcase, color: 'blue', to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
     { label: 'Search Students', sublabel: 'Browse AI-ranked profiles', icon: Users, color: 'emerald', to: '/search' },
   ],
   professor: [
-    { label: 'Post a Project', sublabel: 'Open research positions', icon: Briefcase, color: 'blue',   to: '/jobs/create' },
-    { label: 'Notifications',  sublabel: 'Check your inbox',        icon: Bell,      color: 'amber',  to: '/notifications' },
-    { label: 'Find Students',  sublabel: 'Browse by skills',        icon: Users,     color: 'emerald', to: '/search' },
+    { label: 'Browse Jobs', sublabel: 'View all active postings', icon: Briefcase, color: 'blue', to: '/jobs' },
+    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
+    { label: 'Find Students', sublabel: 'Browse by skills', icon: Users, color: 'emerald', to: '/search' },
   ],
 };
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; text: string; border: string }> = {
-  blue:    { bg: 'bg-blue-50 dark:bg-blue-950/50',    iconBg: 'bg-blue-100 dark:bg-blue-900/50',    text: 'text-blue-600 dark:text-blue-400',    border: 'border-blue-100 dark:border-blue-900/30' },
-  amber:   { bg: 'bg-amber-50 dark:bg-amber-950/50',   iconBg: 'bg-amber-100 dark:bg-amber-900/50',   text: 'text-amber-600 dark:text-amber-400',   border: 'border-amber-100 dark:border-amber-900/30' },
+  blue: { bg: 'bg-blue-50 dark:bg-blue-950/50', iconBg: 'bg-blue-100 dark:bg-blue-900/50', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-100 dark:border-blue-900/30' },
+  amber: { bg: 'bg-amber-50 dark:bg-amber-950/50', iconBg: 'bg-amber-100 dark:bg-amber-900/50', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' },
   emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/50', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
 };
 
-// ─── Skeleton ───────────────────────────────────────────────
-const SkeletonBlock = ({ className = '' }: { className?: string }) => (
-  <div className={`skeleton-shimmer ${className}`} />
-);
 
-const DashboardSkeleton = () => (
-  <div className="space-y-6">
-    <SkeletonBlock className="h-40 w-full rounded-2xl" />
-    <div className="grid gap-5 sm:grid-cols-3">
-      {[...Array(3)].map((_, i) => (
-        <Card key={i} className="p-6 space-y-3">
-          <div className="flex justify-between">
-            <SkeletonBlock className="h-4 w-28" />
-            <SkeletonBlock className="h-9 w-9 rounded-lg" />
-          </div>
-          <SkeletonBlock className="h-4 w-36" />
-        </Card>
-      ))}
-    </div>
-    <Card className="p-6 space-y-4">
-      <SkeletonBlock className="h-5 w-44" />
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="space-y-1.5">
-          <div className="flex justify-between">
-            <SkeletonBlock className="h-4 w-28" />
-            <SkeletonBlock className="h-4 w-10" />
-          </div>
-          <SkeletonBlock className="h-2.5 w-full rounded-full" />
-        </div>
-      ))}
-    </Card>
-  </div>
-);
 
 // ─── Nav card (navigates to a page section) ─────────────────
 interface NavCardProps {
@@ -132,14 +105,18 @@ const NavCard = ({ label, sublabel, icon: Icon, color, to, delay }: NavCardProps
 // ─── Dashboard ───────────────────────────────────────────────
 export const Dashboard = () => {
   const { user } = useAuthStore();
+  const { toast } = useToast();
+  const [trendingSkills, setTrendingSkills] = useState<TrendingSkill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const init = async () => {
       try {
-        await api.get('/api/dashboard');
-      } catch {
-        // API exists but returns minimal data — that's fine
+        const response = await api.get('/api/dashboard');
+        setTrendingSkills(response.data.trendingSkills || []);
+      } catch (error) {
+        console.error('Failed to fetch dashboard data', error);
+        toast('Failed to load dashboard insights', 'error');
       } finally {
         setTimeout(() => setIsLoading(false), 500);
       }
@@ -148,7 +125,7 @@ export const Dashboard = () => {
   }, []);
 
   if (!user) return null;
-  if (isLoading) return <DashboardSkeleton />;
+  if (isLoading) return <LoadingSpinner fullPage message="Preparing your dashboard..." />;
 
   const cards = ROLE_CARDS[user.role] ?? ROLE_CARDS.student;
   const userName = user.email.split('@')[0];
@@ -177,14 +154,6 @@ export const Dashboard = () => {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {(user.role === 'alumni' || user.role === 'professor') && (
-              <Link to="/jobs/create">
-                <Button size="md" className="bg-white text-primary-700 hover:bg-white/90 shadow-lg shadow-primary-900/20">
-                  <Briefcase size={15} className="mr-2" />
-                  Post a Job
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
       </div>
@@ -215,94 +184,54 @@ export const Dashboard = () => {
 
         <CardContent className="pt-6">
           <div className="grid gap-4 sm:grid-cols-2">
-            {TRENDING_SKILLS.map((skill, i) => (
-              <div key={skill.name} className="group">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                      {skill.name}
-                    </span>
-                    {skill.badge && (
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${skill.badgeColor} dark:bg-opacity-20`}>
-                        {skill.badge}
-                      </span>
-                    )}
+            {trendingSkills.length > 0 ? (
+              trendingSkills.map((skill, i) => {
+                const maxCount = Math.max(...trendingSkills.map(s => s.count), 1);
+                const demand = Math.round((skill.count / maxCount) * 100);
+                const badge = i === 0 ? 'Hot' : i === 1 ? 'Rising' : null;
+                const badgeColor = i === 0 ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
+
+                return (
+                  <div key={skill.name} className="group">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                          {skill.name}
+                        </span>
+                        {badge && (
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full ${badgeColor} dark:bg-opacity-20`}>
+                            {badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{demand}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${SKILL_COLORS[i % SKILL_COLORS.length]} animate-progress-fill transition-all duration-300 group-hover:brightness-110`}
+                        style={{ width: `${demand}%`, animationDelay: `${400 + i * 80}ms` }}
+                      />
+                    </div>
                   </div>
-                  <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{skill.demand}%</span>
-                </div>
-                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${skill.color} animate-progress-fill transition-all duration-300 group-hover:brightness-110`}
-                    style={{ width: `${skill.demand}%`, animationDelay: `${400 + i * 80}ms` }}
-                  />
-                </div>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-8 text-center text-slate-500 italic">
+                No active job trends to display yet.
               </div>
-            ))}
+            )}
           </div>
 
           <div className="mt-6 p-3 rounded-xl bg-gradient-to-r from-slate-50 dark:from-slate-900 to-blue-50/50 dark:to-blue-900/10 border border-slate-100 dark:border-slate-800 flex items-start gap-2">
             <Lightbulb size={15} className="text-amber-500 mt-0.5 shrink-0" />
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               <span className="font-semibold text-slate-700 dark:text-slate-300">Tip:</span>{' '}
-              Adding in-demand skills to your{' '}
-              <Link to="/profile" className="text-primary-600 hover:underline font-medium">profile</Link>{' '}
-              boosts your visibility in AI-powered searches.
+              Adding in-demand skills to your profile boosts your visibility in AI-powered searches.
             </p>
           </div>
 
-          <div className="mt-4 flex justify-end">
-            <Link
-              to="/search"
-              className="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-1"
-            >
-              Explore the talent pool <ChevronRight size={13} />
-            </Link>
-          </div>
         </CardContent>
       </Card>
-
-      {/* ── "Trending Skills" stat card for context ───────────── */}
-      <div className="grid gap-4 sm:grid-cols-3 animate-fade-in-up" style={{ animationDelay: '380ms' }}>
-        <Card className="flex items-center gap-4 p-5 border-violet-100 dark:border-violet-900/30">
-          <div className="h-10 w-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
-            <TrendingUp size={18} className="text-violet-600" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">
-              {TRENDING_SKILLS.length}
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">Skills trending now</p>
-          </div>
-        </Card>
-        <Card className="flex items-center gap-4 p-5 border-blue-100 dark:border-blue-900/30">
-          <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-            <Briefcase size={18} className="text-blue-600" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">Looking for work?</p>
-            <Link
-              to="/jobs"
-              className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-            >
-              Browse open jobs →
-            </Link>
-          </div>
-        </Card>
-        <Card className="flex items-center gap-4 p-5 border-emerald-100 dark:border-emerald-900/30">
-          <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <Users size={18} className="text-emerald-600" />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">Grow your network</p>
-            <Link
-              to="/search"
-              className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-            >
-              Search people →
-            </Link>
-          </div>
-        </Card>
-      </div>
 
     </div>
   );
