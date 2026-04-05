@@ -5,15 +5,16 @@ import { Input } from '../components/ui/Input';
 import { X, ShieldAlert, Sliders, Save } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 export const Settings = () => {
   const { user } = useAuthStore();
+  const { toast } = useToast();
   
   const [preferences, setPreferences] = useState<string[]>([]);
   const [newPref, setNewPref] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [message, setMessage] = useState('');
   const [isBanned, setIsBanned] = useState(false);
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export const Settings = () => {
         setIsBanned(response.data.systemStatus === 'banned');
       } catch (error) {
         console.error('Failed to fetch settings', error);
+        toast('Failed to load settings', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -47,12 +49,11 @@ export const Settings = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    setMessage('');
     try {
       await api.put('/settings/preferences', { preferences });
-      setMessage('Preferences saved successfully.');
+      toast('Preferences saved successfully.', 'success');
     } catch (error: any) {
-      setMessage(error.response?.data?.error || 'Failed to save preferences.');
+      toast(error.response?.data?.error || 'Failed to save preferences.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -100,10 +101,7 @@ export const Settings = () => {
                 onKeyDown={handleAddPref}
               />
 
-              <div className="pt-4 flex items-center justify-between border-t border-slate-100">
-                 <span className={`text-sm font-medium ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-                   {message}
-                 </span>
+              <div className="pt-4 flex items-center justify-end border-t border-slate-100">
                  <Button onClick={handleSave} isLoading={isSaving} size="sm">
                    <Save size={16} className="mr-2" /> Save Preferences
                  </Button>

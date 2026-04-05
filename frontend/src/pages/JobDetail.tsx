@@ -49,6 +49,7 @@ export const JobDetail = () => {
       }
     } catch (error) {
       console.error('Failed to fetch job details', error);
+      toast('Failed to load job details', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -66,8 +67,8 @@ export const JobDetail = () => {
 
     setIsApplying(true);
     try {
-      await api.post(`/jobs/${jobId}/apply`);
-      toast('Application submitted successfully!', 'success');
+      const response = await api.post(`/jobs/${jobId}/apply`);
+      toast(response.data.message || 'Application submitted successfully!', 'success');
     } catch (error: any) {
       toast(error.response?.data?.message || 'Failed to apply for this job', 'error');
     } finally {
@@ -82,8 +83,8 @@ export const JobDetail = () => {
 
     setIsWithdrawing(true);
     try {
-      await api.delete(`/jobs/${jobId}`);
-      toast('Job closed successfully', 'success');
+      const response = await api.delete(`/jobs/${jobId}`);
+      toast(response.data.message || 'Job closed successfully', 'success');
       fetchJob(); // Refresh to show new status
     } catch (error: any) {
       toast(error.response?.data?.message || 'Failed to close application', 'error');
@@ -95,8 +96,8 @@ export const JobDetail = () => {
   const updateApplicationStatus = async (appId: string, status: string) => {
     setProcessingId(appId);
     try {
-      await api.patch(`/jobs/applications/${appId}/status`, { status });
-      toast(`Application marked as ${status}`, 'success');
+      const response = await api.patch(`/jobs/applications/${appId}/status`, { status });
+      toast(response.data.message || `Application marked as ${status}`, 'success');
       fetchJob(); // Refresh list
     } catch (error) {
       toast('Failed to update status', 'error');

@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Download, Eye, Cpu } from 'lucide-react';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useToast } from '../context/ToastContext';
 
 interface StudentProfile {
   userId: string;
@@ -23,6 +24,7 @@ interface StudentProfile {
 
 export const ViewProfile = () => {
   const { userId } = useParams<{ userId: string }>();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isViewing, setIsViewing] = useState(false);
@@ -39,6 +41,7 @@ export const ViewProfile = () => {
         }
       } catch (error) {
         console.error('Failed to fetch profile', error);
+        toast('Failed to load student profile', 'error');
         setProfile(null);
       } finally {
         setIsLoading(false);
@@ -77,8 +80,8 @@ export const ViewProfile = () => {
       // Cleanup: increased timer to 60s to ensure the viewer has time to load
       setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
       
-    } catch (error) {
-      alert(`Failed to ${action} resume. It may not exist.`);
+    } catch (error: any) {
+      toast(`Failed to ${action} resume. It may not exist.`, 'error');
     } finally {
       if (action === 'view') setIsViewing(false);
       else setIsDownloading(false);

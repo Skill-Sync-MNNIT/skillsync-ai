@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useToast } from '../context/ToastContext';
 
 interface Job {
   _id: string;
@@ -22,6 +23,7 @@ interface Job {
 
 export const JobListing = () => {
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -37,12 +39,13 @@ export const JobListing = () => {
         setJobs(response.data.jobs || []);
       } catch (error) {
         console.error('Failed to fetch jobs', error);
+        toast('Failed to load job listings', 'error');
       } finally {
         setIsLoading(false);
       }
     };
     fetchJobs();
-  }, [activeTab]);
+  }, [activeTab, toast]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

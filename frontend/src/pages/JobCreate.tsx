@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { X, ShieldAlert } from 'lucide-react';
 import api from '../services/api';
+import { useToast } from '../context/ToastContext';
 
 const jobSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
@@ -20,11 +21,11 @@ type JobForm = z.infer<typeof jobSchema>;
 
 export const JobCreate = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [skillError, setSkillError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState('');
 
   const {
     register,
@@ -55,16 +56,15 @@ export const JobCreate = () => {
     }
 
     setIsSubmitting(true);
-    setApiError('');
     try {
-      await api.post('/jobs', {
+      const response = await api.post('/jobs', {
         ...data,
         requiredSkills: skills,
       });
-      // Redirect back to job listings with maybe a success toast
+      toast(response.data.message || 'Job opportunity posted successfully!', 'success');
       navigate('/jobs');
     } catch (error: any) {
-      setApiError(error.response?.data?.error || 'Failed to submit job. Please check if your account has any violations.');
+      toast(error.response?.data?.error || 'Failed to submit job. Please check if your account has any violations.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -159,12 +159,6 @@ export const JobCreate = () => {
                   By posting this job, you agree to our moderation policies. Content containing spam or offensive language will lead to a 3-day ban, and repeated offenses will result in a permanent ban.
                </div>
             </div>
-
-            {apiError && (
-              <div className="rounded-md bg-red-50 p-4 border border-red-200">
-                <h3 className="text-sm font-medium text-red-800">{apiError}</h3>
-              </div>
-            )}
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
               <Button type="button" variant="ghost" onClick={() => navigate('/jobs')} className="mr-3">

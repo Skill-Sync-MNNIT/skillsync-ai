@@ -5,6 +5,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useToast } from '../context/ToastContext';
 
 interface Notification {
   _id: string;
@@ -16,6 +17,7 @@ interface Notification {
 
 export const Notifications = () => {
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +29,7 @@ export const Notifications = () => {
       setNotifications(response.data.notifications || []);
     } catch (error) {
        console.error('Failed to fetch notifications', error);
+       toast('Failed to load notifications', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -45,6 +48,7 @@ export const Notifications = () => {
         );
       } catch (e) {
          console.error('Failed to mark as read', e);
+         toast('Failed to mark notification as read', 'error');
       }
     }
     
@@ -61,8 +65,10 @@ export const Notifications = () => {
        // Optimization: Could use a single backend call if available, but for now this works
        await Promise.all(unread.map(n => api.patch(`/notifications/${n._id}/read`)));
        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+       toast('All notifications marked as read', 'success');
     } catch (e) {
        console.error('Failed to mark all as read', e);
+       toast('Failed to mark all as read', 'error');
     }
   };
 
@@ -71,8 +77,10 @@ export const Notifications = () => {
     try {
       await api.delete(`/notifications/${id}`);
       setNotifications(prev => prev.filter(n => n._id !== id));
+      toast('Notification deleted', 'success');
     } catch (e) {
       console.error('Failed to delete notification', e);
+      toast('Failed to delete notification', 'error');
     }
   };
 
@@ -81,8 +89,10 @@ export const Notifications = () => {
     try {
       await api.delete('/notifications');
       setNotifications([]);
+      toast('All notifications cleared', 'success');
     } catch (e) {
       console.error('Failed to clear notifications', e);
+      toast('Failed to clear notifications', 'error');
     }
   };
 

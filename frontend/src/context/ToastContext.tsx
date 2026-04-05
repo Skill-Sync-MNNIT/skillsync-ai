@@ -25,7 +25,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, 3000);
   }, []);
 
   const removeToast = (id: string) => {
@@ -35,11 +35,11 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed top-24 right-6 z-[9999] flex flex-col gap-3 pointer-events-none w-full max-w-xs">
+      <div className="fixed top-18 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-lg border animate-in slide-in-from-right-full duration-300 ${
+            className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-xl border bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-full fade-in duration-500 transform-gpu ${
               t.type === 'success'
                 ? 'bg-white border-green-100 text-green-800'
                 : t.type === 'error'

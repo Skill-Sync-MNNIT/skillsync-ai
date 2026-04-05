@@ -10,6 +10,7 @@ import { Button } from '../components/ui/Button';
 import { AuthModal } from '../components/AuthModal';
 import { useAuthStore } from '../store/authStore';
 import { searchService } from '../services/searchService';
+import { useToast } from '../context/ToastContext';
 
 // ─── Types ──────────────────────────────────────────────────
 interface SearchResult {
@@ -178,6 +179,7 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
 // ─── Main Search Component ──────────────────────────────────
 export const Search = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   const [query, setQuery] = useState('');
@@ -209,8 +211,9 @@ export const Search = () => {
     try {
       const data = await searchService.search({ query: searchQuery });
       setResults(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Search failed:', error);
+      toast(error.response?.data?.message || 'AI Search encountered an error. Please try again.', 'error');
       setResults([]);
     } finally {
       setIsLoading(false);
