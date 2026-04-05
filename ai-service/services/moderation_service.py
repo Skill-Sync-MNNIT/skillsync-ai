@@ -17,7 +17,7 @@ MODERATION_PROMPT = PromptTemplate.from_template(
     "Violations to check : spam, fake job, illegal content, discrimnation"
     "misleading salary, adult content.\n\n"
     "Respond ONLY with valid JSON in this exact format:\n"
-    "{{'passed':true/false,'violation_type':'string or null', 'confidence':0.0-1.0}}"
+    "{{\"passed\":true/false,\"violation_type\":\"string or null\", \"confidence\":0.0-1.0}}"
 )
 
 class ModerationService:
@@ -27,6 +27,13 @@ class ModerationService:
             api_key=settings.groq_api_key,
             temperature=0.1,
         )
+        if getattr(settings, "groq_api_key_2", ""):
+            f_llm = ChatGroq(
+                model="llama-3.3-70b-versatile",
+                api_key=settings.groq_api_key_2,
+                temperature=0.1,
+            )
+            llm = llm.with_fallbacks([f_llm])
         self.chain = MODERATION_PROMPT | llm | StrOutputParser()
 
     async def moderate(self, title: str, description: str) -> dict:

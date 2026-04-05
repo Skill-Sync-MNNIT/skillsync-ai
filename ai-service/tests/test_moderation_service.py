@@ -2,7 +2,7 @@ from unittest.mock import patch, AsyncMock
 import pytest
 
 
-@patch("services.moderation_service.ChatGoogleGenerativeAI")
+@patch("services.moderation_service.ChatGroq")
 def test_moderate_passes_clean_job(mock_llm):
     from services.moderation_service import ModerationService
     from unittest.mock import MagicMock, AsyncMock
@@ -16,7 +16,7 @@ def test_moderate_passes_clean_job(mock_llm):
     assert result["violation_type"] is None
 
 
-@patch("services.moderation_service.ChatGoogleGenerativeAI")
+@patch("services.moderation_service.ChatGroq")
 def test_moderate_fails_spam(mock_llm):
     from services.moderation_service import ModerationService
     from unittest.mock import MagicMock, AsyncMock

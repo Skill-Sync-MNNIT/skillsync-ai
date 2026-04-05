@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@lottiefiles/react-lottie-player": "^3.6.0",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.13.6",
     "clsx": "^2.1.1",
