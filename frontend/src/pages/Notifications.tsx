@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCircle, Info, Briefcase } from 'lucide-react';
+import { Bell, CheckCircle, Info, Briefcase, Trash2, X, CheckCheck } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
 interface Notification {
   _id: string;
-  type: 'job_match' | 'system' | 'moderation_alert';
   message: string;
   isRead: boolean;
-  relatedJobId?: string;
+  jobId?: string;
   createdAt: string;
 }
 
@@ -27,13 +27,6 @@ export const Notifications = () => {
       setNotifications(response.data.notifications || []);
     } catch (error) {
        console.error('Failed to fetch notifications', error);
-       // Mock data for UI development if backend fails
-       if (import.meta.env.DEV) {
-         setNotifications([
-            { _id: '1', type: 'job_match', message: 'You have a 92% match for Software Engineer Intern!', isRead: false, relatedJobId: '123', createdAt: new Date().toISOString() },
-            { _id: '2', type: 'system', message: 'Welcome to SkillSync AI. Please complete your profile.', isRead: true, createdAt: new Date(Date.now() - 86400000).toISOString() }
-         ]);
-       }
     } finally {
       setIsLoading(false);
     }
@@ -54,19 +47,42 @@ export const Notifications = () => {
          console.error('Failed to mark as read', e);
       }
     }
-    if (notif.relatedJobId) {
-      navigate(`/jobs/${notif.relatedJobId}`);
+    
+    if (notif.jobId) {
+      navigate(`/jobs/${notif.jobId}`);
     }
   };
 
   const markAllAsRead = async () => {
     try {
-       // Assuming there's a mark-all endpoint, otherwise map through them
        const unread = notifications.filter(n => !n.isRead);
+       if (unread.length === 0) return;
+       
+       // Optimization: Could use a single backend call if available, but for now this works
        await Promise.all(unread.map(n => api.patch(`/notifications/${n._id}/read`)));
        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     } catch (e) {
        console.error('Failed to mark all as read', e);
+    }
+  };
+
+  const handleDeleteNotification = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n._id !== id));
+    } catch (e) {
+      console.error('Failed to delete notification', e);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm('Are you sure you want to clear all notifications?')) return;
+    try {
+      await api.delete('/notifications');
+      setNotifications([]);
+    } catch (e) {
+      console.error('Failed to clear notifications', e);
     }
   };
 
@@ -81,59 +97,72 @@ export const Notifications = () => {
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h1>
         </div>
-        {notifications.some(n => !n.isRead) && (
-          <button 
-            onClick={markAllAsRead}
-            className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
-          >
-            Mark all as read
-          </button>
-        )}
+        <div className="flex items-center gap-4">
+          {notifications.length > 0 && (
+            <>
+              {notifications.some(n => !n.isRead) && (
+                <button 
+                  onClick={markAllAsRead}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                >
+                  <CheckCheck size={16} /> Mark all read
+                </button>
+              )}
+              <button 
+                onClick={handleClearAll}
+                className="flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"
+              >
+                <Trash2 size={16} /> Clear all
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">
         {isLoading ? (
-          <div className="space-y-3">
-             {[1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-200 animate-pulse rounded-xl"></div>)}
-          </div>
+          <LoadingSpinner fullPage message="Syncing your notifications..." />
         ) : notifications.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
-             <CheckCircle className="mx-auto h-12 w-12 text-slate-300 mb-4" />
+          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+             <CheckCircle className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" />
              <h3 className="text-lg font-medium text-slate-900 dark:text-white">You're all caught up!</h3>
-             <p className="mt-1 text-slate-500">No new notifications right now.</p>
+             <p className="mt-1 text-slate-500 dark:text-slate-400">No new notifications right now.</p>
           </div>
         ) : (
           notifications.map((notif) => (
             <Card 
               key={notif._id} 
-              className={`cursor-pointer transition-colors ${!notif.isRead ? 'bg-indigo-50/50 border-primary-200 shadow-sm' : 'bg-white border-slate-200'}`}
+              className={`cursor-pointer transition-colors ${!notif.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-primary-200 dark:border-primary-800 shadow-sm' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}
               onClick={() => handleNotificationClick(notif)}
             >
               <CardContent className="p-4 sm:p-5 flex gap-4">
                 <div className={`mt-1 shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                  notif.type === 'job_match' ? 'bg-green-100 text-green-600' :
-                  notif.type === 'moderation_alert' ? 'bg-red-100 text-red-600' :
-                  'bg-blue-100 text-blue-600'
+                  notif.jobId ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
                 }`}>
-                  {notif.type === 'job_match' ? <Briefcase size={18} /> : 
-                   notif.type === 'moderation_alert' ? <Info size={18} /> :
-                   <Info size={18} />}
+                  {notif.jobId ? <Briefcase size={18} /> : <Info size={18} />}
                 </div>
                 
                 <div className="flex-1">
                   <p className={`text-sm sm:text-base ${!notif.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}>
                     {notif.message}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500 font-medium">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
                     {new Date(notif.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                   </p>
                 </div>
 
-                {!notif.isRead && (
-                   <div className="shrink-0 flex items-center justify-center">
-                      <div className="h-2.5 w-2.5 bg-primary-600 rounded-full"></div>
-                   </div>
-                )}
+                <div className="shrink-0 flex items-center gap-3">
+                  {!notif.isRead && (
+                    <div className="h-2.5 w-2.5 bg-primary-600 rounded-full"></div>
+                  )}
+                  <button
+                    onClick={(e) => handleDeleteNotification(e, notif._id)}
+                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                    title="Delete notification"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </CardContent>
             </Card>
           ))

@@ -3,13 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import {
   Search as SearchIcon, Sparkles, Brain, Zap, GraduationCap,
-  Calendar, ChevronDown, ChevronUp, Download, Eye, ArrowRight, RotateCcw,
+  Calendar, ChevronDown, ChevronUp, Eye, ArrowRight, RotateCcw,
   User as UserIcon
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { AuthModal } from '../components/AuthModal';
 import { useAuthStore } from '../store/authStore';
-import { profileService } from '../services/profileService';
 import { searchService } from '../services/searchService';
 
 // ─── Types ──────────────────────────────────────────────────
@@ -25,14 +24,13 @@ interface SearchResult {
   detailedReasoning?: string;
 }
 
-// ─── Score color map (consistent with Dashboard) ────────────
+// ─── Score color map ────────────────────────────────────────
 const getScoreColor = (score: number) => {
   if (score >= 85) return { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-900/50', bar: 'bg-emerald-500', label: 'Excellent Match' };
   if (score >= 65) return { bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-900/50', bar: 'bg-blue-500', label: 'Good Match' };
   if (score >= 45) return { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-900/50', bar: 'bg-amber-500', label: 'Partial Match' };
   return { bg: 'bg-slate-50 dark:bg-slate-800/50', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-slate-700', bar: 'bg-slate-400', label: 'Low Match' };
 };
-
 
 const SUGGESTION_CHIPS = [
   'React developer with Node.js',
@@ -43,7 +41,7 @@ const SUGGESTION_CHIPS = [
   'Mobile app developer',
 ];
 
-// ─── Typing Indicator ───────────────────────────────────────
+// ─── Special UI Components ──────────────────────────────────
 const TypingIndicator = () => (
   <div className="flex items-center gap-3 p-5 animate-fade-in bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mb-4">
     <div className="h-16 w-16 -ml-4 -my-4 flex items-center justify-center shrink-0">
@@ -58,7 +56,6 @@ const TypingIndicator = () => (
   </div>
 );
 
-// ─── Skeleton Loader ────────────────────────────────────────
 const SkeletonBlock = ({ className = '' }: { className?: string }) => (
   <div className={`skeleton-shimmer ${className}`} />
 );
@@ -89,20 +86,9 @@ const ResultSkeleton = () => (
 // ─── Result Card ────────────────────────────────────────────
 const ResultCard = ({ result, index }: { result: SearchResult; index: number }) => {
   const [expanded, setExpanded] = useState(false);
-  const navigate = useNavigate();
   const sc = getScoreColor(result.matchScore);
   const initials = (result.name || result.email.split('@')[0])
     .split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
-
-  const handleDownloadResume = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      const url = await profileService.getResumeUrl(result.userId);
-      window.open(url, '_blank');
-    } catch {
-      console.error('Failed to get resume URL');
-    }
-  };
 
   return (
     <div
@@ -110,20 +96,17 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
       style={{ animationDelay: `${200 + index * 100}ms` }}
     >
       <div className="flex flex-col sm:flex-row">
-        {/* Score Sidebar */}
         <div className={`sm:w-24 shrink-0 ${sc.bg} flex sm:flex-col items-center justify-center gap-2 p-4 sm:p-5 border-b sm:border-b-0 sm:border-r ${sc.border}`}>
           <div className={`text-3xl sm:text-4xl font-black ${sc.text} tabular-nums`}>
             {result.matchScore}
           </div>
-          <span className={`text-[10px] font-semibold ${sc.text} uppercase tracking-wider`}>Match</span>
+          <span className={`text-[10px] font-semibold ${sc.text} uppercase tracking-wider text-center`}>Match</span>
           <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden mt-1 hidden sm:block">
             <div className={`h-full rounded-full ${sc.bar} animate-progress-fill`} style={{ width: `${result.matchScore}%` }} />
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 p-5">
-          {/* Header */}
           <div className="flex items-start justify-between gap-4 mb-3">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center shrink-0 text-primary-700 dark:text-primary-400 font-bold text-sm">
@@ -144,13 +127,11 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
             </span>
           </div>
 
-          {/* AI Explanation */}
           <div className="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl mb-3">
             <Brain size={15} className="text-primary-500 shrink-0 mt-0.5" />
             <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{result.explanation}</p>
           </div>
 
-          {/* Skills */}
           {result.matchedSkills?.length > 0 && (
             <div className="mb-3">
               <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5">Matched Skills</p>
@@ -164,7 +145,6 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
             </div>
           )}
 
-          {/* Expandable reasoning */}
           {result.detailedReasoning && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
@@ -181,13 +161,12 @@ const ResultCard = ({ result, index }: { result: SearchResult; index: number }) 
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-            <Button size="sm" onClick={() => navigate(`/profile/${result.userId}`)}>
+            <Button size="sm" onClick={() => {
+              const slug = result.email.split('@')[0];
+              window.open(`/profile/${slug}`, '_blank');
+            }}>
               <Eye size={14} className="mr-1.5" /> View Profile
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDownloadResume}>
-              <Download size={14} className="mr-1.5" /> Resume
             </Button>
           </div>
         </div>
@@ -209,19 +188,16 @@ export const Search = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-fill query from URL param (redirect after auth)
   useEffect(() => {
     const q = searchParams.get('q');
     if (q && isAuthenticated()) {
       setQuery(q);
-      // Auto-trigger search
       setTimeout(() => {
         performSearch(q);
       }, 300);
     }
   }, [searchParams]);
 
-  // Focus input on mount
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus();
   }, []);
@@ -245,7 +221,6 @@ export const Search = () => {
     e?.preventDefault();
     if (!query.trim()) return;
 
-    // Auth gate: if not authenticated, redirect to login
     if (!isAuthenticated()) {
       navigate(`/auth/login?q=${encodeURIComponent(query.trim())}`);
       return;
@@ -274,22 +249,18 @@ export const Search = () => {
     }
   };
 
-  // Auto-resize textarea
   const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setQuery(e.target.value);
     const el = e.target;
     el.style.height = 'auto';
     const nextHeight = Math.min(el.scrollHeight, 120);
     el.style.height = nextHeight + 'px';
-    // Only show scrollbar if we hit the max height constraint
     el.style.overflowY = el.scrollHeight > 120 ? 'auto' : 'hidden';
   };
 
-  // ─── IDLE STATE ─────────────────────────────────────────────
   if (!hasSearched && !isLoading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4 pb-24">
-        {/* Hero */}
         <div className="text-center max-w-2xl mx-auto animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 border border-primary-100 dark:border-primary-800 text-xs font-semibold text-primary-600 dark:text-primary-400 mb-6">
             <Sparkles size={13} />
@@ -304,7 +275,6 @@ export const Search = () => {
           </p>
         </div>
 
-        {/* Search Input */}
         <div className="w-full max-w-2xl mx-auto mt-10 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
           <form onSubmit={handleSearch}>
             <div className="relative group">
@@ -312,7 +282,7 @@ export const Search = () => {
               <div className="relative flex items-end bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg shadow-slate-200/50 dark:shadow-none focus-within:border-primary-300 dark:focus-within:border-primary-500 transition-all duration-300">
                 <textarea
                   ref={inputRef}
-                  className="flex-1 resize-none overflow-hidden bg-transparent px-5 py-4 text-base text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none min-h-[56px] max-h-[120px] scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700"
+                  className="flex-1 resize-none overflow-hidden bg-transparent px-5 py-4 text-base text-slate-900 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none min-h-[56px] max-h-[120px]"
                   placeholder="Describe your ideal candidate (e.g. 'React developer')..."
                   value={query}
                   onChange={handleTextareaInput}
@@ -331,7 +301,6 @@ export const Search = () => {
             </div>
           </form>
 
-          {/* Suggestion Chips */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
             <span className="text-xs text-slate-400 dark:text-slate-500 mr-1">Try:</span>
             {SUGGESTION_CHIPS.map((chip) => (
@@ -346,12 +315,10 @@ export const Search = () => {
           </div>
         </div>
 
-        {/* Subtle footer info */}
         <p className="mt-12 text-xs text-slate-400 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           Powered by semantic embeddings • MNNIT Talent Pool
         </p>
 
-        {/* Auth Modal */}
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
@@ -361,10 +328,8 @@ export const Search = () => {
     );
   }
 
-  // ─── RESULTS / LOADING STATE ────────────────────────────────
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 pb-20">
-      {/* User query bubble */}
       <div className="flex justify-end mb-6 animate-fade-in-up">
         <div className="flex items-start gap-3 max-w-[85%]">
           <div className="bg-primary-600 text-white px-5 py-3 rounded-2xl rounded-tr-sm shadow-sm">
@@ -376,13 +341,11 @@ export const Search = () => {
         </div>
       </div>
 
-      {/* AI response area */}
       <div className="flex items-start gap-3 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
         <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
           <Brain size={14} className="text-primary-600" />
         </div>
         <div className="flex-1 min-w-0">
-          {/* Loading state */}
           {isLoading && (
             <>
               <TypingIndicator />
@@ -390,10 +353,8 @@ export const Search = () => {
             </>
           )}
 
-          {/* Results */}
           {!isLoading && hasSearched && results.length > 0 && (
             <div className="animate-fade-in">
-              {/* Response header */}
               <div className="flex items-center justify-between mb-5 px-1">
                 <div>
                   <h2 className="text-base font-semibold text-slate-900 dark:text-white">
@@ -406,7 +367,6 @@ export const Search = () => {
                 </span>
               </div>
 
-              {/* Result cards */}
               <div className="space-y-4">
                 {results.map((result, i) => (
                   <ResultCard key={result.userId} result={result} index={i} />
@@ -429,7 +389,6 @@ export const Search = () => {
         </div>
       </div>
 
-      {/* New Search Button */}
       {!isLoading && hasSearched && (
         <div className="flex justify-center mt-10 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Button variant="outline" size="md" onClick={handleReset}>
@@ -439,7 +398,6 @@ export const Search = () => {
         </div>
       )}
 
-      {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
