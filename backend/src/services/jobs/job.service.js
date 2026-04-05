@@ -10,6 +10,20 @@ export class JobService {
    * and enqueue it to the moderation queue.
    */
   static async createJob(jobData, userId) {
+    // Prevent duplicates (same user, title, and description)
+    const existingJob = await JobPosting.findOne({
+      postedBy: userId,
+      title: jobData.title,
+      description: jobData.description,
+      status: { $ne: 'withdrawn' },
+    });
+
+    if (existingJob) {
+      throw new Error(
+        'You have already posted an identical job. Please edit the existing one or create a new opportunity.'
+      );
+    }
+
     const job = await JobPosting.create({
       ...jobData,
       postedBy: userId,
@@ -24,6 +38,60 @@ export class JobService {
     });
 
     return job;
+  }
+
+  /**
+   * Update an existing job.
+   * Re-moderates if title or description changes.
+   */
+  static async updateJob(jobId, userId, updateData) {
+    const job = await JobPosting.findOne({ _id: jobId, postedBy: userId });
+    if (!job) throw new Error('Job not found or unauthorized');
+
+    const criticalChange =
+      (updateData.title && updateData.title !== job.title) ||
+      (updateData.description && updateData.description !== job.description);
+
+    // Update fields
+    Object.assign(job, updateData);
+
+    if (criticalChange) {
+      job.status = 'pending_moderation';
+    }
+
+    await job.save();
+
+    if (criticalChange) {
+      await moderationQueue.add('moderate-job', {
+        jobId: job._id,
+        title: job.title,
+        description: job.description,
+      });
+    }
+
+    return job;
+  }
+
+  /**
+   * List jobs posted by a specific user (Alumni/Professor).
+   */
+  static async listJobsByUser(userId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const [jobs, total] = await Promise.all([
+      JobPosting.find({ postedBy: userId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('postedBy', 'name email'),
+      JobPosting.countDocuments({ postedBy: userId }),
+    ]);
+
+    return {
+      jobs,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   /**
@@ -66,7 +134,7 @@ export class JobService {
     const job = await JobPosting.findOneAndUpdate(
       { _id: jobId, postedBy: userId },
       { status: 'withdrawn' },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!job) {
