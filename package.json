@@ -45,6 +45,7 @@
     ]
   },
   "dependencies": {
+    "@getbrevo/brevo": "^2.1.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.71.0",
     "cheerio": "^1.2.0",
