@@ -3,12 +3,10 @@ import JobPosting from '../models/JobPosting.js';
 import { ModerationService } from '../services/jobs/moderation.service.js';
 import { NotificationEngine } from '../services/notifications/notification.engine.js';
 import { BanManager } from '../services/auth/ban.manager.js';
-import { sendEmail } from '../utils/email.js';
+import { findUserById } from '../repositories/index.js';
+import { sendJobRejectionEmail } from '../utils/email.js';
 import redis from '../config/redis.js';
 
-/**
- * Worker for the 'moderation-queue'.
- */
 export const initModerationWorker = () => {
   const worker = new Worker(
     'moderation-queue',
@@ -59,12 +57,15 @@ export const initModerationWorker = () => {
 
           // Notify Alumni via Email
           try {
-            await sendEmail({
-              to: 'alumni_email_placeholder@example.com', // In a real scenario, use user.email
-              subject: 'Your Job Posting has been Rejected',
-              text: `Your job posting "${title}" was rejected for: ${result.violation_type}. 
-              Your account has been restricted until ${banInfo.banUntil || 'permanently'}.`,
-            });
+            const user = await findUserById(jobPosting.postedBy);
+            if (user && user.email) {
+              await sendJobRejectionEmail(
+                user.email,
+                title,
+                result.violation_type || 'General Violation',
+                banInfo.banUntil
+              );
+            }
           } catch (emailError) {
             console.error('[MODERATION] Email notification failed:', emailError.message);
           }
