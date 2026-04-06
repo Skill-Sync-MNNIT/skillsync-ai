@@ -1,6 +1,7 @@
 import JobApplication from '../../models/JobApplication.js';
 import JobPosting from '../../models/JobPosting.js';
 import Notification from '../../models/Notification.js';
+import { sendEmail } from '../../utils/email.js';
 
 export class ApplicationService {
   /**
@@ -42,7 +43,11 @@ export class ApplicationService {
    * Update application status.
    */
   static async updateStatus(applicationId, ownerId, status) {
-    const application = await JobApplication.findById(applicationId).populate('jobId');
+    // Populate both jobId (for title) and studentId (for email)
+    const application = await JobApplication.findById(applicationId)
+      .populate('jobId')
+      .populate('studentId', 'name email');
+
     if (!application) throw new Error('Application not found');
 
     if (application.jobId.postedBy.toString() !== ownerId) {
@@ -52,17 +57,38 @@ export class ApplicationService {
     application.status = status;
     await application.save();
 
-    const message =
-      status === 'accepted'
-        ? `Your application for "${application.jobId.title}" has been accepted and alumni will contact you when he's free.`
-        : `Your application for "${application.jobId.title}" was rejected or not selected.`;
+    const isAccepted = status === 'accepted';
+    const message = isAccepted
+      ? `Your application for "${application.jobId.title}" has been accepted and alumni will contact you when he's free.`
+      : `Your application for "${application.jobId.title}" was rejected or not selected.`;
 
-    // Notify the student
+    // 1. Notify the student via dashboard
     await Notification.create({
-      userId: application.studentId,
+      userId: application.studentId._id,
       jobId: application.jobId._id,
       message,
     });
+
+    // 2. Notify the student via email (Only if accepted)
+    if (isAccepted && application.studentId.email) {
+      const studentName = application.studentId.name.split(' ')[0];
+      await sendEmail({
+        to: application.studentId.email,
+        subject: `Application Accepted • ${application.jobId.title}`,
+        text: `Congratulations ${studentName}! Your application for "${application.jobId.title}" has been accepted. The recruiter will contact you soon.`,
+        html: `
+          <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #059669;">Congratulations! 🎊</h2>
+            <p>Hi ${studentName},</p>
+            <p>Great news! Your application for the position <strong>"${application.jobId.title}"</strong> has been <strong>Accepted</strong>.</p>
+            <p>The recruiter (Alumni/Professor) will reach out to you shortly for the next steps.</p>
+            <p>Best of luck!</p>
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #666;">This is an automated notification from SkillSync AI.</p>
+          </div>
+        `,
+      });
+    }
 
     return application;
   }

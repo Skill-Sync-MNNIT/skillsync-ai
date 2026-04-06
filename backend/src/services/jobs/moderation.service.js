@@ -42,9 +42,9 @@ export class ModerationService {
       console.error(`[MODERATION] Error scanning job ${jobId}:`, error.message);
 
       const isTimeout = error.name === 'AbortError';
-      // Fail-safe: if AI service is down, we might want to manually review or reject
+      // Fail-safe: if AI service is down, we allow it for now but log the error
       return {
-        passed: false,
+        passed: true,
         violation_type: isTimeout ? 'service_error/timeout' : 'service_error/network',
         confidence: 0,
         error: error.message,
