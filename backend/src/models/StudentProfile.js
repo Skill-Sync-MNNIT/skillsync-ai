@@ -46,7 +46,6 @@ const studentProfileSchema = new mongoose.Schema(
     embeddingStatus: {
       type: String,
       enum: ['pending', 'processing', 'indexed', 'failed'],
-      default: 'pending',
     },
 
     lastEmbeddingAt: {

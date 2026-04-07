@@ -29,7 +29,7 @@ svc = EmbeddingService()
 
 def get_pending_users() -> list[dict]:
     resp = requests.get(f"{BACKEND_URL}/internal/pending-embeddings",
-    headers=SECRET, timeout=10)
+    headers=SECRET, timeout=90)
     resp.raise_for_status()
     return resp.json().get("data",[])
 
@@ -39,7 +39,7 @@ def update_status(user_id: str, status: str) -> None:
         f"{BACKEND_URL}/internal/embedding-status",
         json={"userId": user_id, "status": status},
         headers={**SECRET,"Content-Type":"application/json"},
-        timeout=10,
+        timeout=90,
     )
     
 def download_pdf(resume_storage_key:str) -> bytes:
