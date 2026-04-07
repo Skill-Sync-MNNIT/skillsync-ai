@@ -161,7 +161,7 @@ export const MyProfile = () => {
       const data = await profileService.fetchProfile(userId);
       setProfileData(data);
       syncEditFields(data);
-      const inProgress = data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing';
+      const inProgress = !!(data.resumeStorageKey && (data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing'));
       inProgress ? startPoll(userId) : stopPoll();
     } catch {
       // Profile document may not exist yet for new users
@@ -213,7 +213,7 @@ export const MyProfile = () => {
     const schema = isStudent ? studentSchema : baseSchema;
     const dataToValidate = isStudent ? {
       name, course, branch, year, cpi, skills,
-      hasResume: !!(profileData?.resumeStorageKey || (profileData?.embeddingStatus && profileData?.embeddingStatus !== 'pending'))
+      hasResume: !!profileData?.resumeStorageKey
     } : { name };
 
     const result = schema.safeParse(dataToValidate);
@@ -644,7 +644,7 @@ export const MyProfile = () => {
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
 
-            {(profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') ? (
+            {(profileData?.resumeStorageKey && (profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing')) ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
                   <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
