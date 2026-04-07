@@ -311,6 +311,7 @@ export const MyProfile = () => {
 
   // ─── Embedding status badge ──────────────────────────────
   const EmbeddingBadge = () => {
+    if (!profileData?.resumeStorageKey) return null;
     const s = profileData?.embeddingStatus;
     if (s === 'indexed')
       return (
