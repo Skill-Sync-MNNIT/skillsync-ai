@@ -2,14 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import {
-  Search as SearchIcon, Sparkles, Brain, Zap, GraduationCap,
-  Calendar, ChevronDown, ChevronUp, Eye, ArrowRight, User as UserIcon
+  Sparkles, Brain, GraduationCap,
+  Calendar, Eye, ArrowRight
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { AuthModal } from '../components/AuthModal';
 import { useAuthStore } from '../store/authStore';
 import { useChatStore, type Message } from '../store/chatStore';
-import { useToast } from '../context/ToastContext';
+
 import { Sidebar } from '../components/Sidebar';
 
 // ─── Score color map ────────────────────────────────────────
@@ -38,7 +38,7 @@ const TypingIndicator = () => (
 
 // ─── Result Card ────────────────────────────────────────────
 const ResultCard = ({ result, index }: { result: any; index: number }) => {
-  const [expanded, setExpanded] = useState(false);
+
   const sc = getScoreColor(result.matchPercent || 0);
   const initials = (result.name || result.email?.split('@')[0] || "U").split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
 
@@ -104,7 +104,7 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
 // ─── Main Component ──────────────────────────────────────────
 export const Search = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuthStore();
   
@@ -161,10 +161,10 @@ export const Search = () => {
                     <Sparkles size={32} className="text-primary-500" />
                   </div>
                   <h1 className="text-4xl text-slate-900 dark:text-white font-bold tracking-tight mb-4">
-                    Ready for your next hire?
+                    Find the right talent, fast
                   </h1>
                   <p className="text-lg text-slate-500 mb-8 max-w-md mx-auto">
-                    Type naturally. The Recruitment Agent preserves your conversation history and intelligently isolates filters like CPI.
+                    Describe who you're looking for in plain language. Our AI agent understands filters like CPI, branch, year, and skills automatically.
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {SUGGESTION_CHIPS.map(chip => (
