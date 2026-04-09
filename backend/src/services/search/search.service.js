@@ -2,13 +2,19 @@ import { findUserById, findProfileByUserId } from '../../repositories/index.js';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
-export const searchStudents = async (query, branch = null, year = null, top_k = 10) => {
+export const searchStudents = async (
+  query,
+  branch = null,
+  year = null,
+  top_k = 10,
+  history = []
+) => {
   let aiResponse;
   try {
     const res = await fetch(`${AI_SERVICE_URL}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, branch, year, top_k }),
+      body: JSON.stringify({ query, branch, year, top_k, history }),
     });
 
     if (!res.ok) throw new Error(`AI service error: ${res.status}`);
@@ -21,8 +27,11 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
     });
   }
 
+  // Handle the new nested AI response schema
+  const candidatesList = Array.isArray(aiResponse) ? aiResponse : aiResponse.candidates || [];
+
   const enriched = await Promise.all(
-    aiResponse.map(async (candidate) => {
+    candidatesList.map(async (candidate) => {
       try {
         const [user, profile] = await Promise.all([
           findUserById(candidate.user_id),
@@ -47,5 +56,11 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
     })
   );
 
-  return enriched.filter(Boolean).sort((a, b) => b.matchPercent - a.matchPercent);
+  const finalCandidates = enriched.filter(Boolean).sort((a, b) => b.matchPercent - a.matchPercent);
+
+  return {
+    candidates: finalCandidates,
+    summary: aiResponse.summary || '',
+    filters: aiResponse.filters || null,
+  };
 };
