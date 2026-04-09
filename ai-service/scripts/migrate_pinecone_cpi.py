@@ -130,8 +130,21 @@ def main():
         vector_values = existing_vector_data.values
         metadata = existing_vector_data.metadata or {}
         
-        # Append CPI
+        # Append CPI, branch, year, skills
         metadata["cpi"] = cpi_val
+        metadata["course"] = profile.get("course", "")
+        metadata["branch"] = profile.get("branch", "")
+        try:
+            metadata["year"] = int(profile.get("year", 0)) if profile.get("year") else 0
+        except ValueError:
+            metadata["year"] = 0
+            
+        skills_raw = profile.get("skills", [])
+        # Sometimes skills could be stored as a string or empty, let's coerce to list
+        if isinstance(skills_raw, list):
+            metadata["skills"] = [str(s) for s in skills_raw]
+        else:
+            metadata["skills"] = [str(skills_raw)] if skills_raw else []
         
         print(f"   => Upserting updated metadata to Pinecone...")
         pinecone_repo.upsert(user_id=user_id_str, vector=vector_values, metadata=metadata)

@@ -14,6 +14,7 @@ class PineconeRepository:
                     "values": vector,
                     "metadata": {
                         "user_id": user_id,
+                        "course": metadata.get("course", ""),
                         "branch": metadata.get("branch", ""),
                         "year": metadata.get("year", ""),
                         "skills": metadata.get("skills", []),
@@ -24,8 +25,10 @@ class PineconeRepository:
             ]
         )
     
-    def search(self,vector: list[float],top_k: int=50,branch: str |None=None, year:int |None=None, min_cpi:float=0.0) -> list[dict]:
+    def search(self,vector: list[float],top_k: int=50,course: str|None=None, branch: str|None=None, year:int|None=None, min_cpi:float=0.0) -> list[dict]:
         filter_dict : dict = {"is_active":{"$eq": True}}
+        if course:
+            filter_dict["course"] = {"$eq": course}
         if branch:
             filter_dict["branch"] = {"$eq": branch}
         if year is not None:
@@ -47,6 +50,13 @@ class PineconeRepository:
             for match in results["matches"]
         ]
         
+    def update_metadata(self, user_id: str, metadata: dict) -> None:
+        try:
+            self.index.update(id=user_id, set_metadata=metadata)
+        except Exception as e:
+            # Might throw if vector doesn't exist yet, we can silently swallow or raise
+            print(f"[Pinecone] Failed to update metadata for {user_id}: {e}")
+
     def delete(self, user_id:str)->None:
         self.index.delete(ids=[user_id])
 
