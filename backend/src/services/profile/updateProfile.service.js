@@ -23,6 +23,27 @@ export const updateProfile = async (userId, data) => {
   //update student profile if user is student
   if (user.role === 'student') {
     profile = await updateProfileByUserId(userId, profileFields);
+
+    // Fire metadata sync to AI Service asynchronously
+    try {
+      const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+      const payload = {};
+      if (profileFields.cpi !== undefined) payload.cpi = profileFields.cpi;
+      if (profileFields.course !== undefined) payload.course = profileFields.course;
+      if (profileFields.branch !== undefined) payload.branch = profileFields.branch;
+      if (profileFields.year !== undefined) payload.year = profileFields.year;
+      if (profileFields.skills !== undefined) payload.skills = profileFields.skills;
+
+      if (Object.keys(payload).length > 0) {
+        fetch(`${aiServiceUrl}/embed/metadata/${userId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch((err) => console.warn('AI metadata sync failed (non-critical):', err.message));
+      }
+    } catch (err) {
+      console.warn('AI metadata sync error:', err.message);
+    }
   }
 
   // Return a merged object for the frontend

@@ -13,6 +13,7 @@ import searchRoutes from './src/routes/search.routes.js';
 import jobRoutes from './src/routes/jobs.routes.js';
 import notificationRoutes from './src/routes/notification.routes.js';
 import settingsRoutes from './src/routes/settings.routes.js';
+import conversationRoutes from './src/routes/conversation.routes.js';
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/search', searchRoutes);
 app.use('/jobs', jobRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/settings', settingsRoutes);
+app.use('/conversations', conversationRoutes);
 
 app.get('/', (req, res) => {
   res.send('SkillSync Backend Running');

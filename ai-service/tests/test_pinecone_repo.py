@@ -38,3 +38,15 @@ def test_search_applies_active_filter(mock_pinecone):
 
     call_kwargs = mock_index.query.call_args.kwargs
     assert call_kwargs["filter"]["is_active"] == {"$eq": True}
+
+
+@patch("services.pinecone_repo.Pinecone")
+def test_update_metadata(mock_pinecone):
+    mock_index = MagicMock()
+    mock_pinecone.return_value.Index.return_value = mock_index
+
+    from services.pinecone_repo import PineconeRepository
+    repo = PineconeRepository()
+    repo.update_metadata("user-1", {"cpi": 9.5})
+
+    mock_index.update.assert_called_once_with(id="user-1", set_metadata={"cpi": 9.5})
