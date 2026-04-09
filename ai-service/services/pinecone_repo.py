@@ -18,17 +18,20 @@ class PineconeRepository:
                         "year": metadata.get("year", ""),
                         "skills": metadata.get("skills", []),
                         "is_active": metadata.get("is_active", True),
+                        "cpi": metadata.get("cpi", 0.0),
                     }
                 }
             ]
         )
     
-    def search(self,vector: list[float],top_k: int=50,branch: str |None=None, year:int |None=None) -> list[dict]:
+    def search(self,vector: list[float],top_k: int=50,branch: str |None=None, year:int |None=None, min_cpi:float=0.0) -> list[dict]:
         filter_dict : dict = {"is_active":{"$eq": True}}
         if branch:
             filter_dict["branch"] = {"$eq": branch}
         if year is not None:
             filter_dict["year"] = {"$eq": year}
+        if min_cpi > 0.0:
+            filter_dict["cpi"] = {"$gte": min_cpi}
         results = self.index.query(
             vector=vector,
             top_k=top_k,
