@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { X, ShieldAlert, Sliders, Save } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
@@ -50,7 +51,7 @@ export const Settings = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await api.put('/settings/preferences', { preferences });
+      await api.put('/settings/preferences', { skillPreferences: preferences });
       toast('Preferences saved successfully.', 'success');
     } catch (error: any) {
       toast(error.response?.data?.error || 'Failed to save preferences.', 'error');
@@ -60,13 +61,13 @@ export const Settings = () => {
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500 animate-pulse">Loading settings...</div>;
+    return <LoadingSpinner fullPage message="Sycing your settings..." />;
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
+        <div className="h-10 w-10 bg-primary-50 dark:bg-primary-900/20 rounded-xl flex items-center justify-center text-primary-600">
            <Sliders size={20} />
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Account Settings</h1>
@@ -85,9 +86,9 @@ export const Settings = () => {
               
               <div className="flex flex-wrap gap-2 pt-2">
                 {preferences.map((pref) => (
-                  <span key={pref} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <span key={pref} className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
                     {pref}
-                    <button type="button" onClick={() => handleRemovePref(pref)} className="ml-1.5 text-indigo-400 hover:text-indigo-600">
+                    <button type="button" onClick={() => handleRemovePref(pref)} className="ml-1.5 text-primary-400 hover:text-primary-600">
                       <X size={14} />
                     </button>
                   </span>
@@ -136,7 +137,7 @@ export const Settings = () => {
                     </div>
                   )}
                   {!isBanned && (
-                    <div className="mt-4 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <div className="mt-4 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
                        Good Standing
                     </div>
                   )}

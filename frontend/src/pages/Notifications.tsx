@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCircle, Info, Briefcase, Trash2, X, CheckCheck } from 'lucide-react';
+import { Bell, Info, Briefcase, Trash2, X, CheckCheck } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { NoData } from '../components/ui/NoData';
 import { useToast } from '../context/ToastContext';
 
 interface Notification {
@@ -102,8 +103,8 @@ export const Notifications = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
-             <Bell size={20} />
+          <div className="h-10 w-10 bg-primary-50 dark:bg-primary-900/20 rounded-xl flex items-center justify-center text-primary-600">
+            <Bell size={20} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h1>
         </div>
@@ -133,22 +134,22 @@ export const Notifications = () => {
         {isLoading ? (
           <LoadingSpinner fullPage message="Syncing your notifications..." />
         ) : notifications.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-             <CheckCircle className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" />
-             <h3 className="text-lg font-medium text-slate-900 dark:text-white">You're all caught up!</h3>
-             <p className="mt-1 text-slate-500 dark:text-slate-400">No new notifications right now.</p>
-          </div>
+          <NoData
+            type="notifications"
+            height="250px"
+            title="All Caught Up!"
+            description="You have no new notifications at the moment. We'll let you know when something important happens!"
+          />
         ) : (
           notifications.map((notif) => (
-            <Card 
-              key={notif._id} 
-              className={`cursor-pointer transition-colors ${!notif.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-primary-200 dark:border-primary-800 shadow-sm' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'}`}
+            <Card
+              key={notif._id}
+              className={`cursor-pointer transition-all duration-200 ${!notif.isRead ? 'bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800 shadow-sm' : 'bg-white dark:bg-slate-800/90 border-slate-100 dark:border-slate-700'}`}
               onClick={() => handleNotificationClick(notif)}
             >
               <CardContent className="p-4 sm:p-5 flex gap-4">
-                <div className={`mt-1 shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
-                  notif.jobId ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
-                }`}>
+                <div className={`mt-1 shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${notif.jobId ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
                   {notif.jobId ? <Briefcase size={18} /> : <Info size={18} />}
                 </div>
                 

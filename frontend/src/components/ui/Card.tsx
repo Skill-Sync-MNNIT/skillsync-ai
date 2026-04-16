@@ -3,7 +3,7 @@ import { cn } from './Button';
 
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-950 dark:text-slate-50 shadow-sm transition-colors duration-200', className)} {...props} />
+    <div ref={ref} className={cn('rounded-2xl bg-white dark:bg-slate-800/90 text-slate-950 dark:text-slate-50 ghost-border ambient-shadow-sm transition-all duration-200', className)} {...props} />
   )
 );
 Card.displayName = 'Card';
