@@ -104,6 +104,44 @@
   100% { transform: rotate(360deg); }
 }
 
+@keyframes orbitCW {
+  0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+@keyframes orbitCCW {
+  0% { transform: rotate(0deg) translateX(90px) rotate(0deg); }
+  100% { transform: rotate(-360deg) translateX(90px) rotate(360deg); }
+}
+
+@keyframes blobFloat1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -25px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.97); }
+}
+
+@keyframes blobFloat2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(-35px, 20px) scale(1.03); }
+  66% { transform: translate(25px, -30px) scale(0.98); }
+}
+
+@keyframes blobFloat3 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(20px, 25px) scale(1.06); }
+}
+
+@keyframes heroIconPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3), 0 0 0 0 rgba(34, 197, 94, 0.15); }
+  50% { box-shadow: 0 0 0 18px rgba(34, 197, 94, 0.08), 0 0 0 36px rgba(34, 197, 94, 0.04); }
+}
+
+@keyframes particleDrift {
+  0%   { transform: translateY(0px) translateX(0px); opacity: 0.6; }
+  50%  { transform: translateY(-18px) translateX(10px); opacity: 1; }
+  100% { transform: translateY(0px) translateX(0px); opacity: 0.6; }
+}
+
 /* ─── Animation Utilities ───────────────────────────────────── */
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out both;
@@ -121,7 +159,7 @@
 }
 
 .dark .skeleton-shimmer {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background: linear-gradient(90deg, #2a2b32 25%, #40414f 50%, #2a2b32 75%);
 }
 
 .animate-fade-in {
@@ -234,5 +272,28 @@
   -webkit-backdrop-filter: blur(24px);
 }
 .dark .glass {
-  background: rgba(11, 17, 32, 0.7);
+  background: rgba(52, 53, 65, 0.85);
 }
+
+@keyframes ripple {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  50% { opacity: 0.3; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.3; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes beam {
+  0%, 100% { transform: translateX(-10%) rotate(-5deg); opacity: 0.1; }
+  50% { transform: translateX(10%) rotate(5deg); opacity: 0.2; }
+}
+

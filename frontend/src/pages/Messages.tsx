@@ -469,7 +469,7 @@ export const Messages = () => {
           </div>
         )}
         {onClear && (
-          <button onClick={onClear} className="absolute top-1 right-1 p-1 bg-white/50 dark:bg-slate-800/50 rounded-full opacity-0 group-hover/reply:opacity-100 transition-opacity">
+          <button onClick={onClear} className="absolute top-1 right-1 p-1 bg-white/50 dark:bg-[#40414f] rounded-full opacity-0 group-hover/reply:opacity-100 transition-opacity">
             <X size={14} />
           </button>
         )}
@@ -569,13 +569,13 @@ export const Messages = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-white dark:bg-slate-950 overflow-hidden relative">
+    <div className="flex h-[calc(100vh-64px)] bg-white dark:bg-[#202123] overflow-hidden relative">
       {/* Sidebar: Rooms */}
       <div className={cn(
-        "w-full md:w-[380px] border-r border-slate-100 dark:border-slate-800 flex flex-col bg-slate-50/30 dark:bg-slate-900/40 transition-all duration-300",
+        "w-full md:w-[380px] border-r border-slate-100 dark:border-[#383942] flex flex-col bg-slate-50/30 dark:bg-[#202123]/40 transition-all duration-300",
         showMobileChat ? "hidden md:flex" : "flex"
       )}>
-        <div className="p-4 bg-white dark:bg-slate-950/80 backdrop-blur-md space-y-4">
+        <div className="p-4 bg-white dark:bg-[#202123] backdrop-blur-md space-y-4">
           <div className="flex justify-between items-center text-slate-900 dark:text-white">
             <h2 className="font-extrabold flex items-center gap-2 text-xl tracking-tight">
               <MessageSquare size={22} className="text-primary-600" /> Messages
@@ -583,7 +583,7 @@ export const Messages = () => {
             <Button
               size="sm"
               variant="ghost"
-              className="h-10 w-10 p-0 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-primary-600 shadow-none border border-slate-100 dark:border-slate-800"
+              className="h-10 w-10 p-0 rounded-xl hover:bg-slate-100 dark:hover:bg-[#2a2b32] text-primary-600 shadow-none border border-slate-100 dark:border-[#383942]"
               onClick={() => setIsGroupModalOpen(true)}
             >
               <Plus size={22} />
@@ -595,22 +595,22 @@ export const Messages = () => {
             <input
               type="text"
               placeholder="Search conversations..."
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 shadow-sm focus:shadow-lg focus:shadow-primary-500/5 focus:-translate-y-0.5 transition-all duration-300 placeholder:text-slate-400 font-medium"
+              className="w-full bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-2xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 shadow-sm focus:shadow-lg focus:shadow-primary-500/5 focus:-translate-y-0.5 transition-all duration-300 placeholder:text-slate-400 font-medium"
               value={roomSearch}
               onChange={(e) => setRoomSearch(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white dark:bg-slate-950 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 text-slate-900 dark:text-white">
+        <div className="flex-1 overflow-y-auto bg-white dark:bg-[#202123] scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-[#383942] text-slate-900 dark:text-white">
           {isLoading ? (
             <div className="p-4 space-y-3">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="flex gap-3 p-3 text-slate-900 dark:text-white">
-                  <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 animate-pulse rounded-2xl shrink-0 text-slate-900 dark:text-white" />
+                  <div className="h-12 w-12 bg-slate-100 dark:bg-[#2a2b32] animate-pulse rounded-2xl shrink-0 text-slate-900 dark:text-white" />
                   <div className="flex-1 space-y-2 py-1 text-slate-900 dark:text-white">
-                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800 animate-pulse rounded text-slate-900 dark:text-white" />
-                    <div className="h-3 w-3/4 bg-slate-100 dark:bg-slate-800 animate-pulse rounded text-slate-900 dark:text-white" />
+                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-[#2a2b32] animate-pulse rounded text-slate-900 dark:text-white" />
+                    <div className="h-3 w-3/4 bg-slate-100 dark:bg-[#2a2b32] animate-pulse rounded text-slate-900 dark:text-white" />
                   </div>
                 </div>
               ))}
@@ -666,13 +666,13 @@ export const Messages = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-primary-400/10 dark:from-primary-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                   <div className="flex items-center gap-3 text-slate-900 dark:text-white transition-transform duration-300 group-hover:translate-x-1 relative z-10">
-                    <div className="relative h-12 w-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
+                    <div className="relative h-12 w-12 rounded-2xl bg-white dark:bg-[#2a2b32] flex items-center justify-center text-slate-500 font-bold overflow-hidden shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
                       {room.isGroup ? (
                         <div className="bg-primary-100 dark:bg-primary-900/20 w-full h-full flex items-center justify-center">
                           <Users size={24} className="text-primary-600" />
                         </div>
                       ) : (
-                        <div className="bg-slate-100 dark:bg-slate-800 w-full h-full flex items-center justify-center text-lg uppercase tracking-tighter">
+                        <div className="bg-slate-100 dark:bg-[#2a2b32] w-full h-full flex items-center justify-center text-lg uppercase tracking-tighter">
                           {otherParticipant?.name?.charAt(0) || 'U'}
                         </div>
                       )}
@@ -723,25 +723,25 @@ export const Messages = () => {
       </div>
       {/* Main: Messages */}
       <div className={cn(
-        "flex-1 flex flex-col bg-[#F8FAFC] dark:bg-slate-950 relative overflow-hidden transition-all duration-300",
+        "flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#343541] relative overflow-hidden transition-all duration-300",
         !showMobileChat ? "hidden md:flex" : "flex"
       )}>
         {currentRoom ? (
           <>
             {/* Header */}
-            <div className="p-3 sm:p-4 border-b dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between shadow-sm z-20">
+            <div className="p-3 sm:p-4 border-b dark:border-[#383942] bg-white/80 dark:bg-[#202123]/80 backdrop-blur-md flex items-center justify-between shadow-sm z-20">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="md:hidden p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+                  className="md:hidden p-1.5 hover:bg-slate-100 dark:hover:bg-[#2a2b32] rounded-full"
                   onClick={() => setShowMobileChat(false)}
                 >
                   <ChevronLeft size={22} className="text-slate-600 dark:text-slate-400" />
                 </Button>
 
                 <div
-                  className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-primary-600 font-bold cursor-pointer shrink-0 shadow-sm ring-2 ring-white dark:ring-slate-900"
+                  className="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center text-primary-600 font-bold cursor-pointer shrink-0 shadow-sm ring-2 ring-white dark:ring-slate-900"
                   onClick={() => {
                     const other = currentRoom?.participants.find((p: any) => String(p._id) !== String(user?._id));
                     if (other && !currentRoom?.isGroup) {
@@ -788,7 +788,7 @@ export const Messages = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="p-2 w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="p-2 w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b32]"
                   onClick={() => setRoomOptionsOpen(true)}
                 >
                   <MoreVertical size={20} className="text-slate-500" />
@@ -797,7 +797,7 @@ export const Messages = () => {
             </div>
 
             {/* Message Area with Wallpaper Background */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800 bg-slate-50/30 dark:bg-[#0b141a]/20 relative">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-[#383942] bg-slate-50/30 dark:bg-[#2a2b32]/30 relative">
               {/* Wallpaper Pattern Overlay */}
               <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0" />
 
@@ -810,7 +810,7 @@ export const Messages = () => {
                   if (msg.messageType === 'system') {
                     return (
                       <div key={msg._id} className="flex justify-center my-2 animate-in fade-in zoom-in duration-500">
-                        <div className="bg-slate-100/50 dark:bg-slate-800/50 backdrop-blur-sm px-4 py-1 rounded-full text-[11px] font-medium text-slate-500 dark:text-slate-400 border border-slate-200/30 dark:border-slate-700/30 shadow-sm transition-all">
+                        <div className="bg-slate-100/50 dark:bg-[#40414f] backdrop-blur-sm px-4 py-1 rounded-full text-[11px] font-medium text-slate-500 dark:text-slate-400 border border-slate-200/30 dark:border-[#565869]/30 shadow-sm transition-all">
                           <span className="opacity-40 mr-2">—</span>
                           {msg.content}
                           <span className="opacity-40 ml-2">—</span>
@@ -838,7 +838,7 @@ export const Messages = () => {
                             "p-2.5 rounded-2xl shadow-sm relative transition-all",
                             isMe
                               ? 'bg-[#E7FFDB] dark:bg-[#056162] text-slate-900 dark:text-white rounded-tr-none'
-                              : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-tl-none',
+                              : 'bg-white dark:bg-[#2a2b32] text-slate-900 dark:text-white rounded-tl-none',
                             isConsecutive && (isMe ? "rounded-tr-2xl" : "rounded-tl-2xl"),
                             msg.isDeletedForEveryone && 'italic opacity-60'
                           )}
@@ -851,7 +851,7 @@ export const Messages = () => {
                             )}>
                               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d={isMe ? "M0 0C6 0 12 0 12 0V12C12 12 6 6 0 0Z" : "M12 0C6 0 0 0 0 0V12C0 12 6 6 12 0Z"}
-                                  fill={isMe ? (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#056162" : "#E7FFDB") : (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#1e293b" : "#ffffff")} />
+                                  fill={isMe ? (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#056162" : "#E7FFDB") : (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#2a2b32" : "#ffffff")} />
                               </svg>
                             </div>
                           )}
@@ -869,7 +869,7 @@ export const Messages = () => {
                                 const parentId = typeof msg.replyTo === 'string' ? msg.replyTo : msg.replyTo._id;
                                 scrollToMessage(parentId);
                               }}
-                              className={`mb-2 p-2 rounded-lg text-xs border-l-4 overflow-hidden cursor-pointer transition-opacity hover:opacity-80 ${isMe ? 'bg-[#C8E6C9]/50 border-primary-500 text-slate-800 dark:text-slate-300' : 'bg-slate-50 dark:bg-slate-900/50 border-primary-500 text-slate-600 dark:text-slate-400'
+                              className={`mb-2 p-2 rounded-lg text-xs border-l-4 overflow-hidden cursor-pointer transition-opacity hover:opacity-80 ${isMe ? 'bg-[#C8E6C9]/50 border-primary-500 text-slate-800 dark:text-slate-300' : 'bg-slate-50 dark:bg-[#202123]/50 border-primary-500 text-slate-600 dark:text-slate-400'
                                 }`}
                             >
                               <p className="font-bold mb-1 truncate text-primary-600">
@@ -895,7 +895,7 @@ export const Messages = () => {
                               />
                             </div>
                           ) : msg.messageType === 'file' && !msg.isDeletedForEveryone ? (
-                            <div className={`mb-1 p-3 rounded-xl border flex items-center gap-3 ${isMe ? 'bg-white/20 border-white/20' : 'bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800'
+                            <div className={`mb-1 p-3 rounded-xl border flex items-center gap-3 ${isMe ? 'bg-white/20 border-white/20' : 'bg-slate-50 dark:bg-[#202123] border-slate-100 dark:border-[#383942]'
                               }`}>
                               <div className={`p-2 rounded-lg ${isMe ? 'bg-white/20' : 'bg-primary-50 dark:bg-primary-900/20'} text-primary-600`}>
                                 <FileText size={24} />
@@ -960,7 +960,7 @@ export const Messages = () => {
                 {/* Typing Indicator */}
                 {typingUser && (
                   <div className="px-6 py-2 flex items-center animate-fade-in">
-                    <div className="flex gap-2 items-center bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm">
+                    <div className="flex gap-2 items-center bg-slate-100 dark:bg-[#2a2b32] px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm">
                       <div className="flex gap-1 items-center">
                         <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-typing-dot"></div>
                         <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-typing-dot [animation-delay:0.2s]"></div>
@@ -984,7 +984,7 @@ export const Messages = () => {
                     </div>
                   )}
                   {editingMessage && (
-                    <div className="p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-xl border-l-[6px] border-amber-500 shadow-xl flex items-center justify-between pointer-events-auto ring-1 ring-slate-200 dark:ring-slate-800">
+                    <div className="p-3 bg-white/95 dark:bg-[#202123]/95 backdrop-blur rounded-xl border-l-[6px] border-amber-500 shadow-xl flex items-center justify-between pointer-events-auto ring-1 ring-slate-200 dark:ring-slate-800">
                       <div className="min-w-0 flex items-center gap-3">
                         <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-500 shrink-0">
                           <Edit3 size={18} />
@@ -994,7 +994,7 @@ export const Messages = () => {
                           <p className="text-xs text-slate-600 dark:text-slate-400 truncate italic">{editingMessage.content}</p>
                         </div>
                       </div>
-                      <button type="button" onClick={() => { setEditingMessage(null); setNewMessage(''); }} className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors shrink-0">
+                      <button type="button" onClick={() => { setEditingMessage(null); setNewMessage(''); }} className="p-1.5 hover:bg-slate-100 dark:hover:bg-[#2a2b32] rounded-full transition-colors shrink-0">
                         <X size={18} className="text-slate-400" />
                       </button>
                     </div>
@@ -1003,14 +1003,14 @@ export const Messages = () => {
               </div>
             )}
 
-            <form onSubmit={handleSendMessage} className="p-2 sm:p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800 relative z-20 shrink-0">
-              <div className="flex items-center gap-1 sm:gap-3 bg-slate-50 dark:bg-slate-800 p-1 sm:p-1.5 rounded-[28px] ring-1 ring-inset ring-slate-200 dark:ring-slate-700/50">
+            <form onSubmit={handleSendMessage} className="p-2 sm:p-4 bg-white dark:bg-[#202123] border-t dark:border-[#383942] relative z-20 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-3 bg-slate-50 dark:bg-[#2a2b32] p-1 sm:p-1.5 rounded-[28px] ring-1 ring-inset ring-slate-200 dark:ring-slate-700/50">
                 <div className="relative flex items-center shrink-0" ref={emojiRef}>
                   <button
                     type="button"
                     onClick={() => setShowEmojis(!showEmojis)}
                     className={cn(
-                      "p-1.5 sm:p-2 ml-0.5 sm:ml-1 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-700",
+                      "p-1.5 sm:p-2 ml-0.5 sm:ml-1 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-[#343541]",
                       showEmojis ? "text-primary-600 bg-primary-50 dark:bg-primary-900/20" : "text-slate-400 hover:text-primary-600"
                     )}
                   >
@@ -1061,7 +1061,7 @@ export const Messages = () => {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className={cn(
-                      "p-1.5 sm:p-2 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-700",
+                      "p-1.5 sm:p-2 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-[#343541]",
                       isUploading ? "animate-spin text-primary-600" : "text-slate-400 hover:text-primary-600"
                     )}
                     disabled={isUploading}
@@ -1095,7 +1095,7 @@ export const Messages = () => {
           {currentRoom?.isGroup && (
             <div className={cn(
               "p-4 rounded-2xl transition-all duration-300",
-              isRenaming ? "bg-primary-50 dark:bg-primary-900/10 ring-1 ring-primary-500/20" : "bg-slate-50 dark:bg-slate-800"
+              isRenaming ? "bg-primary-50 dark:bg-primary-900/10 ring-1 ring-primary-500/20" : "bg-slate-50 dark:bg-[#2a2b32]"
             )}>
               {isRenaming ? (
                 <div className="flex flex-col gap-4">
@@ -1108,7 +1108,7 @@ export const Messages = () => {
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      className="flex-1 bg-white dark:bg-slate-900 border-none ring-1 ring-slate-200 dark:ring-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 transition-all shadow-inner"
+                      className="flex-1 bg-white dark:bg-[#202123] border-none ring-1 ring-slate-200 dark:ring-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 transition-all shadow-inner"
                       value={newNameInput}
                       onChange={(e) => setNewNameInput(e.target.value)}
                       placeholder="Enter new group name..."
@@ -1122,7 +1122,7 @@ export const Messages = () => {
                   onClick={() => { setIsRenaming(true); setNewNameInput(currentRoom?.name || ''); }}
                   className="w-full flex items-center gap-4 text-slate-700 dark:text-slate-300 hover:text-primary-600 transition-all group/rename py-1"
                 >
-                  <div className="p-2 bg-white dark:bg-slate-900 rounded-lg shadow-sm group-hover/rename:scale-110 transition-transform">
+                  <div className="p-2 bg-white dark:bg-[#202123] rounded-lg shadow-sm group-hover/rename:scale-110 transition-transform">
                     <Edit3 size={18} className="text-slate-400 group-hover/rename:text-primary-600" />
                   </div>
                   <span className="font-semibold">Rename Group</span>
@@ -1133,18 +1133,18 @@ export const Messages = () => {
 
           <button
             onClick={() => { handleClearChat(); setRoomOptionsOpen(false); }}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
+            className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
           >
-            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Hash size={20} className="group-hover:text-primary-600" /></div>
+            <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Hash size={20} className="group-hover:text-primary-600" /></div>
             <span className="font-semibold">Clear chat history</span>
           </button>
 
           {currentRoom?.isGroup && (
             <button
               onClick={() => { setIsMembersModalOpen(true); setRoomOptionsOpen(false); }}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
             >
-              <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Users size={20} className="group-hover:text-primary-600" /></div>
+              <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Users size={20} className="group-hover:text-primary-600" /></div>
               <span className="font-semibold">Group members</span>
             </button>
           )}
@@ -1155,9 +1155,9 @@ export const Messages = () => {
                 setIsAddMemberModalOpen(true);
                 setRoomOptionsOpen(false);
               }}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
             >
-              <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Plus size={20} className="group-hover:text-primary-600" /></div>
+              <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors"><Plus size={20} className="group-hover:text-primary-600" /></div>
               <span className="font-semibold">Add members</span>
             </button>
           )}
@@ -1170,9 +1170,9 @@ export const Messages = () => {
                   setRoomOptionsOpen(false);
                 }
               }}
-              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
+              className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
             >
-              <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl transition-colors"><LogOut size={20} /></div>
+              <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl transition-colors"><LogOut size={20} /></div>
               <span className="font-semibold">Leave group</span>
             </button>
           )}
@@ -1219,13 +1219,13 @@ export const Messages = () => {
         title="Group Members"
       >
         <div className="flex flex-col h-[70vh] max-h-[600px]">
-          <div className="p-4 border-b dark:border-slate-800 space-y-4">
+          <div className="p-4 border-b dark:border-[#383942] space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
                 type="text"
                 placeholder="Search group members..."
-                className="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 transition-all outline-none"
+                className="w-full bg-slate-50 dark:bg-[#202123] border-none rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 transition-all outline-none"
                 value={memberSearch}
                 onChange={(e) => setMemberSearch(e.target.value)}
               />
@@ -1241,7 +1241,7 @@ export const Messages = () => {
                 const isMe = participant._id === user?._id;
 
                 return (
-                  <div key={participant._id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <div key={participant._id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-[#2a2b32]/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
                         {participant.name[0]}
@@ -1277,7 +1277,7 @@ export const Messages = () => {
                                 toast(err.response?.data?.message || 'Failed to update role', 'error');
                               }
                             }}
-                            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-primary-600 transition-colors"
+                            className="p-2 hover:bg-slate-100 dark:hover:bg-[#343541] rounded-lg text-slate-400 hover:text-primary-600 transition-colors"
                             title={isAdmin ? "Dismiss as Admin" : "Make Group Admin"}
                           >
                             <Check size={18} />
@@ -1320,13 +1320,13 @@ export const Messages = () => {
         title="Add to Group"
       >
         <div className="flex flex-col h-[70vh] max-h-[600px]">
-          <div className="p-4 border-b dark:border-slate-800 space-y-4">
+          <div className="p-4 border-b dark:border-[#383942] space-y-4">
             <div className="relative group">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={18} />
               <input
                 type="text"
                 placeholder="Search connections to add..."
-                className="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-500/10 transition-all outline-none font-medium"
+                className="w-full bg-slate-50 dark:bg-[#202123] border-none rounded-xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-500/10 transition-all outline-none font-medium"
                 value={addMemberQuery}
                 onChange={(e) => setAddMemberQuery(e.target.value)}
               />
@@ -1349,7 +1349,7 @@ export const Messages = () => {
               })
               .filter((u: any) => u && !currentRoom?.participants?.some((p: any) => p._id === u._id))
               .map((u: any) => (
-                <div key={u._id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div key={u._id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-[#2a2b32]/50 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/20 text-primary-600 flex items-center justify-center font-bold">
                       {u.name[0]}

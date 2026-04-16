@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { X, ShieldAlert, Sliders, Save } from 'lucide-react';
+import { X, ShieldAlert, Sliders, Save, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -35,12 +35,15 @@ export const Settings = () => {
   }, []);
 
   const handleAddPref = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newPref.trim() !== '') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      if (!preferences.includes(newPref.trim())) {
-        setPreferences([...preferences, newPref.trim()]);
+      const val = newPref.trim().toLowerCase();
+      if (val) {
+        if (!preferences.includes(val)) {
+          setPreferences([...preferences, val]);
+        }
+        setNewPref('');
       }
-      setNewPref('');
     }
   };
 
@@ -102,8 +105,12 @@ export const Settings = () => {
                 onKeyDown={handleAddPref}
               />
 
-              <div className="pt-4 flex items-center justify-end border-t border-slate-100">
-                 <Button onClick={handleSave} isLoading={isSaving} size="sm">
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 dark:border-[#383942]">
+                 <div className="flex items-center gap-2 text-xs text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg">
+                    <Sparkles size={14} className="animate-pulse" />
+                    Automated Job Matching is Active
+                 </div>
+                 <Button onClick={handleSave} isLoading={isSaving} size="sm" className="w-full sm:w-auto">
                    <Save size={16} className="mr-2" /> Save Preferences
                  </Button>
               </div>

@@ -71,7 +71,7 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
       <Card className="w-full max-w-md shadow-2xl animate-scale-in overflow-hidden">
-        <div className="p-4 border-b flex justify-between items-center bg-white dark:bg-slate-800">
+        <div className="p-4 border-b flex justify-between items-center bg-white dark:bg-[#2a2b32]">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Users className="text-primary-600" size={24} /> New Group Chat
           </h2>
@@ -81,7 +81,7 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
         </div>
 
         <form onSubmit={handleCreateGroup}>
-          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto bg-slate-50/50 dark:bg-slate-900/50">
+          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto bg-slate-50/50 dark:bg-[#202123]/50">
             <Input
               label="Group Name"
               placeholder="e.g. Study Squad"
@@ -111,7 +111,7 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
                         className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
                           isSelected 
                             ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
-                            : 'border-white dark:border-slate-800 bg-white dark:bg-slate-800'
+                            : 'border-white dark:border-[#383942] bg-white dark:bg-[#2a2b32]'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
             </div>
           </div>
 
-          <div className="p-4 border-t bg-white dark:bg-slate-800 flex gap-3">
+          <div className="p-4 border-t bg-white dark:bg-[#2a2b32] flex gap-3">
             <Button variant="ghost" className="flex-1" type="button" onClick={onClose}>Cancel</Button>
             <Button className="flex-1" type="submit" isLoading={isSubmitting} disabled={selectedIds.length === 0 || !groupName.trim()}>
               Create Group

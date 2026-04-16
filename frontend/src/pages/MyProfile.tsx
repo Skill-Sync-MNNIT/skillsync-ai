@@ -27,7 +27,7 @@ const ReadField = ({
 }) => (
   <div>
     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</p>
-    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+    <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#40414f] px-4 py-2.5 rounded-xl border border-slate-100 dark:border-[#383942]">
       {Icon && <Icon size={14} className="text-slate-400 shrink-0" />}
       <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
     </div>
@@ -338,7 +338,7 @@ export const MyProfile = () => {
     <div className="max-w-2xl mx-auto space-y-6 pt-0 pb-12 px-4 sm:px-0">
 
       {/* ── Page header ─────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-slate-800 pb-5 mb-2">
+      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-[#383942] pb-5 mb-2">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
             <User size={20} className="text-primary-600" />
@@ -369,7 +369,7 @@ export const MyProfile = () => {
 
       {/* ── Account Information (Name is editable) ───────────── */}
       <Card className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
+        <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
           <SectionHeader
             icon={Shield}
             iconBg="bg-primary-50 dark:bg-primary-900/20"
@@ -426,7 +426,7 @@ export const MyProfile = () => {
       {/* ── Profile Details (Students only) ───────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '120ms' }}>
-          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
+          <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
             <SectionHeader
               icon={FileText}
               iconBg="bg-primary-50"
@@ -450,7 +450,7 @@ export const MyProfile = () => {
                         setCourse(e.target.value);
                         if (errors.course) setErrors(prev => ({ ...prev, course: '' }));
                       }}
-                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-slate-900 dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-slate-700 focus:ring-primary-500/40 focus:border-primary-400'
+                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
                         }`}
                     >
                       {COURSES.map((c) => (
@@ -483,7 +483,7 @@ export const MyProfile = () => {
                         setBranch(e.target.value);
                         if (errors.branch) setErrors(prev => ({ ...prev, branch: '' }));
                       }}
-                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-slate-900 dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-slate-700 focus:ring-primary-500/40 focus:border-primary-400'
+                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
                         }`}
                     >
                       {BRANCHES.map((b) => (
@@ -527,7 +527,7 @@ export const MyProfile = () => {
       {/* ── Skills (students only) ────────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '180ms' }}>
-          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
+          <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
             <div className="flex items-center justify-between">
               <SectionHeader
                 icon={Cpu}
@@ -596,7 +596,7 @@ export const MyProfile = () => {
       {/* ── Resume (students only) ───────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '240ms' }}>
-          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
+          <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
             <div className="flex items-center justify-between">
               <SectionHeader
                 icon={FileText}

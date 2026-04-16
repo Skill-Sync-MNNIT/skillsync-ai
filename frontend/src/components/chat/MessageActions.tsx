@@ -44,7 +44,7 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
       <button 
         ref={buttonRef}
         onClick={handleToggle}
-        className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+        className="p-1.5 hover:bg-slate-100 dark:hover:bg-[#2a2b32] rounded-full transition-colors text-slate-400 hover:text-slate-600"
       >
         <MoreHorizontal size={16} />
       </button>
@@ -55,13 +55,13 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
             menuPosition === 'top' 
               ? 'bottom-full mb-2 origin-bottom' 
               : 'top-full mt-2 origin-top'
-          } w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 animate-in fade-in zoom-in-95 ${
+          } w-48 bg-white dark:bg-[#2a2b32] rounded-xl shadow-xl border border-slate-100 dark:border-[#565869] py-1 animate-in fade-in zoom-in-95 ${
             isMe ? 'right-0 origin-right' : 'left-0 origin-left'
           }`}
         >
           <button 
             onClick={() => { onReply(); setIsOpen(false); }}
-            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#343541] transition-colors"
           >
             <Reply size={14} /> Reply
           </button>
@@ -69,7 +69,7 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
           {isMe && onEdit && (
             <button 
               onClick={() => { onEdit(); setIsOpen(false); }}
-              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#343541] transition-colors"
             >
               <Edit2 size={14} /> Edit
             </button>

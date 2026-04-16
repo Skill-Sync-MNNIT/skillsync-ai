@@ -48,11 +48,11 @@ export const AuthModal = ({ isOpen, onClose, pendingQuery }: AuthModalProps) => 
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-scale-in">
+      <div className="relative w-full max-w-md bg-white dark:bg-[#2a2b32] rounded-2xl shadow-2xl border border-slate-200 dark:border-[#565869] overflow-hidden animate-scale-in">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#2a2b32] transition-colors z-10"
         >
           <X size={18} />
         </button>
@@ -75,7 +75,7 @@ export const AuthModal = ({ isOpen, onClose, pendingQuery }: AuthModalProps) => 
           </p>
 
           {pendingQuery && (
-            <div className="mt-5 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-left">
+            <div className="mt-5 px-4 py-3 bg-slate-50 dark:bg-[#2a2b32] border border-slate-100 dark:border-[#565869] rounded-xl text-left">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Your search</p>
               <p className="text-sm text-slate-700 dark:text-slate-300 italic">"{pendingQuery}"</p>
             </div>

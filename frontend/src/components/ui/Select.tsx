@@ -44,7 +44,7 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-all duration-200",
+          "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-[#565869] bg-white dark:bg-[#202123] px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-all duration-200",
           error && "border-red-400 focus:ring-red-500/40 focus:border-red-400 dark:border-red-500",
           isOpen && "ring-2 ring-primary-500/40 border-primary-400"
         )}
@@ -59,7 +59,7 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full origin-top animate-in fade-in zoom-in-95 duration-100 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+        <div className="absolute z-50 mt-1 w-full origin-top animate-in fade-in zoom-in-95 duration-100 overflow-hidden rounded-xl border border-slate-200 dark:border-[#565869] bg-white dark:bg-[#202123] shadow-xl">
           <div className="py-1">
             {options.map((option) => (
               <button
@@ -70,7 +70,7 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-50 dark:hover:bg-slate-800",
+                  "flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-50 dark:hover:bg-[#2a2b32]",
                   option.value === value ? "text-primary-600 bg-primary-50/50 dark:bg-primary-900/10" : "text-slate-700 dark:text-slate-200"
                 )}
               >

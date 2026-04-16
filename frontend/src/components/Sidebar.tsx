@@ -11,7 +11,7 @@ export const Sidebar = () => {
   }, []);
 
   return (
-    <div className="w-64 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full sticky top-16 shrink-0 pt-6">
+    <div className="w-full md:w-64 bg-transparent md:bg-slate-50 dark:md:bg-[#202123] border-b md:border-b-0 md:border-r border-slate-200 dark:border-[#383942] flex flex-col h-full sticky top-0 md:top-16 shrink-0 pt-2 md:pt-6">
       <div className="px-4 mb-6">
         <Button 
           className="w-full justify-start shadow-sm" 
@@ -34,8 +34,8 @@ export const Sidebar = () => {
               key={c._id} 
               className={`group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
                 activeId === c._id 
-                  ? 'bg-primary-100 dark:bg-primary-600 text-primary-900 dark:text-white' 
-                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-primary-100 dark:bg-[#343541] text-primary-900 dark:text-white' 
+                  : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#2a2b32]'
               }`}
               onClick={() => setActiveConversation(c._id)}
             >

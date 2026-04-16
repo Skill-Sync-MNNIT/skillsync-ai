@@ -2,22 +2,22 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import {
-  Sparkles, Brain, GraduationCap,
+  Sparkles, History, Brain, GraduationCap,
   Calendar, Eye, ArrowRight
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { AuthModal } from '../components/AuthModal';
 import { useAuthStore } from '../store/authStore';
 import { useChatStore, type Message } from '../store/chatStore';
 
 import { Sidebar } from '../components/Sidebar';
+import { BottomSheet } from '../components/ui/BottomSheet';
 
 // ─── Score color map ────────────────────────────────────────
 const getScoreColor = (score: number) => {
   if (score >= 85) return { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-900/50', bar: 'bg-emerald-500', label: 'Excellent Match' };
   if (score >= 65) return { bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-900/50', bar: 'bg-blue-500', label: 'Good Match' };
   if (score >= 45) return { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-900/50', bar: 'bg-amber-500', label: 'Partial Match' };
-  return { bg: 'bg-slate-50 dark:bg-slate-800/50', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-slate-700', bar: 'bg-slate-400', label: 'Low Match' };
+  return { bg: 'bg-slate-50 dark:bg-[#40414f]', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-[#565869]', bar: 'bg-slate-400', label: 'Low Match' };
 };
 
 const SUGGESTION_CHIPS = [
@@ -43,7 +43,7 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
   const initials = (result.name || result.email?.split('@')[0] || "U").split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <div className="group bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-slide-in-bottom mb-4 last:mb-0" style={{ animationDelay: `${200 + index * 50}ms` }}>
+    <div className="group bg-white dark:bg-[#40414f] rounded-xl border border-slate-200 dark:border-[#565869] shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-slide-in-bottom mb-4 last:mb-0" style={{ animationDelay: `${200 + index * 50}ms` }}>
       <div className="flex flex-col sm:flex-row">
         <div className={`sm:w-24 shrink-0 ${sc.bg} flex sm:flex-col items-center justify-center gap-2 p-4 border-b sm:border-b-0 sm:border-r ${sc.border}`}>
           <div className={`text-2xl sm:text-3xl font-black ${sc.text} tabular-nums`}>
@@ -74,7 +74,7 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
             {result.cpi && <span className="inline-flex text-xs font-semibold px-2.5 py-1 text-slate-700 bg-slate-100 rounded-lg">CPI: {result.cpi}</span>}
           </div>
 
-          <div className="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl mb-3">
+          <div className="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-[#40414f] border border-slate-100 dark:border-[#383942] rounded-xl mb-3">
             <Brain size={15} className="text-primary-500 shrink-0 mt-0.5" />
             <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{result.explanation}</p>
           </div>
@@ -83,14 +83,14 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
             <div className="mb-3">
               <div className="flex flex-wrap gap-1.5">
                 {result.skills.slice(0, 10).map((skill: string) => (
-                  <span key={skill} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  <span key={skill} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-[#2a2b32] dark:text-slate-300">
                     {skill}
                   </span>
                 ))}
               </div>
             </div>
           )}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-700/50">
+          <div className="pt-2 border-t border-slate-100 dark:border-[#565869]">
              <Button size="sm" onClick={() => window.open(`/profile/${result.email?.split('@')[0] || result.userId}`, '_blank')}>
                 <Eye size={13} className="mr-1.5" /> View Full Profile
              </Button>
@@ -110,7 +110,7 @@ export const Search = () => {
   
   const { activeMessages, isLoading, sendMessage } = useChatStore();
   const [query, setQuery] = useState('');
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMobileHistory, setShowMobileHistory] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -147,35 +147,113 @@ export const Search = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-hidden border-t border-slate-200 dark:border-slate-800">
-      {/* Sidebar - Context / History Manager */}
-      <Sidebar />
+    <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-hidden border-t border-slate-200 dark:border-[#383942]">
+      {/* Sidebar - only visible to logged-in users on desktop/tablet */}
+      {isAuthenticated() && (
+        <div className="hidden md:flex">
+          <Sidebar />
+        </div>
+      )}
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1120] relative">
+      <div className="flex-1 flex flex-col bg-white dark:bg-[#343541] relative">
+        {/* Mobile History Toggle */}
+        {isAuthenticated() && (
+          <button
+            onClick={() => setShowMobileHistory(true)}
+            className="md:hidden absolute top-4 left-4 z-40 p-2.5 bg-white/80 dark:bg-[#202123]/80 backdrop-blur-md border border-slate-200 dark:border-[#383942] rounded-xl shadow-lg text-slate-600 dark:text-slate-300 hover:scale-105 transition-all active:scale-95"
+          >
+            <History size={20} />
+          </button>
+        )}
+
+        {/* Mobile History Sheet */}
+        <BottomSheet
+          isOpen={showMobileHistory}
+          onClose={() => setShowMobileHistory(false)}
+          title="Recent Sessions"
+        >
+          <div className="w-full h-full max-h-[60vh]">
+            <Sidebar />
+          </div>
+        </BottomSheet>
         <div className="flex-1 overflow-y-auto w-full relative scroll-smooth px-4 pt-8 pb-32 flex flex-col items-center">
             {activeMessages.length === 0 ? (
-                // Landing state
-                <div className="m-auto text-center max-w-2xl animate-fade-in-up mt-24">
-                  <div className="inline-flex items-center justify-center p-4 bg-primary-50 dark:bg-primary-900/20 rounded-full mb-6 ring-8 ring-primary-50/50 dark:ring-primary-900/10">
-                    <Sparkles size={32} className="text-primary-500" />
+                // Landing state — Neural Scan Hero
+                <div className="m-auto text-center max-w-2xl w-full px-4 animate-fade-in-up relative z-10" style={{ marginTop: '4rem' }}>
+
+                  {/* Neural background grid */}
+                  <div className="absolute inset-0 -top-20 -bottom-20 pointer-events-none opacity-20 dark:opacity-30 overflow-hidden" aria-hidden="true">
+                    <div className="absolute inset-0" style={{ 
+                      backgroundImage: 'radial-gradient(circle, #22c55e 1px, transparent 1px)', 
+                      backgroundSize: '40px 40px' 
+                    }}>
+                      {[...Array(12)].map((_, i) => (
+                        <div key={i} className="absolute w-1 h-1 bg-primary-400 rounded-full" style={{
+                          top: `${Math.random() * 100}%`,
+                          left: `${Math.random() * 100}%`,
+                          animation: `twinkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 5}s infinite`
+                        }} />
+                      ))}
+                    </div>
                   </div>
-                  <h1 className="text-4xl text-slate-900 dark:text-white font-bold tracking-tight mb-4">
-                    Find the right talent, fast
-                  </h1>
-                  <p className="text-lg text-slate-500 mb-8 max-w-md mx-auto">
-                    Describe who you're looking for in plain language. Our AI agent understands filters like CPI, branch, year, and skills automatically.
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {SUGGESTION_CHIPS.map(chip => (
-                       <button
-                         key={chip}
-                         onClick={() => { setQuery(chip); if(inputRef.current) inputRef.current.focus(); }}
-                         className="px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-700 transition"
-                       >
-                         {chip}
-                       </button>
+
+                  {/* Central Node & Ripple Core */}
+                  <div className="relative inline-flex items-center justify-center mb-12">
+                    {/* Ripple Rings */}
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="absolute left-1/2 top-1/2 w-32 h-32 border border-primary-500/30 rounded-full"
+                        style={{ animation: `ripple ${4}s linear ${i * 1.3}s infinite` }} />
                     ))}
+                    
+                    {/* Scanning Beam/Light */}
+                    <div className="absolute w-[800px] h-[1px] bg-gradient-to-r from-transparent via-primary-500/10 to-transparent left-1/2 -translate-x-1/2 pointer-events-none"
+                      style={{ animation: 'scanline 8s ease-in-out infinite' }} />
+
+                    {/* Central Core */}
+                    <div className="relative z-10 w-24 h-24 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-primary-500/20 dark:bg-primary-500/10 rounded-full blur-2xl animate-pulse" />
+                      <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-primary-500 to-teal-500 shadow-2xl flex items-center justify-center transform rotate-12 transition-transform hover:rotate-0 duration-500">
+                        <Sparkles size={32} className="text-white drop-shadow-lg" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Headline */}
+                  <div className="relative z-10">
+                    <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-6 animate-fade-in"
+                      style={{ animationDelay: '0.2s' }}>
+                      <span className="text-slate-900 dark:text-white block sm:inline">Intelligent </span>
+                      <span className="gradient-text">Talent Match</span>
+                    </h1>
+
+                    {/* Subtitle */}
+                    <p className="text-lg text-slate-500 dark:text-slate-300 mb-12 max-w-lg mx-auto leading-relaxed animate-fade-in font-medium"
+                      style={{ animationDelay: '0.4s' }}>
+                      SkillSync AI analyzes complex developer footprints to find the perfect technical and cultural fit for your team.
+                    </p>
+
+                    {/* Suggestion Chips with dynamic border */}
+                    <div className="flex flex-wrap justify-center gap-3 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                      {SUGGESTION_CHIPS.map((chip, idx) => (
+                        <button
+                          key={chip}
+                          onClick={() => { setQuery(chip); if(inputRef.current) inputRef.current.focus(); }}
+                          className="px-5 py-2.5 bg-white dark:bg-[#2a2b32] hover:bg-primary-50 dark:hover:bg-primary-900/10 border border-slate-200 dark:border-[#383942] hover:border-primary-400 dark:hover:border-primary-600 rounded-2xl text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
+                          style={{ transitionDelay: `${idx * 50}ms` }}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="mt-12 flex items-center justify-center gap-2 animate-fade-in opacity-60" style={{ animationDelay: '1s' }}>
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400 dark:text-slate-500">
+                      Neural Engine Active
+                    </p>
                   </div>
                 </div>
             ) : (
@@ -197,7 +275,7 @@ export const Search = () => {
                                   <Brain size={18} className="text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl rounded-tl-sm border border-slate-100 dark:border-slate-700">
+                                    <div className="bg-slate-50 dark:bg-[#40414f] p-4 rounded-xl rounded-tl-sm border border-slate-100 dark:border-[#565869]">
                                       <p className="text-slate-700 dark:text-slate-200 text-[15px] font-medium leading-relaxed">{msg.content}</p>
                                     </div>
                                     
@@ -231,11 +309,11 @@ export const Search = () => {
         </div>
 
         {/* Floating Chat Input bar */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#0B1120] dark:via-[#0B1120]/90 p-4 pt-10 flex justify-center backdrop-blur-sm pointer-events-none z-10">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#343541] dark:via-[#343541]/90 to-transparent p-4 pt-10 flex justify-center backdrop-blur-sm pointer-events-none z-10">
             <div className="w-full max-w-3xl pointer-events-auto">
                 <form 
                   onSubmit={handleSearchSubmit} 
-                  className="relative flex items-end bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none focus-within:ring-4 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all"
+                  className="relative flex items-end bg-white dark:bg-[#40414f] rounded-3xl border border-slate-200 dark:border-[#565869] shadow-xl shadow-slate-200/50 dark:shadow-none focus-within:ring-4 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all"
                 >
                     <textarea
                       ref={inputRef}
@@ -265,8 +343,6 @@ export const Search = () => {
             </div>
         </div>
       </div>
-      
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} pendingQuery={query} />
     </div>
   );
 };

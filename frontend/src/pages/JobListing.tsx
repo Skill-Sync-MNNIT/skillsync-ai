@@ -121,17 +121,17 @@ export const JobListing = () => {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {job.requiredSkills.slice(0, 4).map(skill => (
-                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
+                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
                         {skill}
                       </span>
                     ))}
                     {job.requiredSkills.length > 4 && (
-                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
+                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[#383942] flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <div className="flex items-center">
                     <Calendar size={14} className="mr-1.5" />
                     Due {new Date(job.deadline).toLocaleDateString()}
