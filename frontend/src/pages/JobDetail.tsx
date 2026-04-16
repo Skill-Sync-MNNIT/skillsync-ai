@@ -7,6 +7,7 @@ import { useAuthStore } from '../store/authStore';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { NoData } from '../components/ui/NoData';
 
 interface Job {
   _id: string;
@@ -22,6 +23,7 @@ interface Job {
   };
   jobLink?: string;
   createdAt: string;
+  hasApplied?: boolean;
 }
 
 export const JobDetail = () => {
@@ -69,6 +71,7 @@ export const JobDetail = () => {
     try {
       const response = await api.post(`/jobs/${jobId}/apply`);
       toast(response.data.message || 'Application submitted successfully!', 'success');
+      setJob(prev => prev ? { ...prev, hasApplied: true } : null);
     } catch (error: any) {
       toast(error.response?.data?.message || 'Failed to apply for this job', 'error');
     } finally {
@@ -112,11 +115,16 @@ export const JobDetail = () => {
 
   if (!job) {
     return (
-      <div className="max-w-4xl mx-auto text-center py-16 bg-white rounded-xl border border-slate-200">
-        <h3 className="text-xl font-medium text-slate-900 dark:text-white">Job not found</h3>
-        <p className="mt-2 text-slate-500 mb-6">This job may have been removed or moderated.</p>
-        <Button onClick={() => navigate('/jobs')} variant="outline">Back to Job Board</Button>
-      </div>
+      <NoData
+        title="Job Opportunity Not Found"
+        description="This job may have been removed, moderated, or has already closed."
+        action={
+          <Button onClick={() => navigate(-1)} variant="outline" className="group hover:border-primary-500 hover:text-primary-600 transition-all duration-300">
+            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+            Go Back
+          </Button>
+        }
+      />
     );
   }
 
@@ -186,11 +194,12 @@ export const JobDetail = () => {
                   size="lg"
                   onClick={handleApply}
                   isLoading={isApplying}
-                  disabled={isExpired || isClosed || job.status !== 'active'}
-                  className="w-full shadow-sm"
+                  disabled={isExpired || isClosed || job.status !== 'active' || job.hasApplied}
+                  variant={job.hasApplied ? "outline" : "primary"}
+                  className={`w-full shadow-sm ${job.hasApplied ? 'border-emerald-200 text-emerald-600 bg-emerald-50/50' : ''}`}
                 >
                   <Send size={18} className="mr-2" />
-                  {job.jobLink ? 'Apply on External Site' : 'Apply Now'}
+                  {job.hasApplied ? 'Already Applied' : job.jobLink ? 'Apply on External Site' : 'Apply Now'}
                 </Button>
               )}
               {isPoster && (
