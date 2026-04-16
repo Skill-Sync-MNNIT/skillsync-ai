@@ -10,7 +10,7 @@ export const applyToJob = async (req, res, next) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'You have already applied for this job' });
+      return res.status(400).json({ message: 'Request could not be processed' });
     }
     next(error);
   }
