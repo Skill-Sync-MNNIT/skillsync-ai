@@ -1,10 +1,14 @@
 import express from 'express';
 import { verifyToken } from '../middleware/verifyToken.js';
-import { updatePreferences } from '../controllers/notifications/notification.controller.js';
+import {
+  getPreferences,
+  updatePreferences,
+} from '../controllers/notifications/notification.controller.js';
 import { deactivateAccount, deleteAccount } from '../controllers/settings/account.controller.js';
 
 const router = express.Router();
 
+router.get('/', verifyToken, getPreferences);
 router.put('/preferences', verifyToken, updatePreferences);
 
 router.patch('/account/deactivate', verifyToken, deactivateAccount);

@@ -14,6 +14,9 @@ import jobRoutes from './src/routes/jobs.routes.js';
 import notificationRoutes from './src/routes/notification.routes.js';
 import settingsRoutes from './src/routes/settings.routes.js';
 import conversationRoutes from './src/routes/conversation.routes.js';
+import connectionRoutes from './src/routes/connection.routes.js';
+import chatRoutes from './src/routes/chat.routes.js';
+import projectRoutes from './src/routes/project.routes.js';
 
 const app = express();
 
@@ -28,8 +31,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 10 * 60 * 1000,
+  max: 1000, // Increased for real-time chat support
 });
 
 app.use(limiter);
@@ -47,6 +50,9 @@ app.use('/jobs', jobRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/settings', settingsRoutes);
 app.use('/conversations', conversationRoutes);
+app.use('/connections', connectionRoutes);
+app.use('/chats', chatRoutes);
+app.use('/projects', projectRoutes);
 
 app.get('/', (req, res) => {
   res.send('SkillSync Backend Running');
