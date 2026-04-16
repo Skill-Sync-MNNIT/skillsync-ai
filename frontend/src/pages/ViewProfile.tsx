@@ -7,6 +7,8 @@ import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
 import { NoData } from '../components/ui/NoData';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
+
 
 interface StudentProfile {
   userId: string;
@@ -44,6 +46,8 @@ export const ViewProfile = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuthStore();
+
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isViewing, setIsViewing] = useState(false);
@@ -208,24 +212,28 @@ export const ViewProfile = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-              {connectionStatus === 'accepted' ? (
-                <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700">
-                  <UserPlus size={16} /> Connected
-                </span>
-              ) : connectionStatus === 'pending' ? (
-                <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-[#2a2b32] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#565869]">
-                  <UserPlus size={16} /> Request Sent
-                </span>
-              ) : connectionStatus === 'none' ? (
-                <Button
-                  variant="primary"
-                  onClick={handleConnect}
-                  disabled={isConnecting}
-                  isLoading={isConnecting}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 h-12 rounded-2xl font-bold shadow-xl shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <UserPlus size={18} /> Connect
-                </Button>
+              {!user || user._id !== profile.userId ? (
+                <>
+                  {connectionStatus === 'accepted' ? (
+                    <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700">
+                      <UserPlus size={16} /> Connected
+                    </span>
+                  ) : connectionStatus === 'pending' ? (
+                    <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-[#2a2b32] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#565869]">
+                      <UserPlus size={16} /> Request Sent
+                    </span>
+                  ) : connectionStatus === 'none' ? (
+                    <Button
+                      variant="primary"
+                      onClick={handleConnect}
+                      disabled={isConnecting}
+                      isLoading={isConnecting}
+                      className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 h-12 rounded-2xl font-bold shadow-xl shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      <UserPlus size={18} /> Connect
+                    </Button>
+                  ) : null}
+                </>
               ) : null}
             </div>
           </div>

@@ -11,7 +11,7 @@ export const Sidebar = () => {
   }, []);
 
   return (
-    <div className="w-64 bg-slate-50 dark:bg-[#202123] border-r border-slate-200 dark:border-[#383942] flex flex-col h-full sticky top-16 shrink-0 pt-6">
+    <div className="w-full md:w-64 bg-transparent md:bg-slate-50 dark:md:bg-[#202123] border-b md:border-b-0 md:border-r border-slate-200 dark:border-[#383942] flex flex-col h-full sticky top-0 md:top-16 shrink-0 pt-2 md:pt-6">
       <div className="px-4 mb-6">
         <Button 
           className="w-full justify-start shadow-sm" 

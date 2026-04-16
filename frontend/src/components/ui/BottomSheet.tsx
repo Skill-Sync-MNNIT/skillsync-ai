@@ -44,7 +44,7 @@ export const BottomSheet = ({ isOpen, onClose, title, children }: BottomSheetPro
         </div>
 
         {(title || !!onClose) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b dark:border-[#383942]">
+          <div className="flex items-center justify-between px-4 py-4 border-b dark:border-[#383942]">
             {title && <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>}
             <button 
               onClick={onClose}
@@ -55,7 +55,7 @@ export const BottomSheet = ({ isOpen, onClose, title, children }: BottomSheetPro
           </div>
         )}
 
-        <div className="px-6 py-6 pb-12 sm:pb-6 max-h-[80vh] overflow-y-auto">
+        <div className="py-6 pb-12 sm:pb-6 max-h-[80vh] overflow-y-auto">
           {children}
         </div>
       </div>
