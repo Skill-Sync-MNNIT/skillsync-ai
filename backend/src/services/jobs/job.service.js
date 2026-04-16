@@ -1,5 +1,6 @@
 import { Queue } from 'bullmq';
 import JobPosting from '../../models/JobPosting.js';
+import JobApplication from '../../models/JobApplication.js';
 import redis from '../../config/redis.js';
 
 const moderationQueue = new Queue('moderation-queue', { connection: redis });
@@ -24,8 +25,13 @@ export class JobService {
       );
     }
 
+    const normalizedSkills = Array.isArray(jobData.requiredSkills)
+      ? jobData.requiredSkills.map((s) => s.trim().toLowerCase())
+      : [];
+
     const job = await JobPosting.create({
       ...jobData,
+      requiredSkills: normalizedSkills,
       postedBy: userId,
       status: 'pending_moderation',
     });
@@ -53,6 +59,9 @@ export class JobService {
       (updateData.description && updateData.description !== job.description);
 
     // Update fields
+    if (updateData.requiredSkills && Array.isArray(updateData.requiredSkills)) {
+      updateData.requiredSkills = updateData.requiredSkills.map((s) => s.trim().toLowerCase());
+    }
     Object.assign(job, updateData);
 
     if (criticalChange) {
@@ -118,13 +127,24 @@ export class JobService {
 
   /**
    * Fetch single job by ID.
+   * Optionally checks if a student has applied.
    */
-  static async getJobById(jobId) {
+  static async getJobById(jobId, studentId = null) {
     const job = await JobPosting.findById(jobId).populate('postedBy', 'name email');
     if (!job) {
       throw new Error('Job not found');
     }
-    return job;
+
+    let hasApplied = false;
+    if (studentId) {
+      const application = await JobApplication.findOne({ jobId, studentId });
+      hasApplied = !!application;
+    }
+
+    return {
+      ...job.toObject(),
+      hasApplied,
+    };
   }
 
   /**

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, Calendar, Clock, PlusCircle } from 'lucide-react';
+import { Calendar, Clock, PlusCircle } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
+import { NoData } from '../components/ui/NoData';
 
 interface Job {
   _id: string;
@@ -91,17 +92,21 @@ export const JobListing = () => {
       {isLoading ? (
         <LoadingSpinner fullPage message="Finding the best opportunities for you..." />
       ) : jobs.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          <Briefcase className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 dark:text-white">No jobs found</h3>
-          <p className="mt-1 text-slate-500 dark:text-slate-400">
-            {activeTab === 'my-jobs' ? "You haven't posted any jobs yet." : "There are currently no active job postings."}
-          </p>
-        </div>
+        <NoData
+          title={activeTab === 'my-jobs' ? "No Jobs Posted" : "No Jobs Found"}
+          description={activeTab === 'my-jobs' ? "You haven't posted any opportunities yet. Start by posting a new job!" : "There are currently no active job postings matching your filters."}
+          action={
+            activeTab === 'my-jobs' && (user?.role === 'alumni' || user?.role === 'professor') && (
+              <Button onClick={() => navigate('/jobs/create')}>
+                Post Your First Job
+              </Button>
+            )
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {jobs.map((job) => (
-            <Card key={job._id} className="hover:shadow-md transition-shadow flex flex-col h-full cursor-pointer" onClick={() => navigate(`/jobs/${job._id}`)}>
+            <Card key={job._id} className="hover:shadow-md transition-all duration-200 flex flex-col h-full cursor-pointer hover:-translate-y-0.5" onClick={() => navigate(`/jobs/${job._id}`)}>
               <CardContent className="p-6 flex-1 flex flex-col">
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-2">
@@ -116,17 +121,17 @@ export const JobListing = () => {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {job.requiredSkills.slice(0, 4).map(skill => (
-                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
+                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
                         {skill}
                       </span>
                     ))}
                     {job.requiredSkills.length > 4 && (
-                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
+                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[#383942] flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <div className="flex items-center">
                     <Calendar size={14} className="mr-1.5" />
                     Due {new Date(job.deadline).toLocaleDateString()}

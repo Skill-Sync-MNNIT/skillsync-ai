@@ -6,7 +6,7 @@ export const getNotifications = async (req, res, next) => {
     const notifications = await Notification.find({ userId: req.user.id })
       .sort({ createdAt: -1 }) // Newest first
       .limit(50);
-    res.status(200).json({ notifications });
+    res.status(200).json({ success: true, notifications });
   } catch (error) {
     next(error);
   }
@@ -22,7 +22,7 @@ export const markAsRead = async (req, res, next) => {
     if (!notification) {
       return res.status(404).json({ message: 'Notification not found' });
     }
-    res.status(200).json({ message: 'Notification marked as read' });
+    res.status(200).json({ success: true, message: 'Notification marked as read' });
   } catch (error) {
     next(error);
   }
@@ -39,7 +39,7 @@ export const deleteNotification = async (req, res, next) => {
       return res.status(404).json({ message: 'Notification not found' });
     }
 
-    res.status(200).json({ message: 'Notification deleted successfully' });
+    res.status(200).json({ success: true, message: 'Notification deleted successfully' });
   } catch (error) {
     next(error);
   }
@@ -48,7 +48,7 @@ export const deleteNotification = async (req, res, next) => {
 export const clearAllNotifications = async (req, res, next) => {
   try {
     await Notification.deleteMany({ userId: req.user.id });
-    res.status(200).json({ message: 'All notifications cleared' });
+    res.status(200).json({ success: true, message: 'All notifications cleared' });
   } catch (error) {
     next(error);
   }
@@ -61,15 +61,34 @@ export const updatePreferences = async (req, res, next) => {
       return res.status(400).json({ message: 'skillPreferences must be an array' });
     }
 
+    const normalizedSkills = skillPreferences.map((s) => s.trim().toLowerCase());
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { skillPreferences },
+      { skillPreferences: normalizedSkills },
       { returnDocument: 'after' }
     ).select('skillPreferences');
 
     res.status(200).json({
+      success: true,
       message: 'Preferences updated successfully',
       skillPreferences: user.skillPreferences,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPreferences = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('skillPreferences isBanned');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      preferences: user.skillPreferences || [],
+      systemStatus: user.isBanned ? 'banned' : 'active',
     });
   } catch (error) {
     next(error);

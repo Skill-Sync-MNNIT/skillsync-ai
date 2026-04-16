@@ -185,8 +185,8 @@ export const ForgotPassword = () => {
   const current = stepConfig[step];
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-6 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#202123] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-6 bg-white dark:bg-[#2a2b32] p-8 rounded-xl shadow-lg border border-slate-100 dark:border-[#565869]">
         
         {/* Step Indicator */}
         <StepIndicator currentStep={step} />

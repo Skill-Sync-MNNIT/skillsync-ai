@@ -20,7 +20,7 @@ class SearchRequest(BaseModel):
     branch: str | None = None
     year: int | None = None
     top_k: int = 10
-
+    history: list[dict] = []
 
 @router.post("")
 async def search_students(request: SearchRequest):
@@ -28,25 +28,34 @@ async def search_students(request: SearchRequest):
         query=request.query,
         branch=request.branch,
         year=request.year,
-        top_k=request.top_k
+        top_k=request.top_k,
+        history=request.history
     )
+
+    candidates = result.get("candidates", [])
 
     explanations = await asyncio.gather(*[
         explanation_engine.explain(
             query=request.query,
             skills=candidate["metadata"].get("skills",[])
-        ) for candidate in result
+        ) for candidate in candidates
     ])
 
-    return [
+    formatted_candidates = [
         {
             "user_id": candidate["user_id"],
             "score": round(candidate["score"],4),
-            "explanation":explanations[i],
-            "metadata":candidate["metadata"],
+            "explanation": explanations[i],
+            "metadata": candidate["metadata"],
         }
-        for i,candidate in enumerate(result)
+        for i, candidate in enumerate(candidates)
     ]
+
+    return {
+        "candidates": formatted_candidates,
+        "summary": result.get("summary", ""),
+        "filters": result.get("filters", {})
+    }
 
 
 @router.get("/{user_id}/detail")

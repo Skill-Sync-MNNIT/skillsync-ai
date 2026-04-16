@@ -41,3 +41,15 @@ def test_delete_embed_success(mock_svc):
     response = client.delete("/embed/user-1")
     assert response.status_code == 200
     assert response.json() == {"status": "deleted", "user_id": "user-1"}
+
+
+@patch("services.pinecone_repo.PineconeRepository")
+def test_patch_metadata_success(mock_repo):
+    mock_repo_instance = MagicMock()
+    mock_repo.return_value = mock_repo_instance
+
+    response = client.patch("/embed/metadata/user-1", json={"cpi": 9.5, "branch": "CSE"})
+    
+    assert response.status_code == 200
+    assert response.json()["status"] == "metadata_updated"
+    mock_repo_instance.update_metadata.assert_called_once_with("user-1", {"cpi": 9.5, "branch": "CSE"})
