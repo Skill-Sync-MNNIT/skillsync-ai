@@ -27,9 +27,9 @@ const ReadField = ({
 }) => (
   <div>
     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</p>
-    <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
       {Icon && <Icon size={14} className="text-slate-400 shrink-0" />}
-      <span className="text-sm font-medium text-slate-700">{value || '—'}</span>
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
     </div>
   </div>
 );
@@ -49,7 +49,7 @@ const SectionHeader = ({
   subtitle?: string;
 }) => (
   <div className="flex items-center gap-3">
-    <div className={`h-9 w-9 rounded-lg ${iconBg} flex items-center justify-center shrink-0`}>
+    <div className={`h-9 w-9 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
       <Icon size={18} className={iconColor} />
     </div>
     <div>
@@ -335,15 +335,15 @@ export const MyProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5 pt-0 pb-12 px-4 sm:px-0">
+    <div className="max-w-2xl mx-auto space-y-6 pt-0 pb-12 px-4 sm:px-0">
 
       {/* ── Page header ─────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 pb-5 mb-2">
+      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-slate-800 pb-5 mb-2">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
-            <User size={20} className="text-blue-600" />
+          <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+            <User size={20} className="text-primary-600" />
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-blue-700 uppercase">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
             My Profile
           </h1>
         </div>
@@ -368,12 +368,12 @@ export const MyProfile = () => {
       </div>
 
       {/* ── Account Information (Name is editable) ───────────── */}
-      <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '60ms' }}>
-        <CardHeader className="border-b border-slate-100">
+      <Card className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
           <SectionHeader
             icon={Shield}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
+            iconBg="bg-primary-50 dark:bg-primary-900/20"
+            iconColor="text-primary-600"
             title="Account Information"
             subtitle={isEditing ? 'Update your name and account details' : 'Verified account identity and status'}
           />
@@ -426,7 +426,7 @@ export const MyProfile = () => {
       {/* ── Profile Details (Students only) ───────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '120ms' }}>
-          <CardHeader className="border-b border-slate-100">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
             <SectionHeader
               icon={FileText}
               iconBg="bg-primary-50"
@@ -450,7 +450,7 @@ export const MyProfile = () => {
                         setCourse(e.target.value);
                         if (errors.course) setErrors(prev => ({ ...prev, course: '' }));
                       }}
-                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-slate-900 dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-slate-700 focus:ring-primary-500/40 focus:border-primary-400'
                         }`}
                     >
                       {COURSES.map((c) => (
@@ -483,7 +483,7 @@ export const MyProfile = () => {
                         setBranch(e.target.value);
                         if (errors.branch) setErrors(prev => ({ ...prev, branch: '' }));
                       }}
-                      className={`flex h-10 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-primary-500'
+                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-slate-900 dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-slate-700 focus:ring-primary-500/40 focus:border-primary-400'
                         }`}
                     >
                       {BRANCHES.map((b) => (
@@ -527,17 +527,17 @@ export const MyProfile = () => {
       {/* ── Skills (students only) ────────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '180ms' }}>
-          <CardHeader className="border-b border-slate-100">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <SectionHeader
                 icon={Cpu}
-                iconBg="bg-violet-50"
-                iconColor="text-violet-600"
+                iconBg="bg-primary-50 dark:bg-primary-900/20"
+                iconColor="text-primary-600"
                 title="Skills"
                 subtitle="Powers your AI-search ranking"
               />
               {skills.length > 0 && (
-                <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-100">
+                <span className="text-xs font-semibold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-2.5 py-1 rounded-full border border-primary-100 dark:border-primary-800">
                   {skills.length} skill{skills.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -572,8 +572,8 @@ export const MyProfile = () => {
                 <span
                   key={skill}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${isEditing
-                    ? 'bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100'
-                    : 'bg-slate-100 text-slate-700'
+                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800 hover:bg-primary-100'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
                 >
                   {skill}
@@ -581,7 +581,7 @@ export const MyProfile = () => {
                     <button
                       type="button"
                       onClick={() => removeSkill(skill)}
-                      className="h-4 w-4 rounded-full flex items-center justify-center text-violet-400 hover:text-white hover:bg-violet-500 transition-all"
+                      className="h-4 w-4 rounded-full flex items-center justify-center text-primary-400 hover:text-white hover:bg-primary-500 transition-all"
                     >
                       <X size={11} />
                     </button>
@@ -596,7 +596,7 @@ export const MyProfile = () => {
       {/* ── Resume (students only) ───────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '240ms' }}>
-          <CardHeader className="border-b border-slate-100">
+          <CardHeader className="border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <SectionHeader
                 icon={FileText}
@@ -634,55 +634,68 @@ export const MyProfile = () => {
                   </div>
                 )}
 
-                {/* Drop zone */}
-                <div
-                  className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
-                    ? 'border-primary-400 bg-primary-50/50'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={(e) => {
-                    handleDrop(e);
-                    if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
-                  }}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <UploadCloud
-                    className={`mx-auto h-7 w-7 mb-2 ${isDragging ? 'text-primary-500' : 'text-slate-400'}`}
-                  />
-                  <p className="text-sm font-medium text-slate-700">
-                    {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">PDF only · Max 5 MB</p>
-                  <input
-                    type="file"
-                    className="sr-only"
-                    accept=".pdf"
-                    ref={fileInputRef}
-                    onChange={(e) => {
-                      handleFileChange(e);
-                      if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
-                    }}
-                  />
-                </div>
-                {errors.hasResume && <p className="text-sm font-medium text-red-500 mt-2">{errors.hasResume}</p>}
-
-                {selectedFile && (
-                  <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <FileText size={15} className="text-primary-500 shrink-0" />
-                      <span className="text-sm font-medium text-slate-700 truncate">{selectedFile.name}</span>
-                    </div>
-                    <Button
-                      size="sm"
-                      isLoading={isUploading}
-                      onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                      className="ml-3 shrink-0"
+                {/* Drop zone & Upload action only visible in Edit Mode */}
+                {isEditing && (
+                  <>
+                    <div
+                      className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
+                        ? 'border-primary-400 bg-primary-50/50'
+                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        }`}
+                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={(e) => {
+                        handleDrop(e);
+                        if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
+                      }}
+                      onClick={() => fileInputRef.current?.click()}
                     >
-                      Upload
-                    </Button>
-                  </div>
+                      <UploadCloud
+                        className={`mx-auto h-7 w-7 mb-2 ${isDragging ? 'text-primary-500' : 'text-slate-400'}`}
+                      />
+                      <p className="text-sm font-medium text-slate-700">
+                        {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">PDF only · Max 5 MB</p>
+                      <input
+                        type="file"
+                        className="sr-only"
+                        accept=".pdf"
+                        ref={fileInputRef}
+                        onChange={(e) => {
+                          handleFileChange(e);
+                          if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
+                        }}
+                      />
+                    </div>
+                    {errors.hasResume && <p className="text-sm font-medium text-red-500 mt-2">{errors.hasResume}</p>}
+
+                    {selectedFile && (
+                      <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in mt-4">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText size={15} className="text-primary-500 shrink-0" />
+                          <span className="text-sm font-medium text-slate-700 truncate">{selectedFile.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <Button
+                             size="sm"
+                             variant="outline"
+                             onClick={() => setSelectedFile(null)}
+                           >
+                             Cancel
+                           </Button>
+                           <Button
+                             size="sm"
+                             isLoading={isUploading}
+                             onClick={(e) => { e.stopPropagation(); handleUpload(); }}
+                             className="shrink-0"
+                           >
+                             Upload
+                           </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -691,7 +704,7 @@ export const MyProfile = () => {
       )}
 
       {/* ── Danger Zone ─────────────────────────────────────── */}
-      <Card className="animate-fade-in-up border-red-100 overflow-hidden" style={{ animationDelay: '300ms' }}>
+      <Card className="animate-fade-in-up border-red-100 dark:border-red-900/30" style={{ animationDelay: '300ms' }}>
         <CardHeader className="border-b border-red-100 bg-red-50/30">
           <SectionHeader
             icon={Trash2}
