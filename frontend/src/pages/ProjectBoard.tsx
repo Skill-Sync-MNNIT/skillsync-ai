@@ -117,7 +117,7 @@ export const ProjectBoard = () => {
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-8 space-y-8 pb-24 lg:pb-8">
       {/* ── Header Area ────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-[#202123] p-6 rounded-3xl border border-slate-200 dark:border-[#383942] shadow-sm animate-fade-in">
         <div className="flex items-center gap-4">
           <div className="h-14 w-14 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
             <Rocket className="text-primary-600" size={32} />
@@ -151,19 +151,19 @@ export const ProjectBoard = () => {
         <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 Available Opportunities
-                <span className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                <span className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-[#2a2b32] px-2.5 py-1 rounded-lg">
                     {projects.length} Total
                 </span>
             </h2>
         </div>
 
         {isLoading ? (
-          <div className="py-24 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800">
+          <div className="py-24 flex flex-col items-center justify-center bg-white dark:bg-[#202123] rounded-3xl border border-slate-100 dark:border-[#383942]">
             <LoadingSpinner message="Scanning for active collaborations..." />
           </div>
         ) : projects.length === 0 ? (
-          <div className="text-center p-16 bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 animate-fade-in">
-            <div className="h-16 w-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-16 bg-white dark:bg-[#202123] rounded-3xl border-2 border-dashed border-slate-200 dark:border-[#383942] animate-fade-in">
+            <div className="h-16 w-16 bg-slate-50 dark:bg-[#2a2b32] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Info size={32} className="text-slate-400" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No projects found</h3>
@@ -179,7 +179,7 @@ export const ProjectBoard = () => {
               return (
                 <Card 
                     key={p._id} 
-                    className="group hover:shadow-xl hover:border-primary-400/50 transition-all duration-300 rounded-3xl overflow-hidden animate-fade-in-up border-slate-200 dark:border-slate-800 cursor-pointer"
+                    className="group hover:shadow-xl hover:border-primary-400/50 transition-all duration-300 rounded-3xl overflow-hidden animate-fade-in-up border-slate-200 dark:border-[#383942] cursor-pointer"
                     onClick={() => {
                         setViewProject(p);
                         setShowViewModal(true);
@@ -198,7 +198,7 @@ export const ProjectBoard = () => {
                         </div>
                         <div className="flex items-center gap-3 text-sm text-slate-500">
                           <div className="flex items-center gap-1.5 font-medium">
-                            <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">
+                            <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center text-[10px] font-bold">
                                 {p.owner?.name?.charAt(0) || 'U'}
                             </div>
                             <span>{p.owner?.name || 'Fellow Student'}</span>
@@ -218,7 +218,7 @@ export const ProjectBoard = () => {
 
                     <div className="flex flex-wrap gap-2 mb-8 mt-auto">
                       {p.requiredSkills.slice(0, 4).map((skill: string) => (
-                        <span key={skill} className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-100 dark:border-slate-700">
+                        <span key={skill} className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#2a2b32] text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-100 dark:border-[#565869]">
                           <Code size={12} className="text-slate-400" /> {skill}
                         </span>
                       ))}
@@ -227,7 +227,7 @@ export const ProjectBoard = () => {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-5 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2 pt-5 border-t border-slate-100 dark:border-[#383942]">
                       {isOwner ? (
                         <>
                           <Button 
@@ -237,7 +237,7 @@ export const ProjectBoard = () => {
                                 e.stopPropagation();
                                 handleEditClick(p);
                             }}
-                            className="flex-1 rounded-xl h-11 font-bold dark:border-slate-700 hover:bg-slate-50"
+                            className="flex-1 rounded-xl h-11 font-bold dark:border-[#565869] hover:bg-slate-50"
                           >
                             <Edit3 size={16} className="mr-2" /> Edit
                           </Button>
@@ -277,8 +277,8 @@ export const ProjectBoard = () => {
       {/* ── Add/Edit Modal ────────────────────────────────── */}
       {showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-            <div className="px-8 pt-8 pb-4 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-white dark:bg-[#202123] w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-[#383942] animate-in zoom-in-95 duration-200">
+            <div className="px-8 pt-8 pb-4 flex justify-between items-center border-b border-slate-100 dark:border-[#383942]">
               <div>
                 <CardTitle className="flex items-center gap-2 text-2xl font-black tracking-tight">
                   <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
@@ -294,7 +294,7 @@ export const ProjectBoard = () => {
                     setIsEditing(false);
                     setCurrentProject(null);
                 }}
-                className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors"
+                className="p-3 rounded-2xl bg-slate-50 dark:bg-[#2a2b32] text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <X size={20} />
               </button>
@@ -312,7 +312,7 @@ export const ProjectBoard = () => {
                 <div className="space-y-1.5">
                   <label className="block text-[13px] font-bold text-slate-500 uppercase tracking-widest pl-1">Tell us more about it</label>
                   <textarea
-                    className="w-full rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-transparent p-4 text-sm focus:border-primary-500 focus:ring-0 transition-all outline-none"
+                    className="w-full rounded-2xl border-2 border-slate-200 dark:border-[#383942] bg-transparent p-4 text-sm focus:border-primary-500 focus:ring-0 transition-all outline-none"
                     rows={4}
                     placeholder="Briefly describe what you're building and who you're looking for..."
                     required
@@ -349,7 +349,7 @@ export const ProjectBoard = () => {
       {/* ── View Details Modal ────────────────────────────── */}
       {showViewModal && viewProject && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+           <div className="bg-white dark:bg-[#202123] w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-[#383942] animate-in zoom-in-95 duration-200">
               <div className="relative h-32 bg-primary-600 flex items-end px-8 pb-6">
                  <button 
                    onClick={() => setShowViewModal(false)}
@@ -369,7 +369,7 @@ export const ProjectBoard = () => {
                             {viewProject.title}
                         </h2>
                         <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
-                            <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full"><User size={14} /> {viewProject.owner?.name}</span>
+                            <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-[#2a2b32] px-3 py-1 rounded-full"><User size={14} /> {viewProject.owner?.name}</span>
                             <span className="h-1 w-1 bg-slate-300 rounded-full" />
                             <span>{new Date(viewProject.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
                         </div>
@@ -379,7 +379,7 @@ export const ProjectBoard = () => {
                     </div>
                  </div>
 
-                 <div className="bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-6 mb-8 border border-slate-100 dark:border-slate-700">
+                 <div className="bg-slate-50 dark:bg-[#40414f] rounded-3xl p-6 mb-8 border border-slate-100 dark:border-[#565869]">
                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 pl-1">Project Description</h4>
                     <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm whitespace-pre-wrap">
                         {viewProject.description}
@@ -390,7 +390,7 @@ export const ProjectBoard = () => {
                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 pl-1">Required Expertise</h4>
                     <div className="flex flex-wrap gap-2.5">
                         {viewProject.requiredSkills.map((skill: string) => (
-                            <span key={skill} className="flex items-center gap-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-4 py-2 rounded-2xl text-xs font-bold border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span key={skill} className="flex items-center gap-2 bg-white dark:bg-[#2a2b32] text-slate-900 dark:text-white px-4 py-2 rounded-2xl text-xs font-bold border border-slate-200 dark:border-[#565869] shadow-sm">
                                 <Code size={14} className="text-primary-500" />
                                 {skill}
                             </span>

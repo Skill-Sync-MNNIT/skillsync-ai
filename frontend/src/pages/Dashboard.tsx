@@ -157,7 +157,7 @@ export const Dashboard = () => {
 
       {/* ── Trending Skills ───────────────────────────────────── */}
       <Card className="animate-fade-in-up" style={{ animationDelay: '280ms' }}>
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
+        <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
@@ -196,7 +196,7 @@ export const Dashboard = () => {
                       </div>
                       <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{demand}%</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-slate-100 dark:bg-[#2a2b32] rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${SKILL_COLORS[i % SKILL_COLORS.length]} animate-progress-fill transition-all duration-300 group-hover:brightness-110`}
                         style={{ width: `${demand}%`, animationDelay: `${400 + i * 80}ms` }}
@@ -212,7 +212,7 @@ export const Dashboard = () => {
             )}
           </div>
 
-          <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-slate-50 dark:from-slate-900 to-emerald-50/50 dark:to-emerald-900/10 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+          <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-slate-50 dark:from-slate-900 to-emerald-50/50 dark:to-emerald-900/10 border border-slate-100 dark:border-[#383942] flex items-start gap-3">
             <Lightbulb size={16} className="text-amber-500 mt-0.5 shrink-0" />
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               <span className="font-semibold text-slate-700 dark:text-slate-300">Tip:</span>{' '}

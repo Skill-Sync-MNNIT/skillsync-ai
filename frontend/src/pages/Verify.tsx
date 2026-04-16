@@ -58,8 +58,8 @@ export const Verify = () => {
 };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-100 dark:border-slate-700">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#202123] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white dark:bg-[#2a2b32] p-8 rounded-xl shadow-lg border border-slate-100 dark:border-[#565869]">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <ShieldCheck size={24} />

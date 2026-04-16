@@ -121,7 +121,7 @@
 }
 
 .dark .skeleton-shimmer {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background: linear-gradient(90deg, #2a2b32 25%, #40414f 50%, #2a2b32 75%);
 }
 
 .animate-fade-in {
@@ -234,5 +234,5 @@
   -webkit-backdrop-filter: blur(24px);
 }
 .dark .glass {
-  background: rgba(11, 17, 32, 0.7);
+  background: rgba(52, 53, 65, 0.85);
 }

@@ -17,7 +17,7 @@ const getScoreColor = (score: number) => {
   if (score >= 85) return { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-400', border: 'border-emerald-200 dark:border-emerald-900/50', bar: 'bg-emerald-500', label: 'Excellent Match' };
   if (score >= 65) return { bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-400', border: 'border-blue-200 dark:border-blue-900/50', bar: 'bg-blue-500', label: 'Good Match' };
   if (score >= 45) return { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-400', border: 'border-amber-200 dark:border-amber-900/50', bar: 'bg-amber-500', label: 'Partial Match' };
-  return { bg: 'bg-slate-50 dark:bg-slate-800/50', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-slate-700', bar: 'bg-slate-400', label: 'Low Match' };
+  return { bg: 'bg-slate-50 dark:bg-[#40414f]', text: 'text-slate-600 dark:text-slate-400', border: 'border-slate-200 dark:border-[#565869]', bar: 'bg-slate-400', label: 'Low Match' };
 };
 
 const SUGGESTION_CHIPS = [
@@ -43,7 +43,7 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
   const initials = (result.name || result.email?.split('@')[0] || "U").split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
-    <div className="group bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-slide-in-bottom mb-4 last:mb-0" style={{ animationDelay: `${200 + index * 50}ms` }}>
+    <div className="group bg-white dark:bg-[#40414f] rounded-xl border border-slate-200 dark:border-[#565869] shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-slide-in-bottom mb-4 last:mb-0" style={{ animationDelay: `${200 + index * 50}ms` }}>
       <div className="flex flex-col sm:flex-row">
         <div className={`sm:w-24 shrink-0 ${sc.bg} flex sm:flex-col items-center justify-center gap-2 p-4 border-b sm:border-b-0 sm:border-r ${sc.border}`}>
           <div className={`text-2xl sm:text-3xl font-black ${sc.text} tabular-nums`}>
@@ -74,7 +74,7 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
             {result.cpi && <span className="inline-flex text-xs font-semibold px-2.5 py-1 text-slate-700 bg-slate-100 rounded-lg">CPI: {result.cpi}</span>}
           </div>
 
-          <div className="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-xl mb-3">
+          <div className="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-[#40414f] border border-slate-100 dark:border-[#383942] rounded-xl mb-3">
             <Brain size={15} className="text-primary-500 shrink-0 mt-0.5" />
             <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{result.explanation}</p>
           </div>
@@ -83,14 +83,14 @@ const ResultCard = ({ result, index }: { result: any; index: number }) => {
             <div className="mb-3">
               <div className="flex flex-wrap gap-1.5">
                 {result.skills.slice(0, 10).map((skill: string) => (
-                  <span key={skill} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                  <span key={skill} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 dark:bg-[#2a2b32] dark:text-slate-300">
                     {skill}
                   </span>
                 ))}
               </div>
             </div>
           )}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-700/50">
+          <div className="pt-2 border-t border-slate-100 dark:border-[#565869]">
              <Button size="sm" onClick={() => window.open(`/profile/${result.email?.split('@')[0] || result.userId}`, '_blank')}>
                 <Eye size={13} className="mr-1.5" /> View Full Profile
              </Button>
@@ -147,12 +147,12 @@ export const Search = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-hidden border-t border-slate-200 dark:border-slate-800">
+    <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-hidden border-t border-slate-200 dark:border-[#383942]">
       {/* Sidebar - Context / History Manager */}
       <Sidebar />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#0B1120] relative">
+      <div className="flex-1 flex flex-col bg-white dark:bg-[#343541] relative">
         <div className="flex-1 overflow-y-auto w-full relative scroll-smooth px-4 pt-8 pb-32 flex flex-col items-center">
             {activeMessages.length === 0 ? (
                 // Landing state
@@ -171,7 +171,7 @@ export const Search = () => {
                        <button
                          key={chip}
                          onClick={() => { setQuery(chip); if(inputRef.current) inputRef.current.focus(); }}
-                         className="px-4 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-full border border-slate-200 dark:border-slate-700 transition"
+                         className="px-4 py-2 bg-slate-50 dark:bg-[#2a2b32] hover:bg-slate-100 dark:hover:bg-[#343541] text-sm font-medium text-slate-700 dark:text-slate-300 rounded-full border border-slate-200 dark:border-[#565869] transition"
                        >
                          {chip}
                        </button>
@@ -197,7 +197,7 @@ export const Search = () => {
                                   <Brain size={18} className="text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl rounded-tl-sm border border-slate-100 dark:border-slate-700">
+                                    <div className="bg-slate-50 dark:bg-[#40414f] p-4 rounded-xl rounded-tl-sm border border-slate-100 dark:border-[#565869]">
                                       <p className="text-slate-700 dark:text-slate-200 text-[15px] font-medium leading-relaxed">{msg.content}</p>
                                     </div>
                                     
@@ -231,11 +231,11 @@ export const Search = () => {
         </div>
 
         {/* Floating Chat Input bar */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#0B1120] dark:via-[#0B1120]/90 p-4 pt-10 flex justify-center backdrop-blur-sm pointer-events-none z-10">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#343541] dark:via-[#343541]/90 to-transparent p-4 pt-10 flex justify-center backdrop-blur-sm pointer-events-none z-10">
             <div className="w-full max-w-3xl pointer-events-auto">
                 <form 
                   onSubmit={handleSearchSubmit} 
-                  className="relative flex items-end bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-none focus-within:ring-4 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all"
+                  className="relative flex items-end bg-white dark:bg-[#40414f] rounded-3xl border border-slate-200 dark:border-[#565869] shadow-xl shadow-slate-200/50 dark:shadow-none focus-within:ring-4 focus-within:ring-primary-500/20 focus-within:border-primary-400 transition-all"
                 >
                     <textarea
                       ref={inputRef}

@@ -144,7 +144,7 @@ export const Notifications = () => {
           notifications.map((notif) => (
             <Card
               key={notif._id}
-              className={`cursor-pointer transition-all duration-200 ${!notif.isRead ? 'bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800 shadow-sm' : 'bg-white dark:bg-slate-800/90 border-slate-100 dark:border-slate-700'}`}
+              className={`cursor-pointer transition-all duration-200 ${!notif.isRead ? 'bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800 shadow-sm' : 'bg-white dark:bg-[#2a2b32]/90 border-slate-100 dark:border-[#565869]'}`}
               onClick={() => handleNotificationClick(notif)}
             >
               <CardContent className="p-4 sm:p-5 flex gap-4">

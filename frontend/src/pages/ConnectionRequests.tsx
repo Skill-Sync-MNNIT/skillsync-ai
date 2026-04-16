@@ -53,7 +53,7 @@ export const ConnectionRequests = () => {
           variant="ghost" 
           size="sm" 
           onClick={() => navigate('/networking')}
-          className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b32]"
         >
           <ArrowLeft size={20} />
         </Button>
@@ -61,7 +61,7 @@ export const ConnectionRequests = () => {
       </div>
 
       {requests.length === 0 ? (
-        <Card className="p-12 text-center border-dashed bg-slate-50/50 dark:bg-slate-900/50">
+        <Card className="p-12 text-center border-dashed bg-slate-50/50 dark:bg-[#202123]/50">
           <UserPlus className="mx-auto text-slate-300 mb-4" size={48} />
           <p className="text-slate-600 dark:text-slate-400 font-medium">No pending invitations.</p>
           <p className="text-sm text-slate-500 mt-2">When people want to connect with you, they'll appear here.</p>
@@ -91,7 +91,7 @@ export const ConnectionRequests = () => {
               <CardContent className="p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div 
-                    className="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 cursor-pointer"
+                    className="h-12 w-12 rounded-full bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center font-bold text-slate-500 cursor-pointer"
                     onClick={() => navigate(`/profile/${req.requester.email?.split('@')[0] || req.requester._id}`)}
                   >
                     {req.requester.name?.charAt(0).toUpperCase() || 'U'}

@@ -112,7 +112,7 @@ export const Networking = () => {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors duration-300" size={20} />
         <Input
           placeholder="Search your connections."
-          className="pl-11 h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl transition-all duration-300 shadow-sm focus:shadow-primary-500/5 group-hover:border-primary-400/30"
+          className="pl-11 h-12 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] rounded-2xl transition-all duration-300 shadow-sm focus:shadow-primary-500/5 group-hover:border-primary-400/30"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -155,7 +155,7 @@ export const Networking = () => {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4 min-w-0">
                       <div
-                        className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xl text-slate-500 overflow-hidden border-2 border-white dark:border-slate-700 shadow-sm cursor-pointer"
+                        className="h-14 w-14 rounded-full bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center font-bold text-xl text-slate-500 overflow-hidden border-2 border-white dark:border-[#565869] shadow-sm cursor-pointer"
                         onClick={() => navigate(`/profile/${otherUser.email?.split('@')[0] || otherUser._id}`)}
                       >
                         {otherUser.name?.charAt(0).toUpperCase() || 'U'}
@@ -183,7 +183,7 @@ export const Networking = () => {
                       </Button>
                       <Button
                         variant="ghost" size="sm"
-                        className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                        className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b32]"
                         onClick={() => {
                           setSelectedConnection({ id: conn._id, user: otherUser });
                           setIsBottomSheetOpen(true);

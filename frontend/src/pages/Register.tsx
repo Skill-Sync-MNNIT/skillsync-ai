@@ -63,7 +63,7 @@ export const Register = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50/50 dark:bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-bg-surface-lowest dark:bg-slate-800/90 p-6 sm:p-10 rounded-2xl ambient-shadow ghost-border-visible">
+      <div className="w-full max-w-md space-y-8 bg-bg-surface-lowest dark:bg-[#2a2b32]/90 p-6 sm:p-10 rounded-2xl ambient-shadow ghost-border-visible">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-primary-100 dark:bg-primary-900/30 text-primary-600 rounded-full flex items-center justify-center mb-4 shadow-inner ring-1 ring-primary-200/50 dark:ring-primary-800/50">
             <UserPlus size={24} />

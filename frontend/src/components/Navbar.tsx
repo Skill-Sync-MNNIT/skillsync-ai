@@ -83,7 +83,7 @@ export const Navbar = () => {
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-all duration-200"
+            className="p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#2a2b32] transition-all duration-200"
             aria-label="Toggle theme"
           >
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
@@ -95,7 +95,7 @@ export const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200"
+                  className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#2a2b32] border border-slate-100 dark:border-[#383942] hover:bg-slate-100 dark:hover:bg-[#343541] transition-all duration-200"
                 >
                   <div className="h-7 w-7 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-xs font-bold text-primary-700 dark:text-primary-400">
                     {initials}
@@ -108,9 +108,9 @@ export const Navbar = () => {
 
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-2xl ghost-border ambient-shadow py-1.5 animate-scale-in origin-top-right z-50">
+                  <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-[#202123] rounded-2xl border border-slate-100 dark:border-[#383942] ambient-shadow py-1.5 animate-scale-in origin-top-right z-50">
                     {/* User info header */}
-                    <div className="px-4 py-3 border-b border-slate-50 dark:border-slate-800">
+                    <div className="px-4 py-3 border-b border-slate-100 dark:border-[#383942]">
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">{userName}</p>
                       <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
                       <span className="mt-1.5 inline-flex items-center rounded-lg bg-primary-50 dark:bg-primary-900/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
@@ -123,7 +123,7 @@ export const Navbar = () => {
                       <Link
                         to="/dashboard"
                         onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-primary-600 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#2a2b32] hover:text-primary-600 transition-colors"
                       >
                         <LayoutDashboard size={16} className="text-slate-400" />
                         Dashboard
@@ -131,7 +131,7 @@ export const Navbar = () => {
                     </div>
 
                     {/* Sign out */}
-                    <div className="border-t border-slate-100 dark:border-slate-800 pt-1.5">
+                    <div className="border-t border-slate-100 dark:border-[#383942] pt-1.5">
                       <button
                         onClick={handleLogout}
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
@@ -147,7 +147,7 @@ export const Navbar = () => {
               {/* Mobile: Hamburger Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-[#2a2b32] transition-colors"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
@@ -167,8 +167,8 @@ export const Navbar = () => {
 
       {/* Mobile Menu */}
       {isLoggedIn && mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 animate-fade-in">
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+        <div className="lg:hidden border-t border-slate-100 dark:border-[#383942] bg-white dark:bg-[#202123] animate-fade-in">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-[#383942] flex items-center gap-3">
             <div className="h-9 w-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-sm font-bold text-primary-700 dark:text-primary-400">
               {initials}
             </div>
@@ -188,7 +188,7 @@ export const Navbar = () => {
                   to={link.to}
                   className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${active
                     ? 'text-primary-700 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/10'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#2a2b32]'
                     }`}
                 >
                   <link.icon size={18} className={active ? 'text-primary-600' : 'text-slate-400'} />
@@ -198,7 +198,7 @@ export const Navbar = () => {
             })}
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-100 dark:border-slate-800 mt-1"
+              className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-100 dark:border-[#383942] mt-1"
             >
               <LogOut size={18} />
               Sign Out

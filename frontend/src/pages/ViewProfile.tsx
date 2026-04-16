@@ -185,7 +185,7 @@ export const ViewProfile = () => {
       )}
 
       {/* ── Hero Header Card ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md animate-fade-in-up shadow-slate-200/50 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] shadow-md animate-fade-in-up shadow-slate-200/50 dark:shadow-none">
         {/* Decorative gradient strip */}
         <div className="h-32 bg-gradient-to-br from-primary-500 via-primary-600 to-indigo-600 relative">
           <div className="absolute inset-0 bg-black/5" />
@@ -213,7 +213,7 @@ export const ViewProfile = () => {
                   <UserPlus size={16} /> Connected
                 </span>
               ) : connectionStatus === 'pending' ? (
-                <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                <span className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 h-12 rounded-2xl font-bold text-sm bg-slate-100 dark:bg-[#2a2b32] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#565869]">
                   <UserPlus size={16} /> Request Sent
                 </span>
               ) : connectionStatus === 'none' ? (
@@ -250,7 +250,7 @@ export const ViewProfile = () => {
         <div className="lg:col-span-2 space-y-6">
 
           {/* ── Academic Background (Unified Section) ── */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
                 <BookOpen size={20} className="text-blue-600" />
@@ -287,7 +287,7 @@ export const ViewProfile = () => {
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-4 group">
-                  <div className="mt-1 w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center text-slate-400 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 group-hover:text-primary-600 transition-colors">
+                  <div className="mt-1 w-12 h-12 rounded-2xl bg-slate-50 dark:bg-[#40414f] flex items-center justify-center text-slate-400 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 group-hover:text-primary-600 transition-colors">
                     {React.cloneElement(item.icon as React.ReactElement<any>, { size: 24 })}
                   </div>
                   <div className="space-y-1">
@@ -303,7 +303,7 @@ export const ViewProfile = () => {
           </div>
 
           {/* ── Technical Skills ── */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '150ms' }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                 <Code2 size={20} className="text-primary-600" />
@@ -320,7 +320,7 @@ export const ViewProfile = () => {
                       key={skill}
                       className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-bold transition-all ${isMatched
                           ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 ring-2 ring-primary-200 dark:ring-primary-800'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent hover:border-slate-300 dark:hover:border-slate-600'
+                          : 'bg-slate-100 dark:bg-[#2a2b32] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#343541] border border-transparent hover:border-slate-300 dark:hover:border-slate-600'
                         }`}
                     >
                       {isMatched && <Star size={14} className="fill-primary-500 text-primary-500" />}
@@ -330,7 +330,7 @@ export const ViewProfile = () => {
                 })}
               </div>
             ) : (
-              <div className="flex flex-col items-center py-6 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
+              <div className="flex flex-col items-center py-6 border-2 border-dashed border-slate-100 dark:border-[#383942] rounded-2xl">
                 <p className="text-slate-400 text-sm font-medium italic">No technical skills listed yet</p>
               </div>
             )}
@@ -340,9 +340,9 @@ export const ViewProfile = () => {
         {/* ── Sidebar (Right) ── */}
         <div className="space-y-6">
           {/* ── Resume Card ── */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl pb-8 overflow-hidden shadow-sm animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-            <div className="h-24 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center border-b border-slate-100 dark:border-slate-800">
-              <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center text-slate-400">
+          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl pb-8 overflow-hidden shadow-sm animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <div className="h-24 bg-slate-50 dark:bg-[#40414f] flex items-center justify-center border-b border-slate-100 dark:border-[#383942]">
+              <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#202123] shadow-sm flex items-center justify-center text-slate-400">
                 <FileText size={28} />
               </div>
             </div>
@@ -364,7 +364,7 @@ export const ViewProfile = () => {
                   onClick={() => handleResumeAction('download')}
                   disabled={isViewing || isDownloading}
                   isLoading={isDownloading}
-                  className="w-full justify-center gap-2 rounded-2xl h-12 font-bold border-2 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className="w-full justify-center gap-2 rounded-2xl h-12 font-bold border-2 hover:bg-slate-50 dark:hover:bg-[#2a2b32]"
                 >
                   <Download size={18} /> Download PDF
                 </Button>

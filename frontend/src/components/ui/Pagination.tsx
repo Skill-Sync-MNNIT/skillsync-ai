@@ -35,7 +35,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg border dark:border-slate-800 disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        className="p-2 rounded-lg border dark:border-[#383942] disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors"
       >
         <ChevronLeft size={18} />
       </button>
@@ -48,7 +48,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange, className }:
             "w-10 h-10 rounded-lg text-sm font-medium transition-all",
             currentPage === page
               ? "bg-primary-600 text-white shadow-lg shadow-primary-600/20"
-              : "border dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"
+              : "border dark:border-[#383942] hover:bg-slate-50 dark:hover:bg-[#2a2b32] text-slate-600 dark:text-slate-400"
           )}
         >
           {page}
@@ -58,7 +58,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange, className }:
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg border dark:border-slate-800 disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+        className="p-2 rounded-lg border dark:border-[#383942] disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors"
       >
         <ChevronRight size={18} />
       </button>

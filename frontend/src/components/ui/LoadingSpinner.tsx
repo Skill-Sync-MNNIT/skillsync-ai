@@ -13,7 +13,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     <div className="flex flex-col items-center justify-center p-8 animate-in fade-in zoom-in-95 duration-500">
       <div className="relative flex items-center justify-center">
         {/* Outer Ring */}
-        <div className="w-16 h-16 rounded-full border-[1.5px] border-slate-200 dark:border-slate-800 animate-[spin_3s_linear_infinite]" />
+        <div className="w-16 h-16 rounded-full border-[1.5px] border-slate-200 dark:border-[#383942] animate-[spin_3s_linear_infinite]" />
         
         {/* Pulsing Core */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -49,7 +49,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   if (fullPage) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl transition-all duration-500">
-        <div className="bg-white/40 dark:bg-slate-900/40 p-12 rounded-[2.5rem] border border-white/20 dark:border-slate-800/50 shadow-2xl backdrop-blur-md">
+        <div className="bg-white/40 dark:bg-[#202123]/40 p-12 rounded-[2.5rem] border border-white/20 dark:border-[#383942]/50 shadow-2xl backdrop-blur-md">
           {content}
         </div>
       </div>

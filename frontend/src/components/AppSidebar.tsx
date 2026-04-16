@@ -37,7 +37,7 @@ export const AppSidebar = () => {
 
   return (
     <aside
-      className={`hidden lg:flex flex-col h-[calc(100vh-4rem)] sticky top-16 bg-bg-surface-low dark:bg-slate-900/80 ghost-border-visible sidebar-transition shrink-0 z-30 ${
+      className={`hidden lg:flex flex-col h-[calc(100vh-4rem)] sticky top-16 bg-bg-surface-low dark:bg-[#202123]/80 ghost-border-visible sidebar-transition shrink-0 z-30 ${
         collapsed ? 'w-16' : 'w-[220px]'
       }`}
     >
@@ -73,10 +73,10 @@ export const AppSidebar = () => {
       </nav>
 
       {/* Collapse Toggle */}
-      <div className="px-3 py-3 border-t border-border-ghost dark:border-slate-800">
+      <div className="px-3 py-3 border-t border-border-ghost dark:border-[#383942]">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-300 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-[#2a2b32] dark:hover:text-slate-300 transition-all"
           >
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
             {!collapsed && <span>Collapse</span>}
