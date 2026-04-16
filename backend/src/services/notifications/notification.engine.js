@@ -66,4 +66,32 @@ export class NotificationEngine {
       console.error('[NOTIF_ENGINE] Error triggering notifications:', error.message);
     }
   }
+
+  // Trigger notifications when a group is discarded by an admin.
+
+  static async triggerForGroupDiscard(room) {
+    console.log(`[NOTIF_ENGINE] Triggering discard notifications for group: ${room._id}`);
+    try {
+      // 1. Prepare notifications for all participants except the admin
+      const participantsToNotify = room.participants.filter((p) => {
+        const pid = typeof p === 'object' ? p._id : p;
+        return String(pid) !== String(room.admins[0]?._id || room.admins[0]);
+      });
+
+      if (participantsToNotify.length === 0) return;
+
+      const notifications = participantsToNotify.map((participant) => ({
+        userId: typeof participant === 'object' ? participant._id : participant,
+        message: `The group "${room.name || 'Conversation'}" has been discarded by the admin.`,
+      }));
+
+      // 2. Insert notifications
+      await Notification.insertMany(notifications, { ordered: false });
+      console.log(
+        `[NOTIF_ENGINE] Group discard notifications sent to ${notifications.length} members.`
+      );
+    } catch (error) {
+      console.error('[NOTIF_ENGINE] Error triggering discard notifications:', error.message);
+    }
+  }
 }
