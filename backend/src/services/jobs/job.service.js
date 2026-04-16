@@ -25,8 +25,13 @@ export class JobService {
       );
     }
 
+    const normalizedSkills = Array.isArray(jobData.requiredSkills)
+      ? jobData.requiredSkills.map((s) => s.trim().toLowerCase())
+      : [];
+
     const job = await JobPosting.create({
       ...jobData,
+      requiredSkills: normalizedSkills,
       postedBy: userId,
       status: 'pending_moderation',
     });
@@ -54,6 +59,9 @@ export class JobService {
       (updateData.description && updateData.description !== job.description);
 
     // Update fields
+    if (updateData.requiredSkills && Array.isArray(updateData.requiredSkills)) {
+      updateData.requiredSkills = updateData.requiredSkills.map((s) => s.trim().toLowerCase());
+    }
     Object.assign(job, updateData);
 
     if (criticalChange) {
