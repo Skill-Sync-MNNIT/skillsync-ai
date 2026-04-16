@@ -41,7 +41,7 @@ export const listMyJobs = async (req, res, next) => {
 
 export const getJob = async (req, res, next) => {
   try {
-    const job = await JobService.getJobById(req.params.jobId);
+    const job = await JobService.getJobById(req.params.jobId, req.user?.id);
     res.status(200).json(job);
   } catch (error) {
     next(error);
