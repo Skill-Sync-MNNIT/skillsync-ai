@@ -17,9 +17,17 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const lastToastRef = React.useRef<{ message: string; time: number } | null>(null);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const toast = useCallback((message: string, type: ToastType = 'success') => {
+    // Prevent duplicate toasts within 1000ms using a ref for synchronous checks
+    const now = Date.now();
+    if (lastToastRef.current && lastToastRef.current.message === message && now - lastToastRef.current.time < 1000) {
+      return;
+    }
+    lastToastRef.current = { message, time: now };
+
     const id = Math.random().toString(36).substring(2, 9);
     setToasts((prev) => [...prev, { id, message, type }]);
 
@@ -31,6 +39,17 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
+
+  // Add global event listener to allow non-component files (like api.ts) to trigger toasts
+  React.useEffect(() => {
+    const handleToastEvent = (e: any) => {
+      const { message, type } = e.detail;
+      toast(message, type);
+    };
+
+    window.addEventListener('app:toast', handleToastEvent);
+    return () => window.removeEventListener('app:toast', handleToastEvent);
+  }, [toast]);
 
   return (
     <ToastContext.Provider value={{ toast }}>

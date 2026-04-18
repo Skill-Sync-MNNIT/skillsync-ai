@@ -45,6 +45,9 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         // Refresh failed (e.g., refresh token expired)
+        window.dispatchEvent(new CustomEvent('app:toast', { 
+          detail: { message: 'Session expired. Please log in again.', type: 'error' } 
+        }));
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }
