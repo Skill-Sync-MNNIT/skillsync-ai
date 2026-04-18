@@ -108,13 +108,20 @@ export class JobService {
    */
   static async listActiveJobs(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
+    const now = new Date();
     const [jobs, total] = await Promise.all([
-      JobPosting.find({ status: 'active' })
+      JobPosting.find({
+        status: 'active',
+        deadline: { $gt: now },
+      })
         .sort({ deadline: 1 })
         .skip(skip)
         .limit(limit)
         .populate('postedBy', 'name email'),
-      JobPosting.countDocuments({ status: 'active' }),
+      JobPosting.countDocuments({
+        status: 'active',
+        deadline: { $gt: now },
+      }),
     ]);
 
     return {
@@ -141,8 +148,17 @@ export class JobService {
       hasApplied = !!application;
     }
 
+    // Dynamically check for expiry if status is still 'active'
+    let currentStatus = job.status;
+    const isPastDeadline = new Date(job.deadline) < new Date();
+
+    if (currentStatus === 'active' && isPastDeadline) {
+      currentStatus = 'expired';
+    }
+
     return {
       ...job.toObject(),
+      status: currentStatus,
       hasApplied,
     };
   }
