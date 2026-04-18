@@ -11,11 +11,19 @@ import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address').refine(e => e.endsWith('@mnnit.ac.in') || !e.includes('mnnit'), { message: "Students must use @mnnit.ac.in. Alumni/Profs can use any valid email if approved." }),
+  email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   role: z.string().refine((val) => ['student', 'professor', 'alumni'].includes(val), {
     message: 'Please select a valid role',
   }),
+}).refine((data) => {
+  if (data.role === 'student') {
+    return data.email.endsWith('@mnnit.ac.in');
+  }
+  return true;
+}, {
+  message: "Students must use their official @mnnit.ac.in email address.",
+  path: ['email'],
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
