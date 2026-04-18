@@ -4,7 +4,7 @@ import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { useToast } from '../context/ToastContext';
 import { Button } from '../components/ui/Button';
-import { Send, MessageSquare, Plus, Users, Hash, Trash2, Smile, MoreVertical, LogOut, Check, CheckCheck, X, Edit3, Image as ImageIcon, FileText, ChevronLeft, Search } from 'lucide-react';
+import { Send, MessageSquare, Plus, Users, Hash, Trash2, Smile, MoreVertical, LogOut, Check, CheckCheck, X, Edit3, Image as ImageIcon, FileText, ChevronLeft, Search, MessageCirclePlus } from 'lucide-react';
 import { CreateGroupModal } from '../components/CreateGroupModal';
 import { useSocket } from '../hooks/useSocket';
 import { BottomSheet } from '../components/ui/BottomSheet';
@@ -12,6 +12,7 @@ import { MessageActions } from '../components/chat/MessageActions';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { cn } from '../components/ui/Button';
 import { NoData } from '../components/ui/NoData';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
 
 export const Messages = () => {
@@ -513,7 +514,7 @@ export const Messages = () => {
 
     const date = new Date(lastSeen);
     const isToday = new Date().toDateString() === date.toDateString();
-    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
     return (
       <span className="text-slate-500">
@@ -620,21 +621,16 @@ export const Messages = () => {
             const name = r.isGroup ? r.name : (other?.name || 'Quick Chat');
             return name.toLowerCase().includes(roomSearch.toLowerCase());
           }).length === 0 ? (
-            <NoData
-              type="chat"
-              title={roomSearch ? "No Search Results" : "No Messages Yet"}
+            <EmptyState
+              icon={MessageCirclePlus}
+              title={roomSearch ? "No Search Results" : "No chats yet"}
               description={roomSearch
                 ? `Couldn't find any conversations matching "${roomSearch}".`
-                : "Your inbox is empty. Start a new conversation to get connected!"
+                : "Connect with the MNNIT community to start your first conversation!"
               }
-              height="180px"
-              action={
-                !roomSearch && (
-                  <Button size="sm" onClick={() => navigate('/networking')} variant="outline">
-                    Start a Chat
-                  </Button>
-                )
-              }
+              actionLabel={!roomSearch ? "Explore Network" : undefined}
+              onAction={() => navigate('/networking')}
+              className="mt-10"
             />
           ) : (
             rooms.filter(r => {
@@ -689,7 +685,7 @@ export const Messages = () => {
                           {room.isGroup ? room.name : otherParticipant?.name || 'Quick Chat'}
                         </p>
                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-tight">
-                          {room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                          {room.lastMessageAt ? new Date(room.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : ''}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-slate-900 dark:text-white">
@@ -801,166 +797,174 @@ export const Messages = () => {
               {/* Wallpaper Pattern Overlay */}
               <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0" />
 
-              <div className="relative z-10 flex flex-col space-y-4 pt-2">
-                {messages.filter(m => !m.deletedBy?.includes(user?._id)).map((msg, idx) => {
-                  const isMe = msg.senderId?._id === user?._id || msg.senderId === user?._id;
-                  const prevMsg = messages[idx - 1];
-                  const isConsecutive = prevMsg?.senderId?._id === (msg.senderId?._id || msg.senderId);
+              <div className="relative z-10 flex flex-col space-y-1 pt-2 min-h-full">
+                {(() => {
+                  const filteredMessages = messages.filter(m => !m.deletedBy?.includes(user?._id));
 
-                  if (msg.messageType === 'system') {
+                  if (filteredMessages.length === 0) {
                     return (
-                      <div key={msg._id} className="flex justify-center my-2 animate-in fade-in zoom-in duration-500">
-                        <div className="bg-slate-100/50 dark:bg-[#40414f] backdrop-blur-sm px-4 py-1 rounded-full text-[11px] font-medium text-slate-500 dark:text-slate-400 border border-slate-200/30 dark:border-[#565869]/30 shadow-sm transition-all">
-                          <span className="opacity-40 mr-2">—</span>
-                          {msg.content}
-                          <span className="opacity-40 ml-2">—</span>
-                        </div>
-                      </div>
+                      <EmptyState
+                        icon={MessageCirclePlus}
+                        title="Your New Conversation!"
+                        description="The best projects start with a simple hello. Say something amazing to get things moving! 👋"
+                        className="min-h-[60vh]"
+                      />
                     );
                   }
 
-                  return (
-                    <div
-                      key={msg._id}
-                      ref={(el) => { messageRefs.current[msg._id] = el; }}
-                      className={cn(
-                        "flex flex-col group animate-in fade-in slide-in-from-bottom-2 duration-300 relative",
-                        "hover:z-[60] focus-within:z-[60]",
-                        isMe ? 'items-end' : 'items-start',
-                        isConsecutive ? "mt-1" : "mt-4"
-                      )}
-                    >
+                  return filteredMessages.map((msg, idx) => {
+                    const isMe = msg.senderId?._id === user?._id || msg.senderId === user?._id;
+                    const prevMsg = messages[idx - 1];
+                    const isConsecutive = prevMsg?.senderId?._id === (msg.senderId?._id || msg.senderId);
+
+                    if (msg.messageType === 'system') {
+                      return (
+                        <div key={msg._id} className="flex justify-center my-2 animate-in fade-in zoom-in duration-500">
+                          <div className="bg-slate-100/50 dark:bg-[#40414f] backdrop-blur-sm px-4 py-1 rounded-full text-[11px] font-medium text-slate-500 dark:text-slate-400 border border-slate-200/30 dark:border-[#565869]/30 shadow-sm transition-all">
+                            <span className="opacity-40 mr-2">—</span>
+                            {msg.content}
+                            <span className="opacity-40 ml-2">—</span>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={msg._id}
+                        ref={(el) => { messageRefs.current[msg._id] = el; }}
+                        className={cn(
+                          "flex flex-col group animate-in fade-in slide-in-from-bottom-2 duration-300 relative",
+                          "hover:z-[60] focus-within:z-[60]",
+                          isMe ? 'items-end' : 'items-start',
+                          isConsecutive ? "mt-0.5" : "mt-2.5"
+                        )}
+                      >
 
 
-                      <div className="relative max-w-[85%] sm:max-w-[75%] lg:max-w-[65%]">
-                        <div
-                          className={cn(
-                            "p-2.5 rounded-2xl shadow-sm relative transition-all",
-                            isMe
-                              ? 'bg-[#E7FFDB] dark:bg-[#056162] text-slate-900 dark:text-white rounded-tr-none'
-                              : 'bg-white dark:bg-[#2a2b32] text-slate-900 dark:text-white rounded-tl-none',
-                            isConsecutive && (isMe ? "rounded-tr-2xl" : "rounded-tl-2xl"),
-                            msg.isDeletedForEveryone && 'italic opacity-60'
-                          )}
-                        >
-                          {/* Tail Effect - Only for first msg in a group */}
-                          {!isConsecutive && (
-                            <div className={cn(
-                              "absolute top-0 w-3 h-3 block",
-                              isMe ? "-right-1.5" : "-left-1.5"
-                            )}>
-                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d={isMe ? "M0 0C6 0 12 0 12 0V12C12 12 6 6 0 0Z" : "M12 0C6 0 0 0 0 0V12C0 12 6 6 12 0Z"}
-                                  fill={isMe ? (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#056162" : "#E7FFDB") : (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? "#2a2b32" : "#ffffff")} />
-                              </svg>
-                            </div>
-                          )}
+                        <div className="relative max-w-[85%] sm:max-w-[75%] lg:max-w-[65%]">
+                          <div
+                            className={cn(
+                              "p-2.5 rounded-2xl shadow-sm relative transition-all",
+                              isMe
+                                ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-slate-900 dark:text-white'
+                                : 'bg-white dark:bg-[#2a2b32] text-slate-900 dark:text-white',
+                              msg.isDeletedForEveryone && 'italic opacity-60'
+                            )}
+                          >
 
-                          {/* Group Sender Name (Inside Bubble) */}
-                          {!isMe && currentRoom?.isGroup && !isConsecutive && (
-                            <div className="text-[12px] font-bold text-primary-500 dark:text-[#53bdeb] mb-0.5 truncate max-w-[200px] sm:max-w-[250px]">
-                              ~ {msg.senderId?.name || 'Team Member'}
-                            </div>
-                          )}
-                          {/* Reply Quote UI */}
-                          {msg.replyTo && !msg.isDeletedForEveryone && (
-                            <div
-                              onClick={() => {
-                                const parentId = typeof msg.replyTo === 'string' ? msg.replyTo : msg.replyTo._id;
-                                scrollToMessage(parentId);
-                              }}
-                              className={`mb-2 p-2 rounded-lg text-xs border-l-4 overflow-hidden cursor-pointer transition-opacity hover:opacity-80 ${isMe ? 'bg-[#C8E6C9]/50 border-primary-500 text-slate-800 dark:text-slate-300' : 'bg-slate-50 dark:bg-[#202123]/50 border-primary-500 text-slate-600 dark:text-slate-400'
-                                }`}
-                            >
-                              <p className="font-bold mb-1 truncate text-primary-600">
-                                {msg.replyTo.senderId?.name || (typeof msg.replyTo === 'object' ? 'User' : 'Original message')}
-                              </p>
-                              {msg.replyTo.messageType === 'image' ? (
-                                <div className="flex items-center gap-2 opacity-80">
-                                  <ImageIcon size={12} /> <span>Photo</span>
+                            {/* Group Sender Name (Inside Bubble) */}
+                            {!isMe && currentRoom?.isGroup && !isConsecutive && (
+                              <div className="text-[12px] font-bold text-primary-500 dark:text-[#53bdeb] mb-0.5 truncate max-w-[200px] sm:max-w-[250px]">
+                                ~ {msg.senderId?.name || 'Team Member'}
+                              </div>
+                            )}
+                            {msg.replyTo && !msg.isDeletedForEveryone && (
+                              <div
+                                onClick={() => {
+                                  const parentId = typeof msg.replyTo === 'string' ? msg.replyTo : msg.replyTo._id;
+                                  scrollToMessage(parentId);
+                                }}
+                                className={cn(
+                                  "mb-2 p-2 rounded-lg text-xs border-l-[3px] overflow-hidden cursor-pointer transition-opacity hover:opacity-80",
+                                  isMe
+                                    ? 'bg-black/5 dark:bg-white/5 border-primary-500 text-slate-800 dark:text-slate-300'
+                                    : 'bg-black/5 dark:bg-white/5 border-pink-500 text-slate-600 dark:text-slate-400'
+                                )}
+                              >
+                                <p className="font-bold mb-1 truncate text-primary-600">
+                                  {msg.replyTo.senderId?.name || (typeof msg.replyTo === 'object' ? 'User' : 'Original message')}
+                                </p>
+                                {msg.replyTo.messageType === 'image' ? (
+                                  <div className="flex items-center gap-2 opacity-80">
+                                    <ImageIcon size={12} /> <span>Photo</span>
+                                  </div>
+                                ) : (
+                                  <p className="truncate opacity-80">{msg.replyTo.content || 'Original message'}</p>
+                                )}
+                              </div>
+                            )}
+
+                            {msg.messageType === 'image' && !msg.isDeletedForEveryone ? (
+                              <div className="mb-1">
+                                <img
+                                  src={msg.content}
+                                  alt="Shared"
+                                  className="rounded-lg max-w-xs sm:max-w-md w-full max-h-[300px] object-contain cursor-pointer hover:opacity-95 transition-all shadow-sm"
+                                  onClick={() => window.open(msg.content, '_blank')}
+                                />
+                              </div>
+                            ) : msg.messageType === 'file' && !msg.isDeletedForEveryone ? (
+                              <div className={`mb-1 p-3 rounded-xl border flex items-center gap-3 ${isMe ? 'bg-white/20 border-white/20' : 'bg-slate-50 dark:bg-[#202123] border-slate-100 dark:border-[#383942]'
+                                }`}>
+                                <div className={`p-2 rounded-lg ${isMe ? 'bg-white/20' : 'bg-primary-50 dark:bg-primary-900/20'} text-primary-600`}>
+                                  <FileText size={24} />
                                 </div>
-                              ) : (
-                                <p className="truncate opacity-80">{msg.replyTo.content || 'Original message'}</p>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-bold truncate">{msg.fileName || 'Document'}</p>
+                                  <button
+                                    type="button"
+                                    onClick={() => window.open(msg.content, '_blank')}
+                                    className="text-[10px] uppercase font-bold text-primary-600 hover:underline mt-0.5 block"
+                                  >
+                                    Open File
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-[14px] leading-relaxed break-words">{msg.content}</p>
+                            )}
+
+                            <div className="mt-1 flex items-center justify-end gap-1.5 opacity-60 select-none">
+                              {msg.isEdited && (
+                                <span className="text-[10px] font-medium italic mr-1">Edited</span>
+                              )}
+                              <span className="text-[10px] leading-none font-medium">
+                                {new Date(msg.isEdited ? msg.updatedAt : msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                              </span>
+                              {isMe && !msg.isDeletedForEveryone && (
+                                <div className="flex">
+                                  {(() => {
+                                    const isRead = currentRoom?.isGroup
+                                      ? (currentRoom?.participants.length > 1 && (msg.readBy?.length || 0) >= currentRoom?.participants.length - 1)
+                                      : (msg.readBy?.length > 0);
+
+                                    const isDelivered = currentRoom?.isGroup
+                                      ? (currentRoom?.participants.length > 1 && (msg.deliveredTo?.length || 0) >= currentRoom?.participants.length - 1)
+                                      : (msg.deliveredTo?.length > 0);
+
+                                    if (isRead) return <CheckCheck size={14} className="text-sky-500 -ml-1 first:ml-0" />;
+                                    if (isDelivered) return <CheckCheck size={14} className="text-slate-400 -ml-1 first:ml-0" />;
+                                    return <Check size={14} className="text-slate-400" />;
+                                  })()}
+                                </div>
                               )}
                             </div>
-                          )}
 
-                          {msg.messageType === 'image' && !msg.isDeletedForEveryone ? (
-                            <div className="mb-1">
-                              <img
-                                src={msg.content}
-                                alt="Shared"
-                                className="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity min-w-[200px]"
-                                onClick={() => window.open(msg.content, '_blank')}
-                              />
-                            </div>
-                          ) : msg.messageType === 'file' && !msg.isDeletedForEveryone ? (
-                            <div className={`mb-1 p-3 rounded-xl border flex items-center gap-3 ${isMe ? 'bg-white/20 border-white/20' : 'bg-slate-50 dark:bg-[#202123] border-slate-100 dark:border-[#383942]'
-                              }`}>
-                              <div className={`p-2 rounded-lg ${isMe ? 'bg-white/20' : 'bg-primary-50 dark:bg-primary-900/20'} text-primary-600`}>
-                                <FileText size={24} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-xs font-bold truncate">{msg.fileName || 'Document'}</p>
-                                <button
-                                  type="button"
-                                  onClick={() => window.open(msg.content, '_blank')}
-                                  className="text-[10px] uppercase font-bold text-primary-600 hover:underline mt-0.5 block"
-                                >
-                                  Open File
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-[14px] leading-relaxed break-words">{msg.content}</p>
-                          )}
-
-                          <div className="mt-1 flex items-center justify-end gap-1.5 opacity-80">
-                            <span className="text-[10px] leading-none">
-                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            {isMe && !msg.isDeletedForEveryone && (
-                              <div className="flex">
-                                {(() => {
-                                  const isRead = currentRoom?.isGroup
-                                    ? (currentRoom?.participants.length > 1 && (msg.readBy?.length || 0) >= currentRoom?.participants.length - 1)
-                                    : (msg.readBy?.length > 0);
-
-                                  const isDelivered = currentRoom?.isGroup
-                                    ? (currentRoom?.participants.length > 1 && (msg.deliveredTo?.length || 0) >= currentRoom?.participants.length - 1)
-                                    : (msg.deliveredTo?.length > 0);
-
-                                  if (isRead) return <CheckCheck size={14} className="text-blue-400 -ml-1 first:ml-0" />;
-                                  if (isDelivered) return <CheckCheck size={14} className="text-slate-400 -ml-1 first:ml-0" />;
-                                  return <Check size={14} className="text-slate-400" />;
-                                })()}
+                            {/* Interaction Actions */}
+                            {!msg.isDeletedForEveryone && (
+                              <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all z-10 ${isMe ? '-left-12' : '-right-12'
+                                }`}>
+                                <MessageActions
+                                  isMe={isMe}
+                                  onReply={() => setReplyTo(msg)}
+                                  onEdit={(isMe && msg.messageType === 'text' && (Date.now() - new Date(msg.createdAt).getTime() < 30 * 60 * 1000)) ? () => handleEditMessage(msg) : undefined}
+                                  onDeleteMe={() => handleDeleteForMe(msg._id)}
+                                  onDeleteEveryone={(isMe && (Date.now() - new Date(msg.createdAt).getTime() < 5 * 60 * 60 * 1000)) ? () => handleDeleteForEveryone(msg._id) : undefined}
+                                />
                               </div>
                             )}
                           </div>
-
-                          {/* Interaction Actions */}
-                          {!msg.isDeletedForEveryone && (
-                            <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-all z-10 ${isMe ? '-left-12' : '-right-12'
-                              }`}>
-                              <MessageActions
-                                isMe={isMe}
-                                onReply={() => setReplyTo(msg)}
-                                onEdit={(isMe && msg.messageType === 'text' && (Date.now() - new Date(msg.createdAt).getTime() < 30 * 60 * 1000)) ? () => handleEditMessage(msg) : undefined}
-                                onDeleteMe={() => handleDeleteForMe(msg._id)}
-                                onDeleteEveryone={(isMe && (Date.now() - new Date(msg.createdAt).getTime() < 5 * 60 * 60 * 1000)) ? () => handleDeleteForEveryone(msg._id) : undefined}
-                              />
-                            </div>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
 
                 {/* Typing Indicator */}
                 {typingUser && (
                   <div className="px-6 py-2 flex items-center animate-fade-in">
-                    <div className="flex gap-2 items-center bg-slate-100 dark:bg-[#2a2b32] px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm">
+                    <div className="flex gap-2 items-center bg-white dark:bg-[#2a2b32] px-4 py-2 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-white/5">
                       <div className="flex gap-1 items-center">
                         <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-typing-dot"></div>
                         <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-typing-dot [animation-delay:0.2s]"></div>
@@ -1077,11 +1081,14 @@ export const Messages = () => {
             </form>
           </>
         ) : (
-          <NoData
-            type="chat"
-            title="SkillSync Messaging"
-            description="Send and receive messages with your network securely and in real-time."
-          />
+          <div className="flex-1 flex items-center justify-center pb-40">
+            <NoData
+              type="chat"
+              title="SkillSync Messaging"
+              description="Send and receive messages with your network securely and in real-time."
+              height="300px"
+            />
+          </div>
         )}
       </div>
 
@@ -1309,6 +1316,14 @@ export const Messages = () => {
                   </div>
                 );
               })}
+            {currentRoom?.participants?.filter((p: any) => p.name.toLowerCase().includes(memberSearch.toLowerCase())).length === 0 && (
+              <EmptyState
+                icon={Search}
+                title="No members found"
+                description={`No results matching "${memberSearch}"`}
+                className="py-12"
+              />
+            )}
           </div>
         </div>
       </BottomSheet>
@@ -1381,11 +1396,19 @@ export const Messages = () => {
                 </div>
               ))}
 
-            {myConnections.length === 0 && !isFetchingConnections && (
-              <div className="text-center p-8">
-                <p className="text-slate-500 text-sm">No connections found.</p>
-              </div>
-            )}
+            {myConnections
+              .map((conn: any) => {
+                const other = conn.requester?._id === user?._id ? conn.recipient : conn.requester;
+                return other;
+              })
+              .filter((u: any) => u && !currentRoom?.participants?.some((p: any) => p._id === u._id)).length === 0 && !isFetchingConnections && (
+                <EmptyState
+                  icon={Search}
+                  title="No connections found"
+                  description={addMemberQuery ? `No connections matching "${addMemberQuery}"` : "You've added all your connections to this group!"}
+                  className="py-12"
+                />
+              )}
           </div>
         </div>
       </BottomSheet>
