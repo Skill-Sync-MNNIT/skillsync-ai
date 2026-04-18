@@ -4,7 +4,7 @@ import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Check, X, ArrowLeft, UserPlus, Clock } from 'lucide-react';
+import { ArrowLeft, UserPlus, Clock } from 'lucide-react';
 import { Pagination } from '../components/ui/Pagination';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
@@ -19,7 +19,7 @@ export const ConnectionRequests = () => {
 
   const fetchRequests = async (currentPage = page) => {
     try {
-      const res = await api.get(`/connections/requests?page=${currentPage}&limit=10`);
+      const res = await api.get(`/connections/requests?page=${currentPage}&limit=5`);
       setRequests(res.data.requests || []);
       setTotalPages(res.data.pages || 1);
       setTotalRequests(res.data.total || 0);
@@ -47,7 +47,7 @@ export const ConnectionRequests = () => {
   if (isLoading) return <LoadingSpinner fullPage message="Fetching invitations..." />;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 p-6">
+    <div className="max-w-3xl mx-auto space-y-6 px-6 pb-12">
       <div className="flex items-center gap-4">
         <Button 
           variant="ghost" 
@@ -87,49 +87,52 @@ export const ConnectionRequests = () => {
             });
             
             return (
-            <Card key={req._id} className="hover:shadow-md transition-shadow border-primary-100 dark:border-primary-900/30">
-              <CardContent className="p-5 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div 
-                    className="h-12 w-12 rounded-full bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center font-bold text-slate-500 cursor-pointer"
-                    onClick={() => navigate(`/profile/${req.requester.email?.split('@')[0] || req.requester._id}`)}
-                  >
-                    {req.requester.name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <div>
-                    <p 
-                      className="font-bold text-slate-900 dark:text-white cursor-pointer hover:text-primary-600 transition-colors"
+              <Card key={req._id} className="group hover:shadow-lg transition-all duration-300 border-slate-100 dark:border-[#383942] hover:border-primary-200 dark:hover:border-primary-900/40 overflow-hidden">
+                <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div 
+                      className="h-14 w-14 rounded-full bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-[#2a2b32] dark:to-[#383942] flex items-center justify-center font-black text-slate-600 dark:text-slate-300 border-2 border-white dark:border-[#202123] shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0"
                       onClick={() => navigate(`/profile/${req.requester.email?.split('@')[0] || req.requester._id}`)}
                     >
-                      {req.requester.name || 'User'}
-                    </p>
-                    <p className="text-xs text-slate-500 capitalize font-medium">{req.requester.role} at MNNIT</p>
-                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-400">
-                      <Clock size={12} />
-                      <span>Sent {date}</span>
+                      {req.requester.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                    <div className="min-w-0">
+                      <p 
+                        className="font-bold text-slate-900 dark:text-white cursor-pointer hover:text-primary-600 transition-colors truncate"
+                        onClick={() => navigate(`/profile/${req.requester.email?.split('@')[0] || req.requester._id}`)}
+                      >
+                        {req.requester.name || 'User'}
+                      </p>
+                      <p className="text-xs text-slate-500 capitalize font-medium flex items-center gap-1">
+                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                        {req.requester.role} @ MNNIT
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1.5 text-[10px] text-slate-400 font-medium">
+                        <Clock size={12} className="opacity-70" />
+                        <span>Invitation sent {date}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    className="gap-2 px-4" 
-                    onClick={() => handleRespond(req._id, 'accepted')}
-                  >
-                    <Check size={16} />
-                    <span className="hidden sm:inline">Accept</span>
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    className="text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 px-4"
-                    onClick={() => handleRespond(req._id, 'rejected')}
-                  >
-                    <X size={16} />
-                    <span className="hidden sm:inline">Ignore</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )})}
+
+                  <div className="flex items-center gap-2 sm:shrink-0 w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-slate-50 dark:border-[#383942] sm:border-none">
+                    <Button 
+                      className="flex-1 sm:flex-none h-10 px-6 bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-md shadow-primary-500/10 transition-all font-bold text-sm" 
+                      onClick={() => handleRespond(req._id, 'accepted')}
+                    >
+                      Accept
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="flex-1 sm:flex-none h-10 px-6 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-all font-bold text-sm"
+                      onClick={() => handleRespond(req._id, 'rejected')}
+                    >
+                      Ignore
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 

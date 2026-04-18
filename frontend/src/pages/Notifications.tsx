@@ -158,7 +158,7 @@ export const Notifications = () => {
                     {notif.message}
                   </p>
                   <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {new Date(notif.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                    {new Date(notif.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', hour12: false })}
                   </p>
                 </div>
 
