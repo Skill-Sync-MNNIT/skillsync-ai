@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Clock, PlusCircle } from 'lucide-react';
-import { Card, CardContent } from '../components/ui/Card';
+import { Plus, Search } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
+import { Pagination } from '../components/ui/Pagination';
 import { NoData } from '../components/ui/NoData';
+import { ListingCard } from '../components/ui/ListingCard';
 
 interface Job {
   _id: string;
@@ -16,9 +17,11 @@ interface Job {
   requiredSkills: string[];
   deadline: string;
   status: string;
+  createdAt: string;
   postedBy: {
     name?: string;
     email: string;
+    _id: string;
   };
 }
 
@@ -30,6 +33,16 @@ export const JobListing = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'my-jobs'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 4;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -48,104 +61,169 @@ export const JobListing = () => {
     fetchJobs();
   }, [activeTab, toast]);
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Job Board</h1>
-          <p className="mt-1 text-slate-500 dark:text-slate-400">Discover exclusive opportunities posted by MNNIT Alumni & Professors.</p>
-        </div>
+  // Filtering Logic
+  const filteredJobs = jobs.filter(job => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      job.title.toLowerCase().includes(searchLower) ||
+      job.description.toLowerCase().includes(searchLower) ||
+      job.requiredSkills.some((skill: string) => skill.toLowerCase().includes(searchLower)) ||
+      (job.postedBy?.name || '').toLowerCase().includes(searchLower)
+    );
+  });
 
-        {(user?.role === 'alumni' || user?.role === 'professor') && (
-          <Button onClick={() => navigate('/jobs/create')}>
-            <PlusCircle size={18} className="mr-2" />
-            Post a Job
-          </Button>
-        )}
+  // Pagination Logic
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Reset to page 1 when searching or changing tabs
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeTab]);
+
+  return (
+    <div className="max-w-6xl mx-auto p-4 pt-0 sm:px-8 sm:pb-8 space-y-6 pb-24 lg:pb-8">
+      {/* ── Header Area ────────────────────────────────────── */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-900 dark:to-[#1a1b1e] p-6 sm:p-10 rounded-[1.5rem] shadow-2xl shadow-primary-500/20 animate-fade-in">
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 h-64 w-64 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 h-64 w-64 bg-primary-400/20 rounded-full blur-3xl" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6 sm:gap-8">
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight mb-2">
+                Job Board
+              </h1>
+              <p className="text-primary-100 text-sm sm:text-base font-medium max-w-md opacity-90 leading-relaxed">
+                {user?.role === 'student' 
+                  ? "Discover exclusive opportunities posted by MNNIT Alumni & Professors." 
+                  : user?.role === 'alumni'
+                  ? "Empower the community by sharing career opportunities with MNNIT students."
+                  : "Connect your students with premium research and industry opportunities."}
+              </p>
+            </div>
+          </div>
+          {(user?.role === 'alumni' || user?.role === 'professor') && (
+            <div className="flex items-center">
+              <Button
+                onClick={() => navigate('/jobs/create')}
+                className="w-full sm:w-auto bg-white hover:bg-primary-50 text-primary-700 rounded-2xl h-11 sm:h-14 px-5 sm:px-8 font-bold sm:font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 border-none"
+              >
+                <Plus size={window.innerWidth < 640 ? 18 : 22} className="mr-1" /> Post a Job
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {(user?.role === 'alumni' || user?.role === 'professor') && (
-        <div className="border-b border-slate-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${activeTab === 'all'
-                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:border-slate-700'
-                }`}
-            >
-              All Active Jobs
-            </button>
-            <button
-              onClick={() => setActiveTab('my-jobs')}
-              className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${activeTab === 'my-jobs'
-                ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 dark:hover:border-slate-700'
-                }`}
-            >
-              My Posted Jobs
-            </button>
-          </nav>
-        </div>
-      )}
-
-      {isLoading ? (
-        <LoadingSpinner fullPage message="Finding the best opportunities for you..." />
-      ) : jobs.length === 0 ? (
-        <NoData
-          title={activeTab === 'my-jobs' ? "No Jobs Posted" : "No Jobs Found"}
-          description={activeTab === 'my-jobs' ? "You haven't posted any opportunities yet. Start by posting a new job!" : "There are currently no active job postings matching your filters."}
-          action={
-            activeTab === 'my-jobs' && (user?.role === 'alumni' || user?.role === 'professor') && (
-              <Button onClick={() => navigate('/jobs/create')}>
-                Post Your First Job
-              </Button>
-            )
-          }
+      {/* ── Search Bar ────────────────────────────────────── */}
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={20} />
+        <input
+          type="text"
+          placeholder={isMobile ? "Search Jobs.." : "Search jobs by title, skills or poster name..."}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full h-14 pl-12 pr-6 rounded-2xl bg-white dark:bg-[#202123] border-2 border-slate-100 dark:border-[#383942] focus:border-primary-500 transition-all outline-none font-medium shadow-sm"
         />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {jobs.map((job) => (
-            <Card key={job._id} className="hover:shadow-md transition-all duration-200 flex flex-col h-full cursor-pointer hover:-translate-y-0.5" onClick={() => navigate(`/jobs/${job._id}`)}>
-              <CardContent className="p-6 flex-1 flex flex-col">
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2">{job.title}</h3>
-                    {activeTab === 'my-jobs' && (
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${job.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : job.status === 'pending_moderation' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
-                        {job.status === 'withdrawn' ? 'Closed' : job.status.replace('_', ' ')}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-4">{job.postedBy?.name || job.postedBy?.email?.split('@')[0] || 'Unknown'}</p>
+      </div>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {job.requiredSkills.slice(0, 4).map(skill => (
-                      <span key={skill} className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">
-                        {skill}
-                      </span>
-                    ))}
-                    {job.requiredSkills.length > 4 && (
-                      <span className="px-2 py-0.5 bg-slate-100 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-300 rounded text-xs font-medium">+{job.requiredSkills.length - 4} more</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[#383942] flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  <div className="flex items-center">
-                    <Calendar size={14} className="mr-1.5" />
-                    Due {new Date(job.deadline).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center text-primary-600 hover:text-primary-700">
-                    <span className="mr-1">View Details</span>
-                    <Clock size={14} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      {/* ── Tabs for Poster ────────────────────────────────── */}
+      {(user?.role === 'alumni' || user?.role === 'professor') && (
+        <div className="bg-slate-100/50 dark:bg-white/5 p-1 rounded-2xl flex gap-1 w-fit border border-slate-200/50 dark:border-white/5">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'all'
+                ? 'bg-white dark:bg-[#2a2b32] text-primary-600 dark:text-primary-400 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+            }`}
+          >
+            All Active Jobs
+          </button>
+          <button
+            onClick={() => setActiveTab('my-jobs')}
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              activeTab === 'my-jobs'
+                ? 'bg-white dark:bg-[#2a2b32] text-primary-600 dark:text-primary-400 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
+            }`}
+          >
+            My Posted Jobs
+          </button>
         </div>
       )}
+
+      {/* ── Main Content ──────────────────────────────────── */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+            Available Opportunities
+            <span className="text-[10px] sm:text-xs font-medium text-slate-400 bg-slate-100 dark:bg-[#2a2b32] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-lg whitespace-nowrap">
+              {filteredJobs.length} found
+            </span>
+          </h2>
+        </div>
+
+        {isLoading ? (
+          <div className="py-24 flex flex-col items-center justify-center bg-white dark:bg-[#202123] rounded-3xl border border-slate-100 dark:border-[#383942]">
+            <LoadingSpinner message="Scanning for active opportunities..." />
+          </div>
+        ) : filteredJobs.length === 0 ? (
+          <NoData 
+            type="search"
+            title={activeTab === 'my-jobs' ? "No Jobs Posted" : "No Jobs Found"}
+            description={activeTab === 'my-jobs' 
+              ? "You haven't posted any opportunities yet. Start by posting a new job to help students!" 
+              : (searchQuery ? `No opportunities match "${searchQuery}". Try a broader search.` : "There are currently no active job postings.")
+            }
+            action={
+              activeTab !== 'my-jobs' && (user?.role === 'alumni' || user?.role === 'professor') && (
+                <Button variant="outline" onClick={() => navigate('/jobs/create')} className="rounded-xl">
+                  Post Your First Job
+                </Button>
+              )
+            }
+          />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {currentJobs.map((job) => {
+                const isExpired = new Date(job.deadline) < new Date() || job.status === 'expired';
+                return (
+                  <ListingCard
+                    key={job._id}
+                    title={job.title}
+                    description={job.description}
+                    status={isExpired ? 'Expired' : job.status}
+                    statusColor={
+                      isExpired ? 'bg-red-50 text-red-600' :
+                      job.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
+                      'bg-amber-50 text-amber-600'
+                    }
+                    posterName={job.postedBy?.name || 'Alumni'}
+                    posterAvatar={job.postedBy?.name?.charAt(0)}
+                    date={new Date(job.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    skills={job.requiredSkills || []}
+                    onCardClick={() => navigate(`/jobs/${job._id}`)}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={paginate}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 };

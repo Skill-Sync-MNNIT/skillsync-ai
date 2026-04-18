@@ -102,7 +102,15 @@ export const JobEdit = () => {
       toast(response.data.message || 'Job updated successfully!', 'success');
       navigate(`/jobs/${jobId}`);
     } catch (error: any) {
-      toast(error.response?.data?.message || 'Failed to update job.', 'error');
+      let message = error.response?.data?.message || 'Failed to submit job. Please check if your account has any violations.';
+      // Fallback: if message is technical JSON, parse it for the user
+      if (typeof message === 'string' && message.startsWith('[') && message.includes('"message":')) {
+        try {
+          const parsed = JSON.parse(message);
+          if (Array.isArray(parsed) && parsed[0]?.message) message = parsed[0].message;
+        } catch (e) { /* keep original */ }
+      }
+      toast(message, 'error');
     } finally {
       setIsSubmitting(false);
     }

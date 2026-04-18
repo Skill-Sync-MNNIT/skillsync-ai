@@ -130,7 +130,7 @@ export const JobDetail = () => {
 
   const isPoster = user?.email === job.postedBy.email;
   const isExpired = new Date(job.deadline) < new Date();
-  const isClosed = job.status === 'withdrawn' || job.status === 'expired';
+  const isClosed = job.status === 'withdrawn' || job.status === 'expired' || job.status === 'rejected';
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -147,11 +147,11 @@ export const JobDetail = () => {
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{job.title}</h1>
-                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${job.status === 'active' ? 'bg-green-100 text-green-700' :
-                  job.status === 'withdrawn' ? 'bg-red-100 text-red-700' :
+                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${(job.status === 'active' && !isExpired) ? 'bg-green-100 text-green-700' :
+                  (job.status === 'withdrawn' || job.status === 'expired' || isExpired) ? 'bg-red-100 text-red-700' :
                     'bg-amber-100 text-amber-700'
                   }`}>
-                  {job.status === 'withdrawn' ? 'Closed' : job.status.replace('_', ' ')}
+                  {(isExpired || job.status === 'expired') ? 'Expired' : job.status === 'withdrawn' ? 'Closed' : job.status.replace('_', ' ')}
                 </span>
               </div>
 
@@ -189,12 +189,12 @@ export const JobDetail = () => {
             </div>
 
             <div className="w-full md:w-auto flex flex-col gap-3 shrink-0">
-              {user?.role === 'student' && (
+              {user?.role === 'student' && !isExpired && job.status === 'active' && (
                 <Button
                   size="lg"
                   onClick={handleApply}
                   isLoading={isApplying}
-                  disabled={isExpired || isClosed || job.status !== 'active' || job.hasApplied}
+                  disabled={job.hasApplied}
                   variant={job.hasApplied ? "outline" : "primary"}
                   className={`w-full shadow-sm ${job.hasApplied ? 'border-emerald-200 text-emerald-600 bg-emerald-50/50' : ''}`}
                 >
@@ -202,28 +202,25 @@ export const JobDetail = () => {
                   {job.hasApplied ? 'Already Applied' : job.jobLink ? 'Apply on External Site' : 'Apply Now'}
                 </Button>
               )}
-              {isPoster && (
+              {isPoster && !isClosed && (
                 <>
                   <Button
                     size="lg"
                     variant="outline"
                     className="w-full"
                     onClick={() => navigate(`/jobs/${jobId}/edit`)}
-                    disabled={isClosed}
                   >
                     Edit Job
                   </Button>
-                  {!isClosed && (
-                    <Button
-                      size="lg"
-                      variant="ghost"
-                      className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
-                      onClick={handleWithdraw}
-                      isLoading={isWithdrawing}
-                    >
-                      Close Application Early
-                    </Button>
-                  )}
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+                    onClick={handleWithdraw}
+                    isLoading={isWithdrawing}
+                  >
+                    Close Application
+                  </Button>
                 </>
               )}
             </div>
