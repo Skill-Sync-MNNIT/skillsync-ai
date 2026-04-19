@@ -64,7 +64,15 @@ export const JobCreate = () => {
       toast(response.data.message || 'Job opportunity posted successfully!', 'success');
       navigate('/jobs');
     } catch (error: any) {
-      toast(error.response?.data?.error || 'Failed to submit job. Please check if your account has any violations.', 'error');
+      let message = error.response?.data?.message || 'Failed to submit job. Please check if your account has any violations.';
+      // Fallback: if message is technical JSON, parse it for the user
+      if (typeof message === 'string' && message.startsWith('[') && message.includes('"message":')) {
+        try {
+          const parsed = JSON.parse(message);
+          if (Array.isArray(parsed) && parsed[0]?.message) message = parsed[0].message;
+        } catch (e) { /* keep original */ }
+      }
+      toast(message, 'error');
     } finally {
       setIsSubmitting(false);
     }

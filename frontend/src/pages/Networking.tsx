@@ -84,7 +84,7 @@ export const Networking = () => {
   if (isLoading) return <LoadingSpinner fullPage message="Syncing your network..." />;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 p-6">
+    <div className="max-w-6xl mx-auto space-y-8 px-6 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Users className="text-primary-600" size={28} />
@@ -94,13 +94,13 @@ export const Networking = () => {
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
-            className="gap-2 relative"
+            className="gap-2 relative group hover:border-primary-500 hover:text-primary-600 transition-all duration-300 rounded-xl px-4 py-2 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] shadow-sm hover:shadow-primary-500/10 hover:ring-1 hover:ring-primary-500/20"
             onClick={() => navigate('/networking/requests')}
           >
-            <Bell size={18} />
-            <span>Invitations</span>
+            <Bell size={18} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-slate-500 group-hover:text-primary-600" />
+            <span className="font-semibold text-slate-700 dark:text-slate-300 group-hover:text-primary-600">Invitations</span>
             {totalPending > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center animate-pulse">
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#202123] shadow-md animate-bounce">
                 {totalPending > 99 ? '99+' : totalPending}
               </span>
             )}
@@ -134,19 +134,15 @@ export const Networking = () => {
               ? `No connections found searching for "${debouncedSearch}". Try a different name or email prefix.` 
               : "Start building your network by connecting with students and alumni from MNNIT!"
             }
-            action={
-              !debouncedSearch && (
-                <Button onClick={() => navigate('/dashboard')} variant="primary">
-                  Go to Dashboard
-                </Button>
-              )
-            }
+            action={null}
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {connections.map((conn) => {
-              const otherUser = conn.requester._id === user?._id ? conn.recipient : conn.requester;
-              const connectedAt = new Date(conn.connectedAt || conn.updatedAt).toLocaleDateString('en-US', {
+              const otherUser = conn.requester?._id === user?._id ? conn.recipient : conn.requester;
+              if (!otherUser) return null;
+
+              const connectedAt = new Date(conn.connectedAt || conn.updatedAt || Date.now()).toLocaleDateString('en-US', {
                 month: 'short', day: 'numeric', year: 'numeric'
               });
 
