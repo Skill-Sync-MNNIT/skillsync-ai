@@ -75,9 +75,9 @@ def main():
     print("=" * 60)
 
     # 1. Connect to Mongo
-    mongo_uri = os.environ.get("MONGO_URI", "")
+    mongo_uri = settings.mongo_uri
     if not mongo_uri:
-        print("ERROR: MONGO_URI environment variable is not set.")
+        print("ERROR: MONGO_URI configuration is missing.")
         return
 
     print("Connecting to MongoDB...")
