@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     embedding_model: str = "gemini-embedding-001"
     llm_model: str = "gemini-2.0-flash-lite"
     top_k_results: int = 10
-    mongo_uri: str
 
     groq_api_key: str = ""
     groq_api_key_2: str = ""
