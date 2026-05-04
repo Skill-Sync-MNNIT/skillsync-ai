@@ -9,8 +9,9 @@ import { Users, MoreVertical, Trash2, Send, Search, Bell } from 'lucide-react';
 import { Pagination } from '../components/ui/Pagination';
 import { BottomSheet } from '../components/ui/BottomSheet';
 import { Input } from '../components/ui/Input';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { NetworkingSkeleton } from '../components/skeletons/NetworkingSkeleton';
 import { NoData } from '../components/ui/NoData';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export const Networking = () => {
   const [connections, setConnections] = useState<any[]>([]);
@@ -26,6 +27,7 @@ export const Networking = () => {
   const { user } = useAuthStore();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   // Handle search debounce
   useEffect(() => {
@@ -39,15 +41,18 @@ export const Networking = () => {
   const fetchData = async (p = page) => {
     try {
       const [connRes, pendingRes] = await Promise.all([
+        // Critical — main content. If this fails, outer catch shows toast.
         api.get(`/connections/list?page=${p}&limit=10&search=${debouncedSearch}`),
-        api.get('/connections/requests'),
+        // Non-critical — just the badge count. If this fails, show 0, don't crash.
+        api.get('/connections/requests').catch(() => null),
       ]);
       setConnections(connRes.data.connections || []);
       setTotalPages(connRes.data.pages || 1);
       setTotalConnections(connRes.data.total || 0);
-      setTotalPending(pendingRes.data.total || 0);
+      setTotalPending(pendingRes?.data?.total || 0); // safely null-check
     } catch (err) {
-      toast('Failed to load networking data', 'error');
+      // Only reaches here if /connections/list itself fails
+      toast('Failed to load your connections', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -69,10 +74,15 @@ export const Networking = () => {
     }
   };
 
-  const handleRemoveConnection = async (connectionId: string) => {
-    if (!window.confirm('Are you sure you want to remove this connection?')) return;
+  const handleRemoveConnection = (connectionId: string) => {
+    setConfirmRemoveId(connectionId);
+  };
+
+  const confirmRemove = async () => {
+    if (!confirmRemoveId) return;
+    setConfirmRemoveId(null);
     try {
-      await api.delete(`/connections/${connectionId}`);
+      await api.delete(`/connections/${confirmRemoveId}`);
       toast('Connection removed', 'success');
       fetchData();
       setIsBottomSheetOpen(false);
@@ -81,7 +91,7 @@ export const Networking = () => {
     }
   };
 
-  if (isLoading) return <LoadingSpinner fullPage message="Syncing your network..." />;
+  if (isLoading) return <NetworkingSkeleton />;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 px-6 pb-12">
@@ -220,6 +230,16 @@ export const Networking = () => {
           </button>
         </div>
       </BottomSheet>
+
+      <ConfirmDialog
+        isOpen={confirmRemoveId !== null}
+        title="Remove Connection?"
+        description="This will permanently remove your connection. You can always reconnect later."
+        confirmLabel="Remove"
+        variant="danger"
+        onConfirm={confirmRemove}
+        onCancel={() => setConfirmRemoveId(null)}
+      />
     </div>
   );
 };

@@ -7,8 +7,8 @@ import {
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
+import { DashboardSkeleton } from '../components/skeletons/DashboardSkeleton';
 
 // ─── Helpers ────────────────────────────────────────────────
 const getGreeting = (): string => {
@@ -111,14 +111,14 @@ export const Dashboard = () => {
         console.error('Failed to fetch dashboard data', error);
         toast('Failed to load dashboard insights', 'error');
       } finally {
-        setTimeout(() => setIsLoading(false), 500);
+        setIsLoading(false);
       }
     };
     init();
   }, []);
 
   if (!user) return null;
-  if (isLoading) return <LoadingSpinner fullPage message="Preparing your dashboard..." />;
+  if (isLoading) return <DashboardSkeleton />;
 
   const cards = ROLE_CARDS[user.role] ?? ROLE_CARDS.student;
   const userName = user.name || user.email.split('@')[0];

@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
-import PrivateRoute from './components/PrivateRoute';
+import PrivateRoute from './components/layout/PrivateRoute';
 import { ToastProvider } from './context/ToastContext';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 

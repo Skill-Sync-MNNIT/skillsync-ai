@@ -6,8 +6,10 @@ import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { useToast } from '../context/ToastContext';
 import api from '../services/api';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { NoData } from '../components/ui/NoData';
+import { JobDetailSkeleton } from '../components/skeletons/JobDetailSkeleton';
+import { SkillBadge } from '../components/ui/SkillBadge';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 interface Job {
   _id: string;
@@ -38,16 +40,22 @@ export const JobDetail = () => {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [applications, setApplications] = useState<any[]>([]);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const fetchJob = async () => {
     try {
-      const response = await api.get(`/jobs/${jobId}`);
-      setJob(response.data);
+      // Fire both requests simultaneously — saves ~300ms
+      // /applications is non-critical: only posters see it, so .catch(() => null)
+      const [jobRes, appsRes] = await Promise.all([
+        api.get(`/jobs/${jobId}`),
+        api.get(`/jobs/${jobId}/applications`).catch(() => null),
+      ]);
 
-      // If the user is the poster, fetch applications
-      if (user?.email === response.data.postedBy.email) {
-        const appsResponse = await api.get(`/jobs/${jobId}/applications`);
-        setApplications(appsResponse.data);
+      setJob(jobRes.data);
+
+      // Only use applications data if the current user is the poster
+      if (appsRes && user?.email === jobRes.data.postedBy.email) {
+        setApplications(appsRes.data);
       }
     } catch (error) {
       console.error('Failed to fetch job details', error);
@@ -80,10 +88,6 @@ export const JobDetail = () => {
   };
 
   const handleWithdraw = async () => {
-    if (!window.confirm('Are you sure you want to close this application early? This action cannot be undone and no more students will be able to apply.')) {
-      return;
-    }
-
     setIsWithdrawing(true);
     try {
       const response = await api.delete(`/jobs/${jobId}`);
@@ -93,6 +97,7 @@ export const JobDetail = () => {
       toast(error.response?.data?.message || 'Failed to close application', 'error');
     } finally {
       setIsWithdrawing(false);
+      setShowConfirm(false);
     }
   };
 
@@ -109,9 +114,7 @@ export const JobDetail = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullPage message="Fetching job details..." />;
-  }
+  if (isLoading) return <JobDetailSkeleton />;
 
   if (!job) {
     return (
@@ -216,7 +219,7 @@ export const JobDetail = () => {
                     size="lg"
                     variant="ghost"
                     className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
-                    onClick={handleWithdraw}
+                    onClick={() => setShowConfirm(true)}
                     isLoading={isWithdrawing}
                   >
                     Close Application
@@ -240,9 +243,7 @@ export const JobDetail = () => {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
                 {job.requiredSkills.map(skill => (
-                  <span key={skill} className="px-3 py-1.5 bg-primary-50 text-primary-700 border border-primary-100 rounded-lg text-sm font-semibold shadow-sm">
-                    {skill}
-                  </span>
+                  <SkillBadge key={skill} label={skill} />
                 ))}
               </div>
             </section>
@@ -309,6 +310,17 @@ export const JobDetail = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ConfirmDialog
+        isOpen={showConfirm}
+        onCancel={() => setShowConfirm(false)}
+        onConfirm={handleWithdraw}
+        title="Close Application"
+        description="Are you sure you want to close this application early? This action cannot be undone and no more students will be able to apply."
+        confirmLabel="Close Job"
+        variant="danger"
+        isLoading={isWithdrawing}
+      />
     </div>
   );
 };
