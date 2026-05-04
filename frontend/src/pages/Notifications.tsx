@@ -4,9 +4,10 @@ import { Bell, Info, Briefcase, Trash2, X, CheckCheck } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { NotificationsSkeleton } from '../components/skeletons/NotificationsSkeleton';
 import { NoData } from '../components/ui/NoData';
 import { useToast } from '../context/ToastContext';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 interface Notification {
   _id: string;
@@ -22,6 +23,7 @@ export const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
   const fetchNotifications = async () => {
     setIsLoading(true);
@@ -86,7 +88,11 @@ export const Notifications = () => {
   };
 
   const handleClearAll = async () => {
-    if (!window.confirm('Are you sure you want to clear all notifications?')) return;
+    setConfirmClearOpen(true);
+  };
+
+  const confirmClearAll = async () => {
+    setConfirmClearOpen(false);
     try {
       await api.delete('/notifications');
       setNotifications([]);
@@ -98,6 +104,7 @@ export const Notifications = () => {
   };
 
   if (!user) return null;
+  if (isLoading) return <NotificationsSkeleton />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -131,9 +138,7 @@ export const Notifications = () => {
       </div>
 
       <div className="space-y-4">
-        {isLoading ? (
-          <LoadingSpinner fullPage message="Syncing your notifications..." />
-        ) : notifications.length === 0 ? (
+        {notifications.length === 0 ? (
           <NoData
             type="notifications"
             height="250px"
@@ -179,6 +184,16 @@ export const Notifications = () => {
           ))
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={confirmClearOpen}
+        title="Clear All Notifications?"
+        description="This will permanently delete all your notifications. This action cannot be undone."
+        confirmLabel="Clear All"
+        variant="danger"
+        onConfirm={confirmClearAll}
+        onCancel={() => setConfirmClearOpen(false)}
+      />
     </div>
   );
 };

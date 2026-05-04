@@ -5,15 +5,17 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import {
-  UploadCloud, X, AlertTriangle, Edit2, Loader2, CheckCircle2,
-  FileText, Trash2, Cpu, Save, XCircle, User, Shield,
-  AtSign,
+  AlertTriangle, Edit2, Loader2, CheckCircle2,
+  FileText, Trash2, Save, XCircle, User, Shield,
+  AtSign, Cpu, UploadCloud, X
 } from 'lucide-react';
 import { profileService } from '../services/profileService';
 import api from '../services/api';
 import type { StudentProfileData } from '../services/profileService';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
+import { useProfilePolling } from '../hooks/useProfilePolling';
+import { ProfileSkeleton } from '../components/skeletons/ProfileSkeleton';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 // ─── Read-only display field ────────────────────────────────
 const ReadField = ({
@@ -63,14 +65,12 @@ const SectionHeader = ({
 const BRANCHES = ['CSE', 'ECE', 'ME', 'CE', 'EEE', 'IT', 'NA'] as const;
 const COURSES = ['B.Tech', 'M.Tech', 'MCA'] as const;
 
-
 // ─── Main Component ─────────────────────────────────────────
 export const MyProfile = () => {
   const { user, updateUser } = useAuthStore();
   const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Profile data from backend
   const [profileData, setProfileData] = useState<StudentProfileData | null>(null);
 
   // Edit state — universal across ALL roles
@@ -96,9 +96,13 @@ export const MyProfile = () => {
   // Danger zone
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Embedding poll
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Embedding poll — via extracted hook
+  const { startPoll, stopPoll } = useProfilePolling(
+    (data) => setProfileData(data)
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -108,7 +112,6 @@ export const MyProfile = () => {
 
   // ─── Sync edit fields from loaded data ──────────────────
   const syncEditFields = (data: StudentProfileData) => {
-    // Falls back to existing name -> auth name -> email prefix
     setName(data.name || user?.name || user?.email.split('@')[0] || '');
     setCourse(data.course || 'B.Tech');
     setBranch(data.branch || 'CSE');
@@ -130,21 +133,6 @@ export const MyProfile = () => {
     } finally {
       setIsLoadingProfile(false);
     }
-  };
-
-  const startPoll = (userId: string) => {
-    if (pollRef.current) return;
-    pollRef.current = setInterval(async () => {
-      try {
-        const data = await profileService.fetchProfile(userId);
-        setProfileData(data);
-        if (data.embeddingStatus === 'indexed' || data.embeddingStatus === 'failed') stopPoll();
-      } catch { /* silent */ }
-    }, 4000);
-  };
-
-  const stopPoll = () => {
-    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   };
 
   // ─── Validation Schemas ──────────────────────────────────
@@ -170,8 +158,6 @@ export const MyProfile = () => {
   // ─── Save handler ────────────────────────────────────────
   const handleSave = async () => {
     setErrors({});
-
-    // Validate
     const schema = isStudent ? studentSchema : baseSchema;
     const dataToValidate = isStudent ? {
       name, course, branch, year, cpi, skills,
@@ -192,12 +178,9 @@ export const MyProfile = () => {
     }
 
     setIsSaving(true);
-
-    // Build payload — only send fields that changed / are relevant to role
     const payload: Parameters<typeof profileService.updateProfile>[0] = {
       name: name.trim(),
     };
-
     if (isStudent) {
       if (course) payload.course = course;
       if (branch) payload.branch = branch.toUpperCase() as any;
@@ -205,16 +188,10 @@ export const MyProfile = () => {
       if (cpi) payload.cpi = parseFloat(cpi);
       payload.skills = skills;
     }
-
     try {
       const updated = await profileService.updateProfile(payload);
-
-      // Merge returned data back into local state
       setProfileData((prev) => prev ? { ...prev, ...updated } : updated);
-
-      // Patch the Zustand store so the name appears in the nav/dashboard
       updateUser({ name: name.trim() });
-
       toast('Profile saved successfully.', 'success');
       setIsEditing(false);
     } catch (err: any) {
@@ -224,7 +201,6 @@ export const MyProfile = () => {
     }
   };
 
-  // ─── Cancel edit ────────────────────────────────────────
   const cancelEdit = () => {
     setIsEditing(false);
     setErrors({});
@@ -270,12 +246,10 @@ export const MyProfile = () => {
       setNewSkill('');
     }
   };
-
   const removeSkill = (s: string) => setSkills(skills.filter((x) => x !== s));
 
   // ─── Account Actions ──────────────────────────────────────
   const handleDeactivate = async () => {
-    if (!window.confirm('Are you sure you want to deactivate? You will be logged out.')) return;
     setIsDeleting(true);
     try {
       const response = await api.patch('/settings/account/deactivate');
@@ -284,6 +258,8 @@ export const MyProfile = () => {
     } catch (error: any) {
       toast(error.response?.data?.error || 'Failed to deactivate account.', 'error');
       setIsDeleting(false);
+    } finally {
+      setShowDeactivateConfirm(false);
     }
   };
 
@@ -296,18 +272,17 @@ export const MyProfile = () => {
     } catch (error: any) {
       toast(error.response?.data?.error || 'Failed to delete account.', 'error');
       setIsDeleting(false);
+    } finally {
+      setShowDeleteConfirm(false);
     }
   };
 
   // ─── Guards ──────────────────────────────────────────────
   if (!user) return null;
-  if (isLoadingProfile) return <LoadingSpinner fullPage message="Loading your profile data..." />;
+  if (isLoadingProfile) return <ProfileSkeleton />;
 
   const isStudent = user.role === 'student';
-
-  // Display name: backend profile name > auth store name > email prefix
-  const displayName =
-    profileData?.name || user.name || user.email.split('@')[0];
+  const displayName = profileData?.name || user.name || user.email.split('@')[0];
 
   // ─── Embedding status badge ──────────────────────────────
   const EmbeddingBadge = () => {
@@ -334,6 +309,13 @@ export const MyProfile = () => {
     return null;
   };
 
+  const selectClass = (hasError: boolean) =>
+    `flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
+      hasError
+        ? 'border-red-400 focus:ring-red-500/40'
+        : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
+    }`;
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 pt-0 pb-12 px-4 sm:px-0">
 
@@ -347,8 +329,6 @@ export const MyProfile = () => {
             My Profile
           </h1>
         </div>
-
-        {/* ── Universal edit/save controls ─────────────────── */}
         <div className="flex items-center gap-2 shrink-0 pt-1">
           {isEditing ? (
             <>
@@ -367,7 +347,7 @@ export const MyProfile = () => {
         </div>
       </div>
 
-      {/* ── Account Information (Name is editable) ───────────── */}
+      {/* ── Account Information ─────────────────────────────── */}
       <Card className="animate-fade-in-up" style={{ animationDelay: '60ms' }}>
         <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
           <SectionHeader
@@ -380,7 +360,6 @@ export const MyProfile = () => {
         </CardHeader>
         <CardContent className="pt-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Name is editable here for ALL roles */}
             {isEditing ? (
               <div className="col-span-1">
                 <Input
@@ -397,33 +376,16 @@ export const MyProfile = () => {
                 />
               </div>
             ) : (
-              <ReadField
-                label="Full Name"
-                value={displayName}
-                icon={User}
-              />
+              <ReadField label="Full Name" value={displayName} icon={User} />
             )}
-
-            <ReadField
-              label="Email Address"
-              value={user.email}
-              icon={AtSign}
-            />
-            <ReadField
-              label="Role"
-              value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-              icon={Shield}
-            />
-            <ReadField
-              label="Account Status"
-              value={user.isVerified ? '✓ Verified' : 'Not verified'}
-              icon={CheckCircle2}
-            />
+            <ReadField label="Email Address" value={user.email} icon={AtSign} />
+            <ReadField label="Role" value={user.role.charAt(0).toUpperCase() + user.role.slice(1)} icon={Shield} />
+            <ReadField label="Account Status" value={user.isVerified ? '✓ Verified' : 'Not verified'} icon={CheckCircle2} />
           </div>
         </CardContent>
       </Card>
 
-      {/* ── Profile Details (Students only) ───────────────────────── */}
+      {/* ── Academic Details (students only) ───────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '120ms' }}>
           <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
@@ -436,7 +398,6 @@ export const MyProfile = () => {
             />
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
-            {/* Academic fields — reordered: Course, Year, Branch, CPI */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {isEditing ? (
                 <>
@@ -446,19 +407,18 @@ export const MyProfile = () => {
                     </label>
                     <select
                       value={course}
-                      onChange={(e) => {
-                        setCourse(e.target.value);
-                        if (errors.course) setErrors(prev => ({ ...prev, course: '' }));
-                      }}
-                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.course ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
-                        }`}
+                      onChange={(e) => { setCourse(e.target.value); if (errors.course) setErrors(prev => ({ ...prev, course: '' })); }}
+                      className={selectClass(!!errors.course)}
                     >
                       {COURSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
-                    {errors.course && <p className="mt-1.5 text-sm font-medium text-red-500">{errors.course}</p>}
+                    {errors.course && (
+                      <p className="mt-1.5 text-sm font-medium text-red-500">{errors.course}</p>
+                    )}
                   </div>
+
                   <Input
                     id="profile-year"
                     label="Year"
@@ -467,31 +427,28 @@ export const MyProfile = () => {
                     max={4}
                     placeholder="1 – 4"
                     value={year}
-                    onChange={(e) => {
-                      setYear(e.target.value);
-                      if (errors.year) setErrors(prev => ({ ...prev, year: '' }));
-                    }}
+                    onChange={(e) => { setYear(e.target.value); if (errors.year) setErrors(prev => ({ ...prev, year: '' })); }}
                     error={errors.year}
                   />
+
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
                       Branch
                     </label>
                     <select
                       value={branch}
-                      onChange={(e) => {
-                        setBranch(e.target.value);
-                        if (errors.branch) setErrors(prev => ({ ...prev, branch: '' }));
-                      }}
-                      className={`flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${errors.branch ? 'border-red-400 focus:ring-red-500/40' : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
-                        }`}
+                      onChange={(e) => { setBranch(e.target.value); if (errors.branch) setErrors(prev => ({ ...prev, branch: '' })); }}
+                      className={selectClass(!!errors.branch)}
                     >
                       {BRANCHES.map((b) => (
                         <option key={b} value={b}>{b}</option>
                       ))}
                     </select>
-                    {errors.branch && <p className="mt-1.5 text-sm font-medium text-red-500">{errors.branch}</p>}
+                    {errors.branch && (
+                      <p className="mt-1.5 text-sm font-medium text-red-500">{errors.branch}</p>
+                    )}
                   </div>
+
                   <Input
                     id="profile-cpi"
                     label="CPI (0 - 10.0)"
@@ -501,22 +458,29 @@ export const MyProfile = () => {
                     max={10}
                     placeholder="e.g. 8.5"
                     value={cpi}
-                    onChange={(e) => {
-                      setCpi(e.target.value);
-                      if (errors.cpi) setErrors(prev => ({ ...prev, cpi: '' }));
-                    }}
+                    onChange={(e) => { setCpi(e.target.value); if (errors.cpi) setErrors(prev => ({ ...prev, cpi: '' })); }}
                     error={errors.cpi}
                   />
                 </>
               ) : (
                 <>
-                  <ReadField label="Course" value={profileData?.course || '—'} />
-                  <ReadField
-                    label="Year"
-                    value={profileData?.year ? String(profileData.year) : '—'}
-                  />
-                  <ReadField label="Branch" value={profileData?.branch || 'NA'} />
-                  <ReadField label="CPI" value={profileData?.cpi ? String(profileData.cpi) : '—'} />
+                  {[
+                    { label: 'Course', value: profileData?.course || '—' },
+                    { label: 'Year', value: profileData?.year ? String(profileData.year) : '—' },
+                    { label: 'Branch', value: profileData?.branch || 'NA' },
+                    { label: 'CPI', value: profileData?.cpi ? String(profileData.cpi) : '—' },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                        {label}
+                      </p>
+                      <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#40414f] px-4 py-2.5 rounded-xl border border-slate-100 dark:border-[#383942]">
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                          {value}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </>
               )}
             </div>
@@ -524,7 +488,7 @@ export const MyProfile = () => {
         </Card>
       )}
 
-      {/* ── Skills (students only) ────────────────────────────── */}
+      {/* ── Skills (students only) ─────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '180ms' }}>
           <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
@@ -544,56 +508,58 @@ export const MyProfile = () => {
             </div>
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
+            <div className="space-y-4">
+              {skills.length === 0 && !isEditing && (
+                <p className="text-sm text-slate-400 text-center py-4 italic">
+                  No skills yet. Click "Edit Profile" to add some.
+                </p>
+              )}
 
-            {skills.length === 0 && !isEditing && (
-              <p className="text-sm text-slate-400 text-center py-4 italic">
-                No skills yet. Click "Edit Profile" to add some.
-              </p>
-            )}
+              {isEditing && (
+                <div className="pt-2">
+                  <Input
+                    label="Add a skill"
+                    placeholder="Type a skill and press Enter (e.g. PyTorch)"
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    onKeyDown={(e) => {
+                      addSkill(e);
+                      if (e.key === 'Enter' && errors.skills) setErrors(prev => ({ ...prev, skills: '' }));
+                    }}
+                    error={errors.skills}
+                  />
+                </div>
+              )}
 
-            {isEditing && (
-              <div className="pt-2">
-                <Input
-                  label="Add a skill"
-                  placeholder="Type a skill and press Enter (e.g. PyTorch)"
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  onKeyDown={(e) => {
-                    addSkill(e);
-                    if (e.key === 'Enter' && errors.skills) setErrors(prev => ({ ...prev, skills: '' }));
-                  }}
-                  error={errors.skills}
-                />
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${isEditing
-                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800 hover:bg-primary-100'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+              <div className="flex flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
+                      isEditing
+                        ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800 hover:bg-primary-100'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                     }`}
-                >
-                  {skill}
-                  {isEditing && (
-                    <button
-                      type="button"
-                      onClick={() => removeSkill(skill)}
-                      className="h-4 w-4 rounded-full flex items-center justify-center text-primary-400 hover:text-white hover:bg-primary-500 transition-all"
-                    >
-                      <X size={11} />
-                    </button>
-                  )}
-                </span>
-              ))}
+                  >
+                    {skill}
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={() => removeSkill(skill)}
+                        className="h-4 w-4 rounded-full flex items-center justify-center text-primary-400 hover:text-white hover:bg-primary-500 transition-all"
+                      >
+                        <X size={11} />
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* ── Resume (students only) ───────────────────────────── */}
+      {/* ── Resume (students only) ─────────────────────────── */}
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '240ms' }}>
           <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
@@ -609,96 +575,96 @@ export const MyProfile = () => {
             </div>
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
-
-            {(profileData?.resumeStorageKey && (profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing')) ? (
-              <div className="flex flex-col items-center py-8 text-center">
-                <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
-                  <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
+            <div className="space-y-4">
+              {profileData?.resumeStorageKey && (profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') ? (
+                <div className="flex flex-col items-center py-8 text-center">
+                  <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
+                    <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    AI is analyzing your resume
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                    Extracting skills, experience, and structure. This takes a moment.
+                  </p>
                 </div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">AI is analyzing your resume</p>
-                <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                  Extracting skills, experience, and structure. This takes a moment.
-                </p>
-              </div>
-            ) : (
-              <>
-                {profileData?.resumeStorageKey ? (
-                  <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                    <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
-                    <p className="text-sm text-emerald-800 font-medium">Resume active and indexed</p>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                    <FileText size={15} className="text-slate-400 shrink-0" />
-                    <p className="text-sm text-slate-600">No resume uploaded yet</p>
-                  </div>
-                )}
-
-                {/* Drop zone & Upload action only visible in Edit Mode */}
-                {isEditing && (
-                  <>
-                    <div
-                      className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
-                        ? 'border-primary-400 bg-primary-50/50'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                      onDragLeave={() => setIsDragging(false)}
-                      onDrop={(e) => {
-                        handleDrop(e);
-                        if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
-                      }}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <UploadCloud
-                        className={`mx-auto h-7 w-7 mb-2 ${isDragging ? 'text-primary-500' : 'text-slate-400'}`}
-                      />
-                      <p className="text-sm font-medium text-slate-700">
-                        {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">PDF only · Max 5 MB</p>
-                      <input
-                        type="file"
-                        className="sr-only"
-                        accept=".pdf"
-                        ref={fileInputRef}
-                        onChange={(e) => {
-                          handleFileChange(e);
-                          if (errors.hasResume) setErrors(prev => ({ ...prev, hasResume: '' }));
-                        }}
-                      />
+              ) : (
+                <>
+                  {profileData?.resumeStorageKey ? (
+                    <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                      <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                      <p className="text-sm text-emerald-800 font-medium">Resume active and indexed</p>
                     </div>
-                    {errors.hasResume && <p className="text-sm font-medium text-red-500 mt-2">{errors.hasResume}</p>}
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                      <FileText size={15} className="text-slate-400 shrink-0" />
+                      <p className="text-sm text-slate-600">No resume uploaded yet</p>
+                    </div>
+                  )}
 
-                    {selectedFile && (
-                      <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in mt-4">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <FileText size={15} className="text-primary-500 shrink-0" />
-                          <span className="text-sm font-medium text-slate-700 truncate">{selectedFile.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <Button
-                             size="sm"
-                             variant="outline"
-                             onClick={() => setSelectedFile(null)}
-                           >
-                             Cancel
-                           </Button>
-                           <Button
-                             size="sm"
-                             isLoading={isUploading}
-                             onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                             className="shrink-0"
-                           >
-                             Upload
-                           </Button>
-                        </div>
+                  {/* Drop zone & Upload action only visible in Edit Mode */}
+                  {isEditing && (
+                    <>
+                      <div
+                        className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${
+                          isDragging
+                            ? 'border-primary-400 bg-primary-50/50'
+                            : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        }`}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={(e) => { handleDrop(e); setErrors(prev => ({ ...prev, hasResume: '' })); }}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <UploadCloud
+                          className={`mx-auto h-7 w-7 mb-2 ${
+                            isDragging ? 'text-primary-500' : 'text-slate-400'
+                          }`}
+                        />
+                        <p className="text-sm font-medium text-slate-700">
+                          {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1">PDF only · Max 5 MB</p>
+                        <input
+                          type="file"
+                          className="sr-only"
+                          accept=".pdf"
+                          ref={fileInputRef}
+                          onChange={(e) => { handleFileChange(e); setErrors(prev => ({ ...prev, hasResume: '' })); }}
+                        />
                       </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
+                      {errors.hasResume && (
+                        <p className="text-sm font-medium text-red-500 mt-2">{errors.hasResume}</p>
+                      )}
+
+                      {selectedFile && (
+                        <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in mt-4">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText size={15} className="text-primary-500 shrink-0" />
+                            <span className="text-sm font-medium text-slate-700 truncate">
+                              {selectedFile.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant="outline" onClick={() => setSelectedFile(null)}>
+                              Cancel
+                            </Button>
+                            <Button
+                              size="sm"
+                              isLoading={isUploading}
+                              onClick={(e) => { e.stopPropagation(); handleUpload(); }}
+                              className="shrink-0"
+                            >
+                              Upload
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -715,42 +681,63 @@ export const MyProfile = () => {
           />
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            {/* Deactivate Option */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDeactivate}
-              isLoading={isDeleting && !deleteConfirm} // Minimal use of state to show loading
-              className="w-full sm:w-auto border-amber-200 text-amber-700 hover:bg-amber-50"
-            >
-              <XCircle size={14} className="mr-2" />
-              Deactivate Account
-            </Button>
+          <div className="pt-6">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              {/* Deactivate Option */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeactivateConfirm(true)}
+                isLoading={isDeleting && !deleteConfirm}
+                className="w-full sm:w-auto border-amber-200 text-amber-700 hover:bg-amber-50"
+              >
+                <XCircle size={14} className="mr-2" />
+                Deactivate Account
+              </Button>
 
-            {/* Permanent Delete Option */}
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={async () => {
-                if (window.confirm('WARNING: Are you absolutely sure you want to PERMANENTLY delete your account? This will erase all your profile data, job postings, and resumes forever. This action is irreversible.')) {
-                  setDeleteConfirm('DELETE'); // Reusing state for handler check
-                  handlePermanentDelete();
-                }
-              }}
-              isLoading={isDeleting && deleteConfirm === 'DELETE'}
-              className="w-full sm:w-auto"
-            >
-              <Trash2 size={14} className="mr-2" />
-              Delete Account Permanently
-            </Button>
+              {/* Permanent Delete Option */}
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(true)}
+                isLoading={isDeleting && deleteConfirm === 'DELETE'}
+                className="w-full sm:w-auto"
+              >
+                <Trash2 size={14} className="mr-2" />
+                Delete Account Permanently
+              </Button>
+            </div>
+            <p className="text-[10px] text-slate-400 mt-4 leading-tight italic">
+              * Deactivation hides your profile temporarily. Permanent deletion wipes all your data forever.
+            </p>
           </div>
-          <p className="text-[10px] text-slate-400 mt-4 leading-tight italic">
-            * Deactivation hides your profile temporarily. Permanent deletion wipes all your data forever.
-          </p>
         </CardContent>
       </Card>
 
+      <ConfirmDialog
+        isOpen={showDeactivateConfirm}
+        onCancel={() => setShowDeactivateConfirm(false)}
+        onConfirm={handleDeactivate}
+        title="Deactivate Account?"
+        description="Are you sure you want to deactivate? You will be logged out and your profile will be hidden."
+        confirmLabel="Deactivate"
+        variant="danger"
+        isLoading={isDeleting}
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          setDeleteConfirm('DELETE');
+          handlePermanentDelete();
+        }}
+        title="PERMANENT DELETE?"
+        description="WARNING: Are you absolutely sure you want to PERMANENTLY delete your account? This will erase all your profile data, job postings, and resumes forever. This action is irreversible."
+        confirmLabel="Delete Forever"
+        variant="danger"
+        isLoading={isDeleting && deleteConfirm === 'DELETE'}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import {
@@ -9,7 +9,7 @@ import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { useChatStore, type Message } from '../store/chatStore';
 
-import { Sidebar } from '../components/Sidebar';
+import { SearchHistorySidebar } from '../components/chat/SearchHistorySidebar';
 import { BottomSheet } from '../components/ui/BottomSheet';
 
 // ─── Score color map ────────────────────────────────────────
@@ -114,6 +114,16 @@ export const Search = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // Pre-compute stable dot positions — Math.random() in JSX re-runs on every render
+  const neuralDots = useMemo(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      duration: `${(2 + Math.random() * 3).toFixed(2)}s`,
+      delay: `${(Math.random() * 5).toFixed(2)}s`,
+    })), []);
+
   useEffect(() => {
     const q = searchParams.get('q');
     if (q && isAuthenticated() && activeMessages.length === 0) {
@@ -151,7 +161,7 @@ export const Search = () => {
       {/* Sidebar - only visible to logged-in users on desktop/tablet */}
       {isAuthenticated() && (
         <div className="hidden md:flex">
-          <Sidebar />
+          <SearchHistorySidebar />
         </div>
       )}
 
@@ -174,7 +184,7 @@ export const Search = () => {
           title="Recent Sessions"
         >
           <div className="w-full h-full max-h-[60vh]">
-            <Sidebar />
+            <SearchHistorySidebar />
           </div>
         </BottomSheet>
         <div className="flex-1 overflow-y-auto w-full relative scroll-smooth px-4 pt-8 pb-32 flex flex-col items-center">
@@ -188,11 +198,11 @@ export const Search = () => {
                       backgroundImage: 'radial-gradient(circle, #22c55e 1px, transparent 1px)', 
                       backgroundSize: '40px 40px' 
                     }}>
-                      {[...Array(12)].map((_, i) => (
-                        <div key={i} className="absolute w-1 h-1 bg-primary-400 rounded-full" style={{
-                          top: `${Math.random() * 100}%`,
-                          left: `${Math.random() * 100}%`,
-                          animation: `twinkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 5}s infinite`
+                      {neuralDots.map((dot) => (
+                        <div key={dot.id} className="absolute w-1 h-1 bg-primary-400 rounded-full" style={{
+                          top: dot.top,
+                          left: dot.left,
+                          animation: `twinkle ${dot.duration} ease-in-out ${dot.delay} infinite`
                         }} />
                       ))}
                     </div>

@@ -4,11 +4,12 @@ import { Plus, Search } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useToast } from '../context/ToastContext';
 import { Pagination } from '../components/ui/Pagination';
 import { NoData } from '../components/ui/NoData';
 import { ListingCard } from '../components/ui/ListingCard';
+import { usePagination } from '../hooks/usePagination';
+import { JobListingSkeleton } from '../components/skeletons/JobListingSkeleton';
 
 interface Job {
   _id: string;
@@ -34,8 +35,6 @@ export const JobListing = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'my-jobs'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const jobsPerPage = 4;
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
   useEffect(() => {
@@ -72,18 +71,10 @@ export const JobListing = () => {
     );
   });
 
-  // Pagination Logic
-  const indexOfLastJob = currentPage * jobsPerPage;
-  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
-  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  //Hook MUST be called before any early returns (React Rules of Hooks)
+  const { currentItems: currentJobs, currentPage, totalPages, setPage } = usePagination(filteredJobs, 4);
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-  // Reset to page 1 when searching or changing tabs
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, activeTab]);
+  if (isLoading) return <JobListingSkeleton />;
 
   return (
     <div className="max-w-6xl mx-auto p-4 pt-0 sm:px-8 sm:pb-8 space-y-6 pb-24 lg:pb-8">
@@ -113,7 +104,7 @@ export const JobListing = () => {
                 onClick={() => navigate('/jobs/create')}
                 className="w-full sm:w-auto bg-white hover:bg-primary-50 text-primary-700 rounded-2xl h-11 sm:h-14 px-5 sm:px-8 font-bold sm:font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 border-none"
               >
-                <Plus size={window.innerWidth < 640 ? 18 : 22} className="mr-1" /> Post a Job
+                <Plus size={isMobile ? 18 : 22} className="mr-1" /> Post a Job
               </Button>
             </div>
           )}
@@ -169,11 +160,7 @@ export const JobListing = () => {
           </h2>
         </div>
 
-        {isLoading ? (
-          <div className="py-24 flex flex-col items-center justify-center bg-white dark:bg-[#202123] rounded-3xl border border-slate-100 dark:border-[#383942]">
-            <LoadingSpinner message="Scanning for active opportunities..." />
-          </div>
-        ) : filteredJobs.length === 0 ? (
+        {filteredJobs.length === 0 ? (
           <NoData 
             type="search"
             title={activeTab === 'my-jobs' ? "No Jobs Posted" : "No Jobs Found"}
@@ -216,10 +203,10 @@ export const JobListing = () => {
             </div>
 
             {/* Pagination */}
-            <Pagination 
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={paginate}
+              onPageChange={setPage}
             />
           </>
         )}

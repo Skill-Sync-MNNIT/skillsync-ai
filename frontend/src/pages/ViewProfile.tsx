@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Download, Eye, Cpu, UserPlus, Mail, BookOpen, GitBranch, Calendar, Award, Code2, FileText, Star, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { ViewProfileSkeleton } from '../components/skeletons/ViewProfileSkeleton';
+import { SkillBadge } from '../components/ui/SkillBadge';
 import { useToast } from '../context/ToastContext';
 import { NoData } from '../components/ui/NoData';
 import { useNavigate } from 'react-router-dom';
@@ -136,9 +137,7 @@ export const ViewProfile = () => {
     }
   };
 
-  if (isLoading) {
-    return <LoadingSpinner fullPage message="Fetching student profile..." />;
-  }
+  if (isLoading) return <ViewProfileSkeleton />;
 
   if (!profile) {
     return (
@@ -324,16 +323,11 @@ export const ViewProfile = () => {
                 {profile.skills.map(skill => {
                   const isMatched = profile.matchedSkills?.includes(skill);
                   return (
-                    <span
+                    <SkillBadge
                       key={skill}
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-bold transition-all ${isMatched
-                          ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 ring-2 ring-primary-200 dark:ring-primary-800'
-                          : 'bg-slate-100 dark:bg-[#2a2b32] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#343541] border border-transparent hover:border-slate-300 dark:hover:border-slate-600'
-                        }`}
-                    >
-                      {isMatched && <Star size={14} className="fill-primary-500 text-primary-500" />}
-                      {skill}
-                    </span>
+                      label={skill}
+                      variant={isMatched ? 'highlighted' : 'default'}
+                    />
                   );
                 })}
               </div>

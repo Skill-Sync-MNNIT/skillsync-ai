@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { X, ShieldAlert, Sliders, Save, Sparkles } from 'lucide-react';
+import { SkillBadge } from '../components/ui/SkillBadge';
+import { ShieldAlert, Sliders, Save, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
@@ -64,7 +64,18 @@ export const Settings = () => {
   };
 
   if (isLoading) {
-    return <LoadingSpinner fullPage message="Sycing your settings..." />;
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 bg-slate-200 dark:bg-[#2a2b32] rounded-xl" />
+          <div className="h-8 w-48 bg-slate-200 dark:bg-[#2a2b32] rounded-lg" />
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="md:col-span-2 h-64 bg-white dark:bg-[#202123] border border-slate-100 dark:border-[#383942] rounded-2xl" />
+          <div className="h-48 bg-white dark:bg-[#202123] border border-slate-100 dark:border-[#383942] rounded-2xl" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -89,12 +100,12 @@ export const Settings = () => {
               
               <div className="flex flex-wrap gap-2 pt-2">
                 {preferences.map((pref) => (
-                  <span key={pref} className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
-                    {pref}
-                    <button type="button" onClick={() => handleRemovePref(pref)} className="ml-1.5 text-primary-400 hover:text-primary-600">
-                      <X size={14} />
-                    </button>
-                  </span>
+                  <SkillBadge
+                    key={pref}
+                    label={pref}
+                    variant="removable"
+                    onRemove={() => handleRemovePref(pref)}
+                  />
                 ))}
               </div>
               

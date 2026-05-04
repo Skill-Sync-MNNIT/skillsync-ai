@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Navbar } from '../components/Navbar';
-import { AppSidebar } from '../components/AppSidebar';
+import { Navbar } from '../components/layout/Navbar';
+import { NavSidebar } from '../components/layout/NavSidebar';
 import { cn } from '../components/ui/Button';
 
 export const DashboardLayout = () => {
@@ -11,7 +11,7 @@ export const DashboardLayout = () => {
     <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-200">
       <Navbar />
       <div className="flex">
-        <AppSidebar />
+        <NavSidebar />
         <main className="flex-1 min-w-0">
           <div className={cn(
             "mx-auto transition-all duration-300",
