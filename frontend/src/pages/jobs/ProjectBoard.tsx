@@ -63,16 +63,19 @@ export const ProjectBoard = () => {
   }, [user]);
 
   // Filtering
-  const filteredProjects = projects.filter((project) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      project.title.toLowerCase().includes(searchLower) ||
-      project.description.toLowerCase().includes(searchLower) ||
-      project.requiredSkills.some((skill: string) =>
-        skill.toLowerCase().includes(searchLower)
-      )
-    );
-  });
+  const filteredProjects = projects
+    // Defensive guard: hide orphaned projects whose owner was hard-deleted before cascade-delete was in place
+    .filter((project) => project.owner != null)
+    .filter((project) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        project.title.toLowerCase().includes(searchLower) ||
+        project.description.toLowerCase().includes(searchLower) ||
+        project.requiredSkills.some((skill: string) =>
+          skill.toLowerCase().includes(searchLower)
+        )
+      );
+    });
 
   // Pagination via hook
   const { currentItems: currentProjects, currentPage, totalPages, setPage } =

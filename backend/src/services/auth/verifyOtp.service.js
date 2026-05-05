@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import {
   findUserByEmail,
   createUser,
   findProfessorByEmail,
   createStudentProfile,
+  updateRefreshToken,
 } from '../../repositories/index.js';
 import redis from '../../config/redis.js';
 
@@ -51,5 +53,16 @@ export const verifyOTPService = async (email, otp) => {
 
   await redis.del(`register:${emailLower}`);
 
-  return true;
+  // Generate tokens so the controller can auto-login the user
+  const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_TOKEN_EXPIRES_IN,
+  });
+
+  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+  });
+
+  await updateRefreshToken(user._id, refreshToken);
+
+  return { user, accessToken, refreshToken };
 };

@@ -57,19 +57,20 @@ export const initModerationWorker = () => {
             // Apply Violation Policy
             const banInfo = await BanManager.applyViolationPolicy(jobPosting.postedBy);
 
-          // Notify Alumni via Email
-          try {
-            const user = await findUserById(jobPosting.postedBy);
-            if (user && user.email) {
-              await sendJobRejectionEmail(
-                user.email,
-                title,
-                result.violation_type || 'General Violation',
-                banInfo.banUntil
-              );
+            // Notify Alumni via Email
+            try {
+              const user = await findUserById(jobPosting.postedBy);
+              if (user && user.email) {
+                await sendJobRejectionEmail(
+                  user.email,
+                  title,
+                  result.violation_type || 'General Violation',
+                  banInfo.banUntil
+                );
+              }
+            } catch (emailError) {
+              console.error('[MODERATION] Email notification failed:', emailError.message);
             }
-          } catch (emailError) {
-            console.error('[MODERATION] Email notification failed:', emailError.message);
           }
         } catch (error) {
           console.error(`[MODERATION] Error processing job ${jobId}:`, error.message);
