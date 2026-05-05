@@ -1,13 +1,28 @@
-import { Outlet } from 'react-router-dom';
-import { Navbar } from '../components/Navbar';
+import { Outlet, useLocation } from 'react-router-dom';
+import { Navbar } from '../components/layout/Navbar';
+import { NavSidebar } from '../components/layout/NavSidebar';
+import { cn } from '../components/ui/Button';
 
 export const DashboardLayout = () => {
+  const location = useLocation();
+  const isMessagesPage = location.pathname === '/messages';
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-200">
       <Navbar />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 pb-20">
-        <Outlet />
-      </main>
+      <div className="flex">
+        <NavSidebar />
+        <main className="flex-1 min-w-0">
+          <div className={cn(
+            "mx-auto transition-all duration-300",
+            isMessagesPage
+              ? "max-w-none px-0 py-0"
+              : "max-w-[1200px] px-6 py-8 lg:px-8 pb-20"
+          )}>
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

@@ -111,4 +111,26 @@ async def embed_from_storage_key(body: EmbedFromKeyRequest):
 async def delete_resume(user_id: str):
     await embedding_service.delete_from_vector_db(user_id)
     return {"status":"deleted","user_id":user_id}
+
+class UpdateMetadataRequest(BaseModel):
+    cpi: float | None = None
+    course: str | None = None
+    branch: str | None = None
+    year: int | None = None
+    skills: list[str] | None = None
+
+@router.patch("/metadata/{user_id}")
+async def update_vector_metadata(user_id: str, body: UpdateMetadataRequest):
+    metadata = {}
+    if body.cpi is not None: metadata["cpi"] = body.cpi
+    if body.course is not None: metadata["course"] = body.course
+    if body.branch is not None: metadata["branch"] = body.branch
+    if body.year is not None: metadata["year"] = body.year
+    if body.skills is not None: metadata["skills"] = body.skills
     
+    if metadata:
+        from services.pinecone_repo import PineconeRepository
+        repo = PineconeRepository()
+        repo.update_metadata(user_id, metadata)
+    
+    return {"status": "metadata_updated"}

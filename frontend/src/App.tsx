@@ -1,25 +1,43 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import PrivateRoute from './components/PrivateRoute';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Verify } from './pages/Verify';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { HomeLayout } from './layouts/HomeLayout';
-import { DashboardLayout } from './layouts/DashboardLayout';
-import { Dashboard } from './pages/Dashboard';
-import { MyProfile } from './pages/MyProfile';
-import { ViewProfile } from './pages/ViewProfile';
-import { Search } from './pages/Search';
-import { JobListing } from './pages/JobListing';
-import { JobCreate } from './pages/JobCreate';
-import { JobDetail } from './pages/JobDetail';
-import { Notifications } from './pages/Notifications';
-import { Settings } from './pages/Settings';
+import { Player } from '@lottiefiles/react-lottie-player';
+import PrivateRoute from './components/layout/PrivateRoute';
+import { ToastProvider } from './context/ToastContext';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
+
+const Login = lazy(() => import('./pages/auth/Login').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/auth/Register').then(m => ({ default: m.Register })));
+const Verify = lazy(() => import('./pages/auth/Verify').then(m => ({ default: m.Verify })));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const HomeLayout = lazy(() => import('./layouts/HomeLayout').then(m => ({ default: m.HomeLayout })));
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout').then(m => ({ default: m.DashboardLayout })));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
+const MyProfile = lazy(() => import('./pages/profile/MyProfile').then(m => ({ default: m.MyProfile })));
+const ViewProfile = lazy(() => import('./pages/profile/ViewProfile').then(m => ({ default: m.ViewProfile })));
+const Search = lazy(() => import('./pages/search/Search').then(m => ({ default: m.Search })));
+const JobListing = lazy(() => import('./pages/jobs/JobListing').then(m => ({ default: m.JobListing })));
+const JobCreate = lazy(() => import('./pages/jobs/JobCreate').then(m => ({ default: m.JobCreate })));
+const JobDetail = lazy(() => import('./pages/jobs/JobDetail').then(m => ({ default: m.JobDetail })));
+const JobEdit = lazy(() => import('./pages/jobs/JobEdit').then(m => ({ default: m.JobEdit })));
+const Notifications = lazy(() => import('./pages/notifications/Notifications').then(m => ({ default: m.Notifications })));
+const Settings = lazy(() => import('./pages/settings/Settings').then(m => ({ default: m.Settings })));
+const Connections = lazy(() => import('./pages/Connections/Connections').then(m => ({ default: m.Connections })));
+const ConnectionRequests = lazy(() => import('./pages/Connections/ConnectionRequests').then(m => ({ default: m.ConnectionRequests })));
+const Messages = lazy(() => import('./pages/chat/Messages').then(m => ({ default: m.Messages })));
+const ProjectBoard = lazy(() => import('./pages/jobs/ProjectBoard').then(m => ({ default: m.ProjectBoard })));
+
 
 const NotFound = () => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center text-center px-4">
-    <h1 className="text-8xl font-black text-slate-200">404</h1>
-    <h2 className="mt-4 text-2xl font-bold text-slate-900">Page Not Found</h2>
+    <div className="w-full max-w-sm mb-4 mix-blend-multiply dark:mix-blend-screen opacity-90">
+      <Player
+        autoplay
+        loop
+        src="https://assets3.lottiefiles.com/packages/lf20_suhe7qtm.json"
+        style={{ height: '250px', width: '100%' }}
+      />
+    </div>
+    <h2 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">Page Not Found</h2>
     <p className="mt-2 text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
     <a href="/" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Home</a>
   </div>
@@ -27,41 +45,50 @@ const NotFound = () => (
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen font-sans bg-slate-50 text-slate-900">
-        <Routes>
-          {/* Public: AI Search Home Page */}
-          <Route element={<HomeLayout />}>
-            <Route path="/" element={<Search />} />
-          </Route>
+    <ToastProvider>
+      <BrowserRouter>
+        <div className="min-h-screen font-sans bg-slate-50/50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-200">
+          <Suspense fallback={<LoadingSpinner fullPage message="Securely loading your workspace..." />}>
+            <Routes>
+              {/* Public: AI Search Home Page */}
+              <Route element={<HomeLayout />}>
+                <Route path="/" element={<Search />} />
+              </Route>
 
-          {/* Auth Routes */}
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/verify-otp" element={<Verify />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+              {/* Auth Routes */}
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/register" element={<Register />} />
+              <Route path="/auth/verify-otp" element={<Verify />} />
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
 
-          {/* Protected Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<MyProfile />} />
-              <Route path="/profile/:userId" element={<ViewProfile />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/jobs" element={<JobListing />} />
-              <Route path="/jobs/create" element={<JobCreate />} />
-              <Route path="/jobs/:jobId" element={<JobDetail />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Route>
+              {/* Protected Routes */}
+              <Route element={<PrivateRoute />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/profile" element={<MyProfile />} />
+                  <Route path="/profile/:userId" element={<ViewProfile />} />
+                  <Route path="/search" element={<Search />} />
+                  <Route path="/jobs" element={<JobListing />} />
+                  <Route path="/jobs/create" element={<JobCreate />} />
+                  <Route path="/jobs/:jobId" element={<JobDetail />} />
+                  <Route path="/jobs/:jobId/edit" element={<JobEdit />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/connections" element={<Connections />} />
+                  <Route path="/connections/requests" element={<ConnectionRequests />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/projects" element={<ProjectBoard />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
 

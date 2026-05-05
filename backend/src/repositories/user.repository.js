@@ -21,6 +21,15 @@ export const findUserByEmail = async (email) => {
 };
 
 /**
+ * Find a user by their email prefix (e.g., "yugank.2024ca116" matches "yugank.2024ca116@mnnit.ac.in").
+ * @param {string} prefix
+ * @returns {Promise<User|null>}
+ */
+export const findUserByEmailPrefix = async (prefix) => {
+  return await User.findOne({ email: { $regex: new RegExp(`^${prefix}@`, 'i') } });
+};
+
+/**
  * Find a user by their MongoDB ObjectId.
  * @param {string} id
  * @returns {Promise<User|null>}
@@ -57,6 +66,19 @@ export const updateUserById = async (id, update) => {
  */
 export const updateRefreshToken = async (id, token) => {
   return await User.findByIdAndUpdate(id, { refreshToken: token }, { returnDocument: 'after' });
+};
+
+/**
+ * Update user online status and last seen time.
+ * @param {string} id
+ * @param {boolean} isOnline
+ */
+export const updateOnlineStatus = async (id, isOnline) => {
+  const update = { isOnline };
+  if (!isOnline) {
+    update.lastSeen = Date.now();
+  }
+  return await User.findByIdAndUpdate(id, update, { returnDocument: 'after' });
 };
 
 // ─── Delete ───────────────────────────────────────────────────────────────────

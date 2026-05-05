@@ -31,20 +31,23 @@ api.interceptors.response.use(
       try {
         // Attempt to refresh the token using the HttpOnly cookie
         const res = await axios.post(`${BASE_URL}/auth/refresh`, {}, { withCredentials: true });
-        
+
         // If the backend returns a new access token, update the store
         if (res.data?.accessToken) {
           const authStore = useAuthStore.getState();
           if (authStore.user) {
             authStore.login(authStore.user, res.data.accessToken);
           }
-          
+
           // Update the original request's Authorization header
           originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
         // Refresh failed (e.g., refresh token expired)
+        window.dispatchEvent(new CustomEvent('app:toast', {
+          detail: { message: 'Session expired. Please log in again.', type: 'error' }
+        }));
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }

@@ -2,26 +2,36 @@ import { findUserById, findProfileByUserId } from '../../repositories/index.js';
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
-export const searchStudents = async (query, branch = null, year = null, top_k = 10) => {
+export const searchStudents = async (
+  query,
+  branch = null,
+  year = null,
+  top_k = 10,
+  history = []
+) => {
   let aiResponse;
   try {
     const res = await fetch(`${AI_SERVICE_URL}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, branch, year, top_k }),
+      body: JSON.stringify({ query, branch, year, top_k, history }),
     });
 
     if (!res.ok) throw new Error(`AI service error: ${res.status}`);
 
     aiResponse = await res.json();
   } catch (err) {
-    const error = new Error('AI search service is currently unavailable', { cause: err });
-    error.status = 503;
-    throw error;
+    throw Object.assign(new Error('AI search service is currently unavailable'), {
+      status: 503,
+      cause: err,
+    });
   }
 
+  // Handle the new nested AI response schema
+  const candidatesList = Array.isArray(aiResponse) ? aiResponse : aiResponse.candidates || [];
+
   const enriched = await Promise.all(
-    aiResponse.map(async (candidate) => {
+    candidatesList.map(async (candidate) => {
       try {
         const [user, profile] = await Promise.all([
           findUserById(candidate.user_id),
@@ -30,16 +40,9 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
 
         if (!user || !profile) return null;
 
-        const namePart = user.email.split('@')[0].split('.');
-        const name = namePart
-          .map((p) => p.replace(/[0-9]/g, '').trim())
-          .filter(Boolean)
-          .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-          .join(' ');
-
         return {
           userId: candidate.user_id,
-          name,
+          name: user.name,
           email: user.email,
           branch: profile.branch || candidate.metadata?.branch || null,
           year: profile.year || candidate.metadata?.year || null,
@@ -53,5 +56,11 @@ export const searchStudents = async (query, branch = null, year = null, top_k = 
     })
   );
 
-  return enriched.filter(Boolean).sort((a, b) => b.matchPercent - a.matchPercent);
+  const finalCandidates = enriched.filter(Boolean).sort((a, b) => b.matchPercent - a.matchPercent);
+
+  return {
+    candidates: finalCandidates,
+    summary: aiResponse.summary || '',
+    filters: aiResponse.filters || null,
+  };
 };
