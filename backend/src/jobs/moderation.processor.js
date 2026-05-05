@@ -77,7 +77,21 @@ export const initModerationWorker = () => {
           throw error; // Re-queue if it fails
         }
       },
-      { connection: redis }
+      {
+        connection: redis,
+
+        /**
+         * Upstash free tier = 10,000 Redis commands/day.
+         * BullMQ default drainDelay is 5ms → ~17M commands/day when idle.
+         *
+         * drainDelay: 1000  → poll every 1s when queue is empty (~86,400/day)
+         * stalledInterval   → check for stalled jobs every 60s (default: 30s)
+         * lockDuration      → job lock lasts 60s → fewer mid-job lock renewals
+         */
+        drainDelay: 1000, // ms to wait between polls when queue is empty
+        stalledInterval: 60_000, // ms between stalled-job checks
+        lockDuration: 60_000, // ms a job lock stays valid (default: 30_000)
+      }
     );
   } catch (err) {
     console.warn(
