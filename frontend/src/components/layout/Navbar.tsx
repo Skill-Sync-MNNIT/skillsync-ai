@@ -57,7 +57,7 @@ export const Navbar = () => {
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', show: true },
     { to: '/search', icon: Search, label: 'AI Search', show: true },
     { to: '/jobs', icon: Briefcase, label: 'Jobs', show: true },
-    { to: '/networking', icon: Users, label: 'Network', show: true },
+    { to: '/connections', icon: Users, label: 'Connections', show: true },
     { to: '/messages', icon: MessageSquare, label: 'Messages', show: true },
     { to: '/projects', icon: Rocket, label: 'Projects', show: user?.role === 'student' },
     { to: '/profile', icon: UserIcon, label: 'My Profile', show: true },

@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
 import { X, ShieldAlert } from 'lucide-react';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const jobSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),

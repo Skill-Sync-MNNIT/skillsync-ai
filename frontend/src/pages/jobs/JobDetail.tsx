@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, User, ArrowLeft, Send } from 'lucide-react';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { useAuthStore } from '../store/authStore';
-import { useToast } from '../context/ToastContext';
-import api from '../services/api';
-import { NoData } from '../components/ui/NoData';
-import { JobDetailSkeleton } from '../components/skeletons/JobDetailSkeleton';
-import { SkillBadge } from '../components/ui/SkillBadge';
-import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { useAuthStore } from '../../store/authStore';
+import { useToast } from '../../context/ToastContext';
+import api from '../../services/api';
+import { NoData } from '../../components/ui/NoData';
+import { JobDetailSkeleton } from '../../components/skeletons/JobDetailSkeleton';
+import { SkillBadge } from '../../components/ui/SkillBadge';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 interface Job {
   _id: string;

@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import api from '../services/api';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
-import { useToast } from '../context/ToastContext';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import { useAuthStore } from '../../store/authStore';
+import { useToast } from '../../context/ToastContext';
+import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { Users, MoreVertical, Trash2, Send, Search, Bell } from 'lucide-react';
-import { Pagination } from '../components/ui/Pagination';
-import { BottomSheet } from '../components/ui/BottomSheet';
-import { Input } from '../components/ui/Input';
-import { NetworkingSkeleton } from '../components/skeletons/NetworkingSkeleton';
-import { NoData } from '../components/ui/NoData';
-import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { Pagination } from '../../components/ui/Pagination';
+import { BottomSheet } from '../../components/ui/BottomSheet';
+import { Input } from '../../components/ui/Input';
+import { NetworkingSkeleton } from '../../components/skeletons/NetworkingSkeleton';
+import { NoData } from '../../components/ui/NoData';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
-export const Networking = () => {
+export const Connections = () => {
   const [connections, setConnections] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -105,7 +105,7 @@ export const Networking = () => {
           <Button
             variant="outline"
             className="gap-2 relative group hover:border-primary-500 hover:text-primary-600 transition-all duration-300 rounded-xl px-4 py-2 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] shadow-sm hover:shadow-primary-500/10 hover:ring-1 hover:ring-primary-500/20"
-            onClick={() => navigate('/networking/requests')}
+            onClick={() => navigate('/connections/requests')}
           >
             <Bell size={18} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-slate-500 group-hover:text-primary-600" />
             <span className="font-semibold text-slate-700 dark:text-slate-300 group-hover:text-primary-600">Invitations</span>
@@ -244,4 +244,4 @@ export const Networking = () => {
   );
 };
 
-export default Networking;
+export default Connections;

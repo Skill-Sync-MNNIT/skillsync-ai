@@ -4,11 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { Select } from '../components/ui/Select';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { Select } from '../../components/ui/Select';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
+import { Card, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { ArrowLeft, UserPlus, Clock } from 'lucide-react';
-import { Pagination } from '../components/ui/Pagination';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { Pagination } from '../../components/ui/Pagination';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
 
 export const ConnectionRequests = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -52,7 +52,7 @@ export const ConnectionRequests = () => {
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => navigate('/networking')}
+          onClick={() => navigate('/connections')}
           className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b32]"
         >
           <ArrowLeft size={20} />
@@ -68,7 +68,7 @@ export const ConnectionRequests = () => {
           <Button 
             className="mt-6" 
             variant="secondary"
-            onClick={() => navigate('/networking')}
+            onClick={() => navigate('/connections')}
           >
             Back to Network
           </Button>
