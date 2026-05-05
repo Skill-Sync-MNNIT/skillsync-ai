@@ -5,6 +5,10 @@ import { initFacultyScraperJob } from './src/jobs/facultyScraperJob.js';
 import { initJobExpiryJob } from './src/jobs/jobExpiry.js';
 import { initModerationWorker } from './src/jobs/moderation.processor.js';
 import { initSocket } from './src/services/socket.js';
+import {
+  reconcileStaleJobs,
+  registerRedisReconnectReconciliation,
+} from './src/jobs/reconcileStaleJobs.js';
 
 await connectDB();
 
@@ -16,6 +20,12 @@ const server = app.listen(PORT, () => {
   initFacultyScraperJob();
   initJobExpiryJob();
   initModerationWorker();
+
+  // Re-enqueue any jobs that got stuck as pending_moderation during Redis downtime
+  reconcileStaleJobs();
+
+  // Auto-reconcile whenever Upstash reconnects mid-session
+  registerRedisReconnectReconciliation();
 });
 
 process.on('SIGINT', () => {
