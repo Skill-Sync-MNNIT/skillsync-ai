@@ -1,23 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import api from '../services/api';
-import { useAuthStore } from '../store/authStore';
-import { useToast } from '../context/ToastContext';
+import api from '../../services/api';
+import { useAuthStore } from '../../store/authStore';
+import { useToast } from '../../context/ToastContext';
 import { MessageCirclePlus } from 'lucide-react';
-import { cn } from '../components/ui/Button';
-import { CreateGroupModal } from '../components/chat/CreateGroupModal';
-import { useSocket } from '../hooks/useSocket';
-import { EmptyState } from '../components/ui/EmptyState';
-import { ChatSkeleton } from '../components/skeletons/ChatSkeleton';
+import { cn } from '../../components/ui/Button';
+import { CreateGroupModal } from '../../components/chat/CreateGroupModal';
+import { useSocket } from '../../hooks/useSocket';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { ChatSkeleton } from '../../components/skeletons/ChatSkeleton';
 
 // ── Extracted Components ──────────────────────────────────────
-import { ChatSidebar } from '../components/chat/ChatSidebar';
-import { ChatHeader } from '../components/chat/ChatHeader';
-import { MessageBubble } from '../components/chat/MessageBubble';
-import { MessageInput } from '../components/chat/MessageInput';
-import { GroupSettingsSheet } from '../components/chat/ChatModals/GroupSettingsSheet';
-import { MembersSheet } from '../components/chat/ChatModals/MembersSheet';
-import { AddMemberSheet } from '../components/chat/ChatModals/AddMemberSheet';
+import { ChatSidebar } from '../../components/chat/ChatSidebar';
+import { ChatHeader } from '../../components/chat/ChatHeader';
+import { MessageBubble } from '../../components/chat/MessageBubble';
+import { MessageInput } from '../../components/chat/MessageInput';
+import { GroupSettingsSheet } from '../../components/chat/ChatModals/GroupSettingsSheet';
+import { MembersSheet } from '../../components/chat/ChatModals/MembersSheet';
+import { AddMemberSheet } from '../../components/chat/ChatModals/AddMemberSheet';
 
 export const Messages = () => {
   const { user } = useAuthStore();

@@ -5,12 +5,12 @@ import {
   Sparkles, History, Brain, GraduationCap,
   Calendar, Eye, ArrowRight
 } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { useAuthStore } from '../store/authStore';
-import { useChatStore, type Message } from '../store/chatStore';
+import { Button } from '../../components/ui/Button';
+import { useAuthStore } from '../../store/authStore';
+import { useChatStore, type Message } from '../../store/chatStore';
 
-import { SearchHistorySidebar } from '../components/chat/SearchHistorySidebar';
-import { BottomSheet } from '../components/ui/BottomSheet';
+import { SearchHistorySidebar } from '../../components/chat/SearchHistorySidebar';
+import { BottomSheet } from '../../components/ui/BottomSheet';
 
 // ─── Score color map ────────────────────────────────────────
 const getScoreColor = (score: number) => {

@@ -1,21 +1,21 @@
 import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import { z } from 'zod';
-import { useAuthStore } from '../store/authStore';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { useAuthStore } from '../../store/authStore';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import {
   AlertTriangle, Edit2, Loader2, CheckCircle2,
   FileText, Trash2, Save, XCircle, User, Shield,
   AtSign, Cpu, UploadCloud, X
 } from 'lucide-react';
-import { profileService } from '../services/profileService';
-import api from '../services/api';
-import type { StudentProfileData } from '../services/profileService';
-import { useToast } from '../context/ToastContext';
-import { useProfilePolling } from '../hooks/useProfilePolling';
-import { ProfileSkeleton } from '../components/skeletons/ProfileSkeleton';
-import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { profileService } from '../../services/profileService';
+import api from '../../services/api';
+import type { StudentProfileData } from '../../services/profileService';
+import { useToast } from '../../context/ToastContext';
+import { useProfilePolling } from '../../hooks/useProfilePolling';
+import { ProfileSkeleton } from '../../components/skeletons/ProfileSkeleton';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 // ─── Read-only display field ────────────────────────────────
 const ReadField = ({

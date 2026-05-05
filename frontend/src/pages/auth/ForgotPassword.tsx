@@ -4,10 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { KeyRound, Mail, ShieldCheck, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 // ─── Step 1: Email schema ───────────────────────────────────────────────
 const emailSchema = z.object({

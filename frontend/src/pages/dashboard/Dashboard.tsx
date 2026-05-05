@@ -1,14 +1,14 @@
-import { useAuthStore } from '../store/authStore';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { useAuthStore } from '../../store/authStore';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import {
   Briefcase, Bell, Users, ArrowUpRight,
   Flame, BarChart3, Lightbulb,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
-import { DashboardSkeleton } from '../components/skeletons/DashboardSkeleton';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
+import { DashboardSkeleton } from '../../components/skeletons/DashboardSkeleton';
 
 // ─── Helpers ────────────────────────────────────────────────
 const getGreeting = (): string => {

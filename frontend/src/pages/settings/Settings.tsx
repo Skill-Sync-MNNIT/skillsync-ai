@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { SkillBadge } from '../components/ui/SkillBadge';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { SkillBadge } from '../../components/ui/SkillBadge';
 import { ShieldAlert, Sliders, Save, Sparkles } from 'lucide-react';
-import { useAuthStore } from '../store/authStore';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
+import { useAuthStore } from '../../store/authStore';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 export const Settings = () => {
   const { user } = useAuthStore();

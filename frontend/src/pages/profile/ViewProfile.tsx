@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
+import { Button } from '../../components/ui/Button';
 import { Download, Eye, Cpu, UserPlus, Mail, BookOpen, GitBranch, Calendar, Award, Code2, FileText, Star, ArrowLeft } from 'lucide-react';
-import api from '../services/api';
-import { ViewProfileSkeleton } from '../components/skeletons/ViewProfileSkeleton';
-import { SkillBadge } from '../components/ui/SkillBadge';
-import { useToast } from '../context/ToastContext';
-import { NoData } from '../components/ui/NoData';
+import api from '../../services/api';
+import { ViewProfileSkeleton } from '../../components/skeletons/ViewProfileSkeleton';
+import { SkillBadge } from '../../components/ui/SkillBadge';
+import { useToast } from '../../context/ToastContext';
+import { NoData } from '../../components/ui/NoData';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 
 
 interface StudentProfile {

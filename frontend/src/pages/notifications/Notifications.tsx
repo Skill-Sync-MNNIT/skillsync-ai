@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Info, Briefcase, Trash2, X, CheckCheck } from 'lucide-react';
-import { Card, CardContent } from '../components/ui/Card';
-import { useAuthStore } from '../store/authStore';
-import api from '../services/api';
-import { NotificationsSkeleton } from '../components/skeletons/NotificationsSkeleton';
-import { NoData } from '../components/ui/NoData';
-import { useToast } from '../context/ToastContext';
-import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { Card, CardContent } from '../../components/ui/Card';
+import { useAuthStore } from '../../store/authStore';
+import api from '../../services/api';
+import { NotificationsSkeleton } from '../../components/skeletons/NotificationsSkeleton';
+import { NoData } from '../../components/ui/NoData';
+import { useToast } from '../../context/ToastContext';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 interface Notification {
   _id: string;

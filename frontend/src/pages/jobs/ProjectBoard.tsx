@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import api from '../services/api';
-import { useAuthStore } from '../store/authStore';
-import { useToast } from '../context/ToastContext';
-import { Button } from '../components/ui/Button';
+import api from '../../services/api';
+import { useAuthStore } from '../../store/authStore';
+import { useToast } from '../../context/ToastContext';
+import { Button } from '../../components/ui/Button';
 import { Plus, AlertCircle, UserPlus, Search } from 'lucide-react';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { Pagination } from '../components/ui/Pagination';
-import { NoData } from '../components/ui/NoData';
-import { ListingCard } from '../components/ui/ListingCard';
-import { ProjectFormModal } from '../components/projects/ProjectFormModal';
-import { ProjectDetailsModal } from '../components/projects/ProjectDetailsModal';
-import { usePagination } from '../hooks/usePagination';
-import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
+import { Pagination } from '../../components/ui/Pagination';
+import { NoData } from '../../components/ui/NoData';
+import { ListingCard } from '../../components/ui/ListingCard';
+import { ProjectFormModal } from '../../components/projects/ProjectFormModal';
+import { ProjectDetailsModal } from '../../components/projects/ProjectDetailsModal';
+import { usePagination } from '../../hooks/usePagination';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export const ProjectBoard = () => {
   const { user } = useAuthStore();

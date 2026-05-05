@@ -4,10 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { ShieldCheck } from 'lucide-react';
-import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const verifySchema = z.object({
   otp: z.string().length(6, 'OTP must be exactly 6 digits'),

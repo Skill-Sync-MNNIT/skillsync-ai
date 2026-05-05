@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { useAuthStore } from '../store/authStore';
-import api from '../services/api';
-import { useToast } from '../context/ToastContext';
-import { Pagination } from '../components/ui/Pagination';
-import { NoData } from '../components/ui/NoData';
-import { ListingCard } from '../components/ui/ListingCard';
-import { usePagination } from '../hooks/usePagination';
-import { JobListingSkeleton } from '../components/skeletons/JobListingSkeleton';
+import { Button } from '../../components/ui/Button';
+import { useAuthStore } from '../../store/authStore';
+import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
+import { Pagination } from '../../components/ui/Pagination';
+import { NoData } from '../../components/ui/NoData';
+import { ListingCard } from '../../components/ui/ListingCard';
+import { usePagination } from '../../hooks/usePagination';
+import { JobListingSkeleton } from '../../components/skeletons/JobListingSkeleton';
 
 interface Job {
   _id: string;
