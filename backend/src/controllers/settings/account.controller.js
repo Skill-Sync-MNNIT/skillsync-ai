@@ -4,6 +4,8 @@ import JobPosting from '../../models/JobPosting.js';
 import JobApplication from '../../models/JobApplication.js';
 import Notification from '../../models/Notification.js';
 import DownloadLog from '../../models/DownloadLog.js';
+import Project from '../../models/Project.js';
+import Connection from '../../models/Connection.js';
 import cloudinary from '../../config/cloudinary.js';
 import { updateEmbeddingStatus } from '../../repositories/index.js';
 
@@ -84,6 +86,18 @@ export const deleteAccount = async (req, res, next) => {
     await Notification.deleteMany({ userId });
     await DownloadLog.deleteMany({
       $or: [{ downloaderId: userId }, { resumeOwnerId: userId }],
+    });
+
+    // Delete all projects the user owns (they cannot be shown without an owner)
+    await Project.deleteMany({ owner: userId });
+
+    // Remove the user from the participants list of any project they had joined
+    await Project.updateMany({ participants: userId }, { $pull: { participants: userId } });
+
+    // Remove all connection records involving this user (both sent and received)
+    // This removes them from every other student's connection list
+    await Connection.deleteMany({
+      $or: [{ requester: userId }, { recipient: userId }],
     });
 
     //Finally, delete the User record

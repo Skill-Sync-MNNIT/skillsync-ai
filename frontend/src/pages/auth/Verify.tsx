@@ -8,6 +8,7 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { useAuthStore } from '../../store/authStore';
 
 const verifySchema = z.object({
   otp: z.string().length(6, 'OTP must be exactly 6 digits'),
@@ -17,6 +18,7 @@ type VerifyForm = z.infer<typeof verifySchema>;
 
 export const Verify = () => {
   const { toast } = useToast();
+  const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   
   const location = useLocation();
@@ -46,11 +48,14 @@ export const Verify = () => {
   try {
     const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
 
-    toast(response.data.message || 'Email verified. Registration successful!', 'success');
-    navigate('/auth/login', { replace: true });
+    // Auto-login: store the user and token in auth state
+    login(response.data.user, response.data.token);
+
+    toast(response.data.message || 'Email verified! Welcome to SkillSync', 'success');
+    navigate('/dashboard', { replace: true });
 
   } catch (error: any) {
-    const errorMsg = error.response?.data?.error || 'Invalid or expired OTP. Please try again.';
+    const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Invalid or expired OTP. Please try again.';
     toast(errorMsg, 'error');
   } finally {
     setIsLoading(false);
