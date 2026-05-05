@@ -6,8 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import {
   AlertTriangle, Edit2, Loader2, CheckCircle2,
-  FileText, Trash2, Save, XCircle, User, Shield,
-  AtSign, Cpu, UploadCloud, X
+  FileText, Trash2, Save, XCircle, User, Shield, Cpu, UploadCloud
 } from 'lucide-react';
 import { profileService } from '../../services/profileService';
 import api from '../../services/api';
@@ -16,22 +15,20 @@ import { useToast } from '../../context/ToastContext';
 import { useProfilePolling } from '../../hooks/useProfilePolling';
 import { ProfileSkeleton } from '../../components/skeletons/ProfileSkeleton';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { SkillBadge } from '../../components/ui/SkillBadge';
 
 // ─── Read-only display field ────────────────────────────────
 const ReadField = ({
   label,
   value,
-  icon: Icon,
 }: {
   label: string;
   value: string;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
 }) => (
-  <div>
+  <div className="min-w-0">
     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</p>
-    <div className="flex items-center gap-2 bg-slate-50 dark:bg-[#40414f] px-4 py-2.5 rounded-xl border border-slate-100 dark:border-[#383942]">
-      {Icon && <Icon size={14} className="text-slate-400 shrink-0" />}
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{value || '—'}</span>
+    <div className="flex items-center bg-slate-50 dark:bg-[#40414f] px-4 py-2.5 rounded-xl border border-slate-100 dark:border-[#383942] min-w-0">
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate w-full block">{value || '—'}</span>
     </div>
   </div>
 );
@@ -227,10 +224,13 @@ export const MyProfile = () => {
     if (!selectedFile) return;
     setIsUploading(true);
     try {
-      await profileService.uploadResume(selectedFile);
+      const updatedData = await profileService.uploadResume(selectedFile);
       toast('Resume uploaded! AI indexing started.', 'success');
       setSelectedFile(null);
-      if (user) loadProfile(user._id);
+      setProfileData(updatedData);
+      if (user && (updatedData.embeddingStatus === 'pending' || updatedData.embeddingStatus === 'processing')) {
+        startPoll(user._id);
+      }
     } catch (err: any) {
       toast(err.response?.data?.message || 'Upload failed.', 'error');
     } finally {
@@ -239,11 +239,39 @@ export const MyProfile = () => {
   };
 
   // ─── Skill handlers ──────────────────────────────────────
+  const processSkills = (inputStr: string) => {
+    const parsedSkills = inputStr
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    const uniqueNewSkills = parsedSkills.filter(s => !skills.includes(s));
+    const finalSkillsToAdd = [...new Set(uniqueNewSkills)];
+
+    if (finalSkillsToAdd.length > 0) {
+      setSkills(prev => {
+        const toAdd = finalSkillsToAdd.filter(s => !prev.includes(s));
+        return [...prev, ...toAdd];
+      });
+    }
+
+    setNewSkill('');
+    setErrors(prev => ({ ...prev, skills: '' }));
+  };
+
   const addSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newSkill.trim()) {
       e.preventDefault();
-      if (!skills.includes(newSkill.trim())) setSkills([...skills, newSkill.trim()]);
-      setNewSkill('');
+      processSkills(newSkill);
+    }
+  };
+
+  const handleSkillChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val.includes(',')) {
+      processSkills(val);
+    } else {
+      setNewSkill(val);
     }
   };
   const removeSkill = (s: string) => setSkills(skills.filter((x) => x !== s));
@@ -310,38 +338,43 @@ export const MyProfile = () => {
   };
 
   const selectClass = (hasError: boolean) =>
-    `flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
-      hasError
-        ? 'border-red-400 focus:ring-red-500/40'
-        : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
+    `flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${hasError
+      ? 'border-red-400 focus:ring-red-500/40'
+      : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
     }`;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pt-0 pb-12 px-4 sm:px-0">
 
       {/* ── Page header ─────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-[#383942] pb-5 mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-[#383942] pb-5 mb-2">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center shrink-0">
             <User size={20} className="text-primary-600" />
           </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
             My Profile
           </h1>
         </div>
-        <div className="flex items-center gap-2 shrink-0 pt-1">
+        <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
           {isEditing ? (
             <>
-              <Button size="sm" onClick={handleSave} isLoading={isSaving}>
+              <Button size="sm" onClick={handleSave} isLoading={isSaving} className="flex-1 sm:flex-none">
                 <Save size={14} className="mr-1.5" /> Save
               </Button>
-              <Button size="sm" variant="outline" onClick={cancelEdit} disabled={isSaving}>
+              <Button size="sm" variant="outline" onClick={cancelEdit} disabled={isSaving} className="flex-1 sm:flex-none">
                 <XCircle size={14} className="mr-1.5" /> Cancel
               </Button>
             </>
           ) : (
-            <Button size="sm" variant="outline" onClick={() => { setIsEditing(true); }}>
-              <Edit2 size={14} className="mr-1.5" /> Edit Profile
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => { setIsEditing(true); }}
+              className="gap-1.5 w-full sm:w-auto justify-center relative group hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 rounded-full px-5 py-2 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] shadow-sm hover:shadow-primary-500/20 font-semibold text-slate-700 dark:text-slate-200"
+            >
+              <Edit2 size={14} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-primary-500 dark:text-primary-400" />
+              <span className="group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">Edit Profile</span>
             </Button>
           )}
         </div>
@@ -376,11 +409,11 @@ export const MyProfile = () => {
                 />
               </div>
             ) : (
-              <ReadField label="Full Name" value={displayName} icon={User} />
+              <ReadField label="Full Name" value={displayName} />
             )}
-            <ReadField label="Email Address" value={user.email} icon={AtSign} />
-            <ReadField label="Role" value={user.role.charAt(0).toUpperCase() + user.role.slice(1)} icon={Shield} />
-            <ReadField label="Account Status" value={user.isVerified ? '✓ Verified' : 'Not verified'} icon={CheckCircle2} />
+            <ReadField label="Email Address" value={user.email} />
+            <ReadField label="Role" value={user.role.charAt(0).toUpperCase() + user.role.slice(1)} />
+            <ReadField label="Account Status" value={user.isVerified ? '✓ Verified' : 'Not verified'} />
           </div>
         </CardContent>
       </Card>
@@ -492,16 +525,18 @@ export const MyProfile = () => {
       {isStudent && (
         <Card className="animate-fade-in-up overflow-hidden" style={{ animationDelay: '180ms' }}>
           <CardHeader className="border-b border-slate-100 dark:border-[#383942]">
-            <div className="flex items-center justify-between">
-              <SectionHeader
-                icon={Cpu}
-                iconBg="bg-primary-50 dark:bg-primary-900/20"
-                iconColor="text-primary-600"
-                title="Skills"
-                subtitle="Powers your AI-search ranking"
-              />
+            <div className="flex items-start sm:items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <SectionHeader
+                  icon={Cpu}
+                  iconBg="bg-primary-50 dark:bg-primary-900/20"
+                  iconColor="text-primary-600"
+                  title="Skills"
+                  subtitle="Highlight your technical strengths and expertise"
+                />
+              </div>
               {skills.length > 0 && (
-                <span className="text-xs font-semibold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-2.5 py-1 rounded-full border border-primary-100 dark:border-primary-800">
+                <span className="shrink-0 whitespace-nowrap mt-1 sm:mt-0 text-xs font-semibold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-2.5 py-1 rounded-full border border-primary-100 dark:border-primary-800">
                   {skills.length} skill{skills.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -519,9 +554,9 @@ export const MyProfile = () => {
                 <div className="pt-2">
                   <Input
                     label="Add a skill"
-                    placeholder="Type a skill and press Enter (e.g. PyTorch)"
+                    placeholder="e.g. React, Python, MongoDB (comma-separated)"
                     value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
+                    onChange={handleSkillChange}
                     onKeyDown={(e) => {
                       addSkill(e);
                       if (e.key === 'Enter' && errors.skills) setErrors(prev => ({ ...prev, skills: '' }));
@@ -533,25 +568,12 @@ export const MyProfile = () => {
 
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span
+                  <SkillBadge
                     key={skill}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
-                      isEditing
-                        ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800 hover:bg-primary-100'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {skill}
-                    {isEditing && (
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(skill)}
-                        className="h-4 w-4 rounded-full flex items-center justify-center text-primary-400 hover:text-white hover:bg-primary-500 transition-all"
-                      >
-                        <X size={11} />
-                      </button>
-                    )}
-                  </span>
+                    label={skill}
+                    variant={isEditing ? 'removable' : 'default'}
+                    onRemove={isEditing ? () => removeSkill(skill) : undefined}
+                  />
                 ))}
               </div>
             </div>
@@ -606,20 +628,18 @@ export const MyProfile = () => {
                   {isEditing && (
                     <>
                       <div
-                        className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${
-                          isDragging
+                        className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
                             ? 'border-primary-400 bg-primary-50/50'
                             : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                        }`}
+                          }`}
                         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={(e) => { handleDrop(e); setErrors(prev => ({ ...prev, hasResume: '' })); }}
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <UploadCloud
-                          className={`mx-auto h-7 w-7 mb-2 ${
-                            isDragging ? 'text-primary-500' : 'text-slate-400'
-                          }`}
+                          className={`mx-auto h-7 w-7 mb-2 ${isDragging ? 'text-primary-500' : 'text-slate-400'
+                            }`}
                         />
                         <p className="text-sm font-medium text-slate-700">
                           {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
@@ -638,22 +658,22 @@ export const MyProfile = () => {
                       )}
 
                       {selectedFile && (
-                        <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in mt-4">
-                          <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-white border border-slate-200 rounded-lg animate-fade-in mt-4 gap-3">
+                          <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto">
                             <FileText size={15} className="text-primary-500 shrink-0" />
                             <span className="text-sm font-medium text-slate-700 truncate">
                               {selectedFile.name}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Button size="sm" variant="outline" onClick={() => setSelectedFile(null)}>
+                          <div className="flex items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0">
+                            <Button size="sm" variant="outline" onClick={() => setSelectedFile(null)} className="flex-1 sm:flex-none">
                               Cancel
                             </Button>
                             <Button
                               size="sm"
                               isLoading={isUploading}
                               onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                              className="shrink-0"
+                              className="flex-1 sm:flex-none"
                             >
                               Upload
                             </Button>
@@ -704,7 +724,7 @@ export const MyProfile = () => {
                 className="w-full sm:w-auto"
               >
                 <Trash2 size={14} className="mr-2" />
-                Delete Account Permanently
+                Delete Permanently
               </Button>
             </div>
             <p className="text-[10px] text-slate-400 mt-4 leading-tight italic">
