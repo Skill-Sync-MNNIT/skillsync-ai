@@ -1,30 +1,30 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
-import PrivateRoute from './components/PrivateRoute';
+import PrivateRoute from './components/layout/PrivateRoute';
 import { ToastProvider } from './context/ToastContext';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
-const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
-const Register = lazy(() => import('./pages/Register').then(m => ({ default: m.Register })));
-const Verify = lazy(() => import('./pages/Verify').then(m => ({ default: m.Verify })));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const Login = lazy(() => import('./pages/auth/Login').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/auth/Register').then(m => ({ default: m.Register })));
+const Verify = lazy(() => import('./pages/auth/Verify').then(m => ({ default: m.Verify })));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
 const HomeLayout = lazy(() => import('./layouts/HomeLayout').then(m => ({ default: m.HomeLayout })));
 const DashboardLayout = lazy(() => import('./layouts/DashboardLayout').then(m => ({ default: m.DashboardLayout })));
-const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
-const MyProfile = lazy(() => import('./pages/MyProfile').then(m => ({ default: m.MyProfile })));
-const ViewProfile = lazy(() => import('./pages/ViewProfile').then(m => ({ default: m.ViewProfile })));
-const Search = lazy(() => import('./pages/Search').then(m => ({ default: m.Search })));
-const JobListing = lazy(() => import('./pages/JobListing').then(m => ({ default: m.JobListing })));
-const JobCreate = lazy(() => import('./pages/JobCreate').then(m => ({ default: m.JobCreate })));
-const JobDetail = lazy(() => import('./pages/JobDetail').then(m => ({ default: m.JobDetail })));
-const JobEdit = lazy(() => import('./pages/JobEdit').then(m => ({ default: m.JobEdit })));
-const Notifications = lazy(() => import('./pages/Notifications').then(m => ({ default: m.Notifications })));
-const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
-const Networking = lazy(() => import('./pages/Networking').then(m => ({ default: m.Networking })));
-const ConnectionRequests = lazy(() => import('./pages/ConnectionRequests').then(m => ({ default: m.ConnectionRequests })));
-const Messages = lazy(() => import('./pages/Messages').then(m => ({ default: m.Messages })));
-const ProjectBoard = lazy(() => import('./pages/ProjectBoard').then(m => ({ default: m.ProjectBoard })));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
+const MyProfile = lazy(() => import('./pages/profile/MyProfile').then(m => ({ default: m.MyProfile })));
+const ViewProfile = lazy(() => import('./pages/profile/ViewProfile').then(m => ({ default: m.ViewProfile })));
+const Search = lazy(() => import('./pages/search/Search').then(m => ({ default: m.Search })));
+const JobListing = lazy(() => import('./pages/jobs/JobListing').then(m => ({ default: m.JobListing })));
+const JobCreate = lazy(() => import('./pages/jobs/JobCreate').then(m => ({ default: m.JobCreate })));
+const JobDetail = lazy(() => import('./pages/jobs/JobDetail').then(m => ({ default: m.JobDetail })));
+const JobEdit = lazy(() => import('./pages/jobs/JobEdit').then(m => ({ default: m.JobEdit })));
+const Notifications = lazy(() => import('./pages/notifications/Notifications').then(m => ({ default: m.Notifications })));
+const Settings = lazy(() => import('./pages/settings/Settings').then(m => ({ default: m.Settings })));
+const Connections = lazy(() => import('./pages/Connections/Connections').then(m => ({ default: m.Connections })));
+const ConnectionRequests = lazy(() => import('./pages/Connections/ConnectionRequests').then(m => ({ default: m.ConnectionRequests })));
+const Messages = lazy(() => import('./pages/chat/Messages').then(m => ({ default: m.Messages })));
+const ProjectBoard = lazy(() => import('./pages/jobs/ProjectBoard').then(m => ({ default: m.ProjectBoard })));
 
 
 const NotFound = () => (
@@ -74,8 +74,8 @@ function App() {
                   <Route path="/jobs/:jobId/edit" element={<JobEdit />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="/networking" element={<Networking />} />
-                  <Route path="/networking/requests" element={<ConnectionRequests />} />
+                  <Route path="/connections" element={<Connections />} />
+                  <Route path="/connections/requests" element={<ConnectionRequests />} />
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/projects" element={<ProjectBoard />} />
                   <Route path="*" element={<NotFound />} />

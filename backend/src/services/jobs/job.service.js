@@ -1,9 +1,6 @@
-import { Queue } from 'bullmq';
 import JobPosting from '../../models/JobPosting.js';
 import JobApplication from '../../models/JobApplication.js';
-import redis from '../../config/redis.js';
-
-const moderationQueue = new Queue('moderation-queue', { connection: redis });
+import { moderationQueue } from '../../config/queue.js';
 
 export class JobService {
   /**
@@ -36,12 +33,25 @@ export class JobService {
       status: 'pending_moderation',
     });
 
-    // Enqueue for AI moderation
-    await moderationQueue.add('moderate-job', {
-      jobId: job._id,
-      title: job.title,
-      description: job.description,
-    });
+    // Enqueue for AI moderation (skipped gracefully if Redis is unavailable)
+    if (moderationQueue) {
+      try {
+        await moderationQueue.add('moderate-job', {
+          jobId: job._id,
+          title: job.title,
+          description: job.description,
+        });
+      } catch (queueErr) {
+        console.warn(
+          `[JobService] Could not enqueue job ${job._id} for moderation:`,
+          queueErr.message
+        );
+      }
+    } else {
+      console.warn(
+        `[JobService] Moderation queue unavailable — job ${job._id} saved as pending_moderation but not queued.`
+      );
+    }
 
     return job;
   }
