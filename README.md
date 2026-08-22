@@ -103,22 +103,45 @@ cp .env.example .env
 # Fill in all values in .env (see Environment Variables section below)
 ```
 
-### 3. Start infrastructure (MongoDB + AI Service)
+### 3. Start full stack via Docker (Recommended)
 
 ```bash
-docker-compose up -d
+# This starts MongoDB, Redis, AI Service, Backend, and Frontend
+docker compose up -d
+
+# Services will be available at:
+# - Frontend: http://localhost:5173
+# - Backend API: http://localhost:5000
+# - AI Service API: http://localhost:8000
 ```
 
-### 4. Start Node.js backend
+### 4. Running Tests
+
+**Backend Tests:**
+```bash
+npm ci
+npm test
+```
+
+**AI Service Tests:**
+```bash
+cd ai-service
+pip install -r requirements.txt pytest
+pytest tests -v
+```
+
+**Frontend Tests:**
+*(Coming soon!)*
+
+### 5. Start Node.js backend (Manual Local Dev)
 
 ```bash
-cd backend
 npm install
 npm run dev
 # Runs on http://localhost:5000
 ```
 
-### 5. Start Python AI service (without Docker)
+### 6. Start Python AI service (Manual Local Dev)
 
 ```bash
 cd ai-service
@@ -129,7 +152,7 @@ uvicorn main:app --reload --port 8000
 # Runs on http://localhost:8000
 ```
 
-### 6. Start React frontend
+### 7. Start React frontend (Manual Local Dev)
 
 ```bash
 cd frontend
