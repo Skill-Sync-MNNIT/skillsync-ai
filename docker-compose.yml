@@ -37,5 +37,37 @@ services:
       - mongodb
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
+  redis:
+    image: redis:7
+    container_name: skillsync-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: skillsync-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+      - redis
+      - ai-service
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skillsync-frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env
+    depends_on:
+      - backend
+
 volumes:
   mongo_data:
