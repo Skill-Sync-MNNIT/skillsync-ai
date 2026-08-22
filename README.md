@@ -107,7 +107,7 @@ cp .env.example .env
 
 ```bash
 # This starts MongoDB, Redis, AI Service, Backend, and Frontend
-docker-compose up -d
+docker compose up -d
 
 # Services will be available at:
 # - Frontend: http://localhost:5173
