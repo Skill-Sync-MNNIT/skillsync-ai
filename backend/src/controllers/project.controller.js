@@ -33,7 +33,11 @@ export const getAllProjects = async (req, res, next) => {
     }
 
     const projects = await projectRepo.findProjects();
-    res.json(projects);
+
+    // Hide orphaned projects whose owner was deleted — they should not be publicly visible
+    const validProjects = projects.filter((p) => p.owner != null);
+
+    res.json(validProjects);
   } catch (err) {
     next(err);
   }
