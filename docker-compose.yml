@@ -40,8 +40,8 @@ services:
   redis:
     image: redis:7
     container_name: skillsync-redis
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379" # Commented out to prevent conflict with local host redis
 
   backend:
     build:
