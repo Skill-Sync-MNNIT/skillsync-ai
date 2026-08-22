@@ -22,7 +22,7 @@ class RankingService:
         )
         self.repo = PineconeRepository()
         self.llm = ChatGroq(
-            model="llama-3.1-8b-instant",
+            model=settings.llm_model_fast,
             api_key=settings.groq_api_key,
             temperature=0.0,
             model_kwargs={"response_format": {"type": "json_object"}}
