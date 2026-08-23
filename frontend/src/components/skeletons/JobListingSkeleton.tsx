@@ -35,7 +35,11 @@ export const JobListingSkeleton = () => (
           {/* Skills */}
           <div className="flex flex-wrap gap-1.5">
             {[60, 80, 70].map((w, j) => (
-              <div key={j} className="h-7 bg-slate-100 dark:bg-[#40414f] rounded-lg" style={{ width: w }} />
+              <div
+                key={j}
+                className="h-7 bg-slate-100 dark:bg-[#40414f] rounded-lg"
+                style={{ width: w }}
+              />
             ))}
           </div>
 

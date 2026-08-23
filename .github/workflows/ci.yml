@@ -23,8 +23,11 @@ jobs:
       - name: Install Frontend Dependencies
         working-directory: ./frontend
         run: npm ci
-      - name: Lint Backend and Frontend
-        run: npx eslint backend frontend --max-warnings=0
+      - name: Lint Backend
+        run: npx eslint backend
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: npm run lint
       - name: Check Prettier
         run: npx prettier --check .
 

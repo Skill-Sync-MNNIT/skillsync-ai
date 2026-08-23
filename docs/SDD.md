@@ -48,15 +48,15 @@ This document covers:
 
 ### 1.3 Definitions
 
-| Term | Definition |
-|------|-----------|
-| ANN | Approximate Nearest Neighbor – fast vector similarity search |
-| JWT | JSON Web Token – stateless authentication token |
-| RAG | Retrieval-Augmented Generation – AI pattern combining vector search + LLM |
-| Vector Embedding | High-dimensional float array representing semantic meaning of text |
-| Cosine Similarity | Similarity metric between two vectors (range: -1 to 1) |
-| Soft Delete | Marking a record inactive (`isActive: false`) without physical deletion |
-| OTP | One-Time Password used for professor email verification |
+| Term              | Definition                                                                |
+| ----------------- | ------------------------------------------------------------------------- |
+| ANN               | Approximate Nearest Neighbor – fast vector similarity search              |
+| JWT               | JSON Web Token – stateless authentication token                           |
+| RAG               | Retrieval-Augmented Generation – AI pattern combining vector search + LLM |
+| Vector Embedding  | High-dimensional float array representing semantic meaning of text        |
+| Cosine Similarity | Similarity metric between two vectors (range: -1 to 1)                    |
+| Soft Delete       | Marking a record inactive (`isActive: false`) without physical deletion   |
+| OTP               | One-Time Password used for professor email verification                   |
 
 ---
 
@@ -922,9 +922,7 @@ All API errors follow a consistent envelope:
   "error": {
     "code": "VALIDATION_ERROR",
     "message": "email field is required",
-    "details": [
-      { "field": "email", "issue": "required" }
-    ]
+    "details": [{ "field": "email", "issue": "required" }]
   },
   "requestId": "req_abc123",
   "timestamp": "2024-03-01T10:00:00Z"
@@ -933,19 +931,19 @@ All API errors follow a consistent envelope:
 
 ### 11.2 Error Code Reference
 
-| HTTP Code | Error Code | Scenario |
-|-----------|-----------|---------|
-| 400 | `VALIDATION_ERROR` | Invalid request body or params |
-| 401 | `UNAUTHENTICATED` | Missing or expired JWT |
-| 403 | `FORBIDDEN` | Role not authorized for action |
-| 403 | `ACCOUNT_BANNED` | User account is banned |
-| 403 | `ACCOUNT_INACTIVE` | Soft-deleted or unverified account |
-| 404 | `NOT_FOUND` | Resource does not exist |
-| 409 | `CONFLICT` | Duplicate email on register |
-| 422 | `UNPROCESSABLE` | PDF parsing failed |
-| 429 | `RATE_LIMITED` | Too many requests |
-| 500 | `INTERNAL_ERROR` | Unhandled server error |
-| 503 | `SERVICE_UNAVAILABLE` | External API (LLM/Embed) down |
+| HTTP Code | Error Code            | Scenario                           |
+| --------- | --------------------- | ---------------------------------- |
+| 400       | `VALIDATION_ERROR`    | Invalid request body or params     |
+| 401       | `UNAUTHENTICATED`     | Missing or expired JWT             |
+| 403       | `FORBIDDEN`           | Role not authorized for action     |
+| 403       | `ACCOUNT_BANNED`      | User account is banned             |
+| 403       | `ACCOUNT_INACTIVE`    | Soft-deleted or unverified account |
+| 404       | `NOT_FOUND`           | Resource does not exist            |
+| 409       | `CONFLICT`            | Duplicate email on register        |
+| 422       | `UNPROCESSABLE`       | PDF parsing failed                 |
+| 429       | `RATE_LIMITED`        | Too many requests                  |
+| 500       | `INTERNAL_ERROR`      | Unhandled server error             |
+| 503       | `SERVICE_UNAVAILABLE` | External API (LLM/Embed) down      |
 
 ### 11.3 Logging Strategy
 
@@ -969,13 +967,13 @@ flowchart LR
 
 ### 12.1 Performance Targets
 
-| Operation | Target Latency | Strategy |
-|-----------|---------------|---------|
-| AI Search (end-to-end) | < 2 seconds | Parallel ANN + LLM batch |
-| Resume Upload | < 5 seconds | Async embedding queue |
-| Job Posting | < 1 second | Async moderation queue |
-| Profile Fetch | < 300ms | MongoDB index + Redis cache |
-| Notification Fetch | < 300ms | Compound index on userId + isRead |
+| Operation              | Target Latency | Strategy                          |
+| ---------------------- | -------------- | --------------------------------- |
+| AI Search (end-to-end) | < 2 seconds    | Parallel ANN + LLM batch          |
+| Resume Upload          | < 5 seconds    | Async embedding queue             |
+| Job Posting            | < 1 second     | Async moderation queue            |
+| Profile Fetch          | < 300ms        | MongoDB index + Redis cache       |
+| Notification Fetch     | < 300ms        | Compound index on userId + isRead |
 
 ### 12.2 Scalability Design
 
@@ -1007,15 +1005,15 @@ flowchart TD
 
 ### 12.3 Caching Strategy
 
-| Cache Layer | What is Cached | TTL | Invalidation |
-|-------------|---------------|-----|-------------|
-| Redis | Query embedding vectors | 5 min | None (TTL-based) |
-| Redis | Trending skills result | 1 hour | On new job post |
-| Redis | User session metadata | JWT lifetime (15 min) | On logout/ban |
-| MongoDB | Student profile (read-heavy) | CDN/App level | On profile update |
+| Cache Layer | What is Cached               | TTL                   | Invalidation      |
+| ----------- | ---------------------------- | --------------------- | ----------------- |
+| Redis       | Query embedding vectors      | 5 min                 | None (TTL-based)  |
+| Redis       | Trending skills result       | 1 hour                | On new job post   |
+| Redis       | User session metadata        | JWT lifetime (15 min) | On logout/ban     |
+| MongoDB     | Student profile (read-heavy) | CDN/App level         | On profile update |
 
 ---
 
-*End of Software Design Document*
+_End of Software Design Document_
 
-*Next: Implementation follows the module order: Auth → Profile & Resume → Embedding → Search → Jobs → Moderation → Notifications → Analytics*
+_Next: Implementation follows the module order: Auth → Profile & Resume → Embedding → Search → Jobs → Moderation → Notifications → Analytics_

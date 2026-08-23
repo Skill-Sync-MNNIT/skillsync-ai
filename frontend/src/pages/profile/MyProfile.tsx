@@ -5,8 +5,18 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import {
-  AlertTriangle, Edit2, Loader2, CheckCircle2,
-  FileText, Trash2, Save, XCircle, User, Shield, Cpu, UploadCloud
+  AlertTriangle,
+  Edit2,
+  Loader2,
+  CheckCircle2,
+  FileText,
+  Trash2,
+  Save,
+  XCircle,
+  User,
+  Shield,
+  Cpu,
+  UploadCloud,
 } from 'lucide-react';
 import { profileService } from '../../services/profileService';
 import api from '../../services/api';
@@ -18,17 +28,13 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { SkillBadge } from '../../components/ui/SkillBadge';
 
 // ─── Read-only display field ────────────────────────────────
-const ReadField = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) => (
+const ReadField = ({ label, value }: { label: string; value: string }) => (
   <div className="min-w-0">
     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</p>
     <div className="flex items-center bg-slate-50 dark:bg-[#40414f] px-4 py-2.5 rounded-xl border border-slate-100 dark:border-[#383942] min-w-0">
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate w-full block">{value || '—'}</span>
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate w-full block">
+        {value || '—'}
+      </span>
     </div>
   </div>
 );
@@ -97,9 +103,7 @@ export const MyProfile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Embedding poll — via extracted hook
-  const { startPoll, stopPoll } = useProfilePolling(
-    (data) => setProfileData(data)
-  );
+  const { startPoll, stopPoll } = useProfilePolling((data) => setProfileData(data));
 
   useEffect(() => {
     if (!user) return;
@@ -123,7 +127,10 @@ export const MyProfile = () => {
       const data = await profileService.fetchProfile(userId);
       setProfileData(data);
       syncEditFields(data);
-      const inProgress = !!(data.resumeStorageKey && (data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing'));
+      const inProgress = !!(
+        data.resumeStorageKey &&
+        (data.embeddingStatus === 'pending' || data.embeddingStatus === 'processing')
+      );
       inProgress ? startPoll(userId) : stopPoll();
     } catch {
       // Profile document may not exist yet for new users
@@ -134,37 +141,56 @@ export const MyProfile = () => {
 
   // ─── Validation Schemas ──────────────────────────────────
   const baseSchema = z.object({
-    name: z.string().trim().min(1, 'Name is required.').max(80, 'Name must be 80 characters or fewer.'),
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Name is required.')
+      .max(80, 'Name must be 80 characters or fewer.'),
   });
 
   const studentSchema = baseSchema.extend({
     course: z.string().min(1, 'Course is required.'),
     branch: z.enum([...BRANCHES] as [string, ...string[]], { message: 'Branch is required.' }),
-    year: z.string().min(1, 'Year is required.').refine(val => {
-      const y = parseInt(val, 10);
-      return !isNaN(y) && y >= 1 && y <= 4;
-    }, 'Year must be between 1 and 4.'),
-    cpi: z.string().min(1, 'CPI is required.').refine(val => {
-      const c = parseFloat(val);
-      return !isNaN(c) && c >= 0 && c <= 10;
-    }, 'CPI must be between 0 and 10.0.'),
+    year: z
+      .string()
+      .min(1, 'Year is required.')
+      .refine((val) => {
+        const y = parseInt(val, 10);
+        return !isNaN(y) && y >= 1 && y <= 4;
+      }, 'Year must be between 1 and 4.'),
+    cpi: z
+      .string()
+      .min(1, 'CPI is required.')
+      .refine((val) => {
+        const c = parseFloat(val);
+        return !isNaN(c) && c >= 0 && c <= 10;
+      }, 'CPI must be between 0 and 10.0.'),
     skills: z.array(z.string()).min(1, 'At least one skill is required.'),
-    hasResume: z.boolean().refine(val => val === true, 'Resume upload is required before saving.'),
+    hasResume: z
+      .boolean()
+      .refine((val) => val === true, 'Resume upload is required before saving.'),
   });
 
   // ─── Save handler ────────────────────────────────────────
   const handleSave = async () => {
     setErrors({});
     const schema = isStudent ? studentSchema : baseSchema;
-    const dataToValidate = isStudent ? {
-      name, course, branch, year, cpi, skills,
-      hasResume: !!profileData?.resumeStorageKey
-    } : { name };
+    const dataToValidate = isStudent
+      ? {
+          name,
+          course,
+          branch,
+          year,
+          cpi,
+          skills,
+          hasResume: !!profileData?.resumeStorageKey,
+        }
+      : { name };
 
     const result = schema.safeParse(dataToValidate);
     if (!result.success) {
       const formattedErrors: Record<string, string> = {};
-      result.error.issues.forEach(issue => {
+      result.error.issues.forEach((issue) => {
         if (issue.path[0]) {
           formattedErrors[issue.path[0] as string] = issue.message;
         }
@@ -187,7 +213,7 @@ export const MyProfile = () => {
     }
     try {
       const updated = await profileService.updateProfile(payload);
-      setProfileData((prev) => prev ? { ...prev, ...updated } : updated);
+      setProfileData((prev) => (prev ? { ...prev, ...updated } : updated));
       updateUser({ name: name.trim() });
       toast('Profile saved successfully.', 'success');
       setIsEditing(false);
@@ -208,16 +234,18 @@ export const MyProfile = () => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.type === 'application/pdf') { setSelectedFile(f); }
-    else toast('Please select a valid PDF file.', 'error');
+    if (f.type === 'application/pdf') {
+      setSelectedFile(f);
+    } else toast('Please select a valid PDF file.', 'error');
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     const f = e.dataTransfer.files[0];
-    if (f?.type === 'application/pdf') { setSelectedFile(f); }
-    else toast('Please drop a valid PDF file.', 'error');
+    if (f?.type === 'application/pdf') {
+      setSelectedFile(f);
+    } else toast('Please drop a valid PDF file.', 'error');
   };
 
   const handleUpload = async () => {
@@ -228,7 +256,10 @@ export const MyProfile = () => {
       toast('Resume uploaded! AI indexing started.', 'success');
       setSelectedFile(null);
       setProfileData(updatedData);
-      if (user && (updatedData.embeddingStatus === 'pending' || updatedData.embeddingStatus === 'processing')) {
+      if (
+        user &&
+        (updatedData.embeddingStatus === 'pending' || updatedData.embeddingStatus === 'processing')
+      ) {
         startPoll(user._id);
       }
     } catch (err: any) {
@@ -242,21 +273,21 @@ export const MyProfile = () => {
   const processSkills = (inputStr: string) => {
     const parsedSkills = inputStr
       .split(',')
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
-    const uniqueNewSkills = parsedSkills.filter(s => !skills.includes(s));
+    const uniqueNewSkills = parsedSkills.filter((s) => !skills.includes(s));
     const finalSkillsToAdd = [...new Set(uniqueNewSkills)];
 
     if (finalSkillsToAdd.length > 0) {
-      setSkills(prev => {
-        const toAdd = finalSkillsToAdd.filter(s => !prev.includes(s));
+      setSkills((prev) => {
+        const toAdd = finalSkillsToAdd.filter((s) => !prev.includes(s));
         return [...prev, ...toAdd];
       });
     }
 
     setNewSkill('');
-    setErrors(prev => ({ ...prev, skills: '' }));
+    setErrors((prev) => ({ ...prev, skills: '' }));
   };
 
   const addSkill = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -338,14 +369,14 @@ export const MyProfile = () => {
   };
 
   const selectClass = (hasError: boolean) =>
-    `flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${hasError
-      ? 'border-red-400 focus:ring-red-500/40'
-      : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
+    `flex h-11 w-full rounded-xl border bg-white dark:bg-[#202123] dark:text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium text-slate-700 ${
+      hasError
+        ? 'border-red-400 focus:ring-red-500/40'
+        : 'border-slate-200 dark:border-[#565869] focus:ring-primary-500/40 focus:border-primary-400'
     }`;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pt-0 pb-12 px-4 sm:px-0">
-
       {/* ── Page header ─────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-up border-b border-slate-100 dark:border-[#383942] pb-5 mb-2">
         <div className="flex items-center gap-3">
@@ -359,22 +390,40 @@ export const MyProfile = () => {
         <div className="flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
           {isEditing ? (
             <>
-              <Button size="sm" onClick={handleSave} isLoading={isSaving} className="flex-1 sm:flex-none">
+              <Button
+                size="sm"
+                onClick={handleSave}
+                isLoading={isSaving}
+                className="flex-1 sm:flex-none"
+              >
                 <Save size={14} className="mr-1.5" /> Save
               </Button>
-              <Button size="sm" variant="outline" onClick={cancelEdit} disabled={isSaving} className="flex-1 sm:flex-none">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={cancelEdit}
+                disabled={isSaving}
+                className="flex-1 sm:flex-none"
+              >
                 <XCircle size={14} className="mr-1.5" /> Cancel
               </Button>
             </>
           ) : (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => { setIsEditing(true); }}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setIsEditing(true);
+              }}
               className="gap-1.5 w-full sm:w-auto justify-center relative group hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300 rounded-full px-5 py-2 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] shadow-sm hover:shadow-primary-500/20 font-semibold text-slate-700 dark:text-slate-200"
             >
-              <Edit2 size={14} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-primary-500 dark:text-primary-400" />
-              <span className="group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">Edit Profile</span>
+              <Edit2
+                size={14}
+                className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-primary-500 dark:text-primary-400"
+              />
+              <span className="group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+                Edit Profile
+              </span>
             </Button>
           )}
         </div>
@@ -388,7 +437,11 @@ export const MyProfile = () => {
             iconBg="bg-primary-50 dark:bg-primary-900/20"
             iconColor="text-primary-600"
             title="Account Information"
-            subtitle={isEditing ? 'Update your name and account details' : 'Verified account identity and status'}
+            subtitle={
+              isEditing
+                ? 'Update your name and account details'
+                : 'Verified account identity and status'
+            }
           />
         </CardHeader>
         <CardContent className="pt-5">
@@ -402,7 +455,7 @@ export const MyProfile = () => {
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
-                    if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                    if (errors.name) setErrors((prev) => ({ ...prev, name: '' }));
                   }}
                   error={errors.name}
                   autoFocus
@@ -412,8 +465,14 @@ export const MyProfile = () => {
               <ReadField label="Full Name" value={displayName} />
             )}
             <ReadField label="Email Address" value={user.email} />
-            <ReadField label="Role" value={user.role.charAt(0).toUpperCase() + user.role.slice(1)} />
-            <ReadField label="Account Status" value={user.isVerified ? '✓ Verified' : 'Not verified'} />
+            <ReadField
+              label="Role"
+              value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+            />
+            <ReadField
+              label="Account Status"
+              value={user.isVerified ? '✓ Verified' : 'Not verified'}
+            />
           </div>
         </CardContent>
       </Card>
@@ -427,7 +486,11 @@ export const MyProfile = () => {
               iconBg="bg-primary-50"
               iconColor="text-primary-600"
               title="Academic Details"
-              subtitle={isEditing ? 'Editing — changes save when you click Save' : 'Branch, Year and academic information'}
+              subtitle={
+                isEditing
+                  ? 'Editing — changes save when you click Save'
+                  : 'Branch, Year and academic information'
+              }
             />
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
@@ -440,11 +503,16 @@ export const MyProfile = () => {
                     </label>
                     <select
                       value={course}
-                      onChange={(e) => { setCourse(e.target.value); if (errors.course) setErrors(prev => ({ ...prev, course: '' })); }}
+                      onChange={(e) => {
+                        setCourse(e.target.value);
+                        if (errors.course) setErrors((prev) => ({ ...prev, course: '' }));
+                      }}
                       className={selectClass(!!errors.course)}
                     >
                       {COURSES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
                       ))}
                     </select>
                     {errors.course && (
@@ -460,7 +528,10 @@ export const MyProfile = () => {
                     max={4}
                     placeholder="1 – 4"
                     value={year}
-                    onChange={(e) => { setYear(e.target.value); if (errors.year) setErrors(prev => ({ ...prev, year: '' })); }}
+                    onChange={(e) => {
+                      setYear(e.target.value);
+                      if (errors.year) setErrors((prev) => ({ ...prev, year: '' }));
+                    }}
                     error={errors.year}
                   />
 
@@ -470,11 +541,16 @@ export const MyProfile = () => {
                     </label>
                     <select
                       value={branch}
-                      onChange={(e) => { setBranch(e.target.value); if (errors.branch) setErrors(prev => ({ ...prev, branch: '' })); }}
+                      onChange={(e) => {
+                        setBranch(e.target.value);
+                        if (errors.branch) setErrors((prev) => ({ ...prev, branch: '' }));
+                      }}
                       className={selectClass(!!errors.branch)}
                     >
                       {BRANCHES.map((b) => (
-                        <option key={b} value={b}>{b}</option>
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
                       ))}
                     </select>
                     {errors.branch && (
@@ -491,7 +567,10 @@ export const MyProfile = () => {
                     max={10}
                     placeholder="e.g. 8.5"
                     value={cpi}
-                    onChange={(e) => { setCpi(e.target.value); if (errors.cpi) setErrors(prev => ({ ...prev, cpi: '' })); }}
+                    onChange={(e) => {
+                      setCpi(e.target.value);
+                      if (errors.cpi) setErrors((prev) => ({ ...prev, cpi: '' }));
+                    }}
                     error={errors.cpi}
                   />
                 </>
@@ -559,7 +638,8 @@ export const MyProfile = () => {
                     onChange={handleSkillChange}
                     onKeyDown={(e) => {
                       addSkill(e);
-                      if (e.key === 'Enter' && errors.skills) setErrors(prev => ({ ...prev, skills: '' }));
+                      if (e.key === 'Enter' && errors.skills)
+                        setErrors((prev) => ({ ...prev, skills: '' }));
                     }}
                     error={errors.skills}
                   />
@@ -598,10 +678,16 @@ export const MyProfile = () => {
           </CardHeader>
           <CardContent className="pt-5 space-y-4">
             <div className="space-y-4">
-              {profileData?.resumeStorageKey && (profileData?.embeddingStatus === 'pending' || profileData?.embeddingStatus === 'processing') ? (
+              {profileData?.resumeStorageKey &&
+              (profileData?.embeddingStatus === 'pending' ||
+                profileData?.embeddingStatus === 'processing') ? (
                 <div className="flex flex-col items-center py-8 text-center">
                   <div className="h-14 w-14 rounded-full bg-primary-50 flex items-center justify-center mb-3 animate-pulse">
-                    <Cpu size={26} className="text-primary-600 animate-spin" style={{ animationDuration: '3s' }} />
+                    <Cpu
+                      size={26}
+                      className="text-primary-600 animate-spin"
+                      style={{ animationDuration: '3s' }}
+                    />
                   </div>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">
                     AI is analyzing your resume
@@ -615,7 +701,9 @@ export const MyProfile = () => {
                   {profileData?.resumeStorageKey ? (
                     <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                       <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
-                      <p className="text-sm text-emerald-800 font-medium">Resume active and indexed</p>
+                      <p className="text-sm text-emerald-800 font-medium">
+                        Resume active and indexed
+                      </p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
@@ -628,18 +716,26 @@ export const MyProfile = () => {
                   {isEditing && (
                     <>
                       <div
-                        className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${isDragging
+                        className={`border-2 border-dashed rounded-xl px-4 py-8 text-center cursor-pointer transition-all duration-200 ${
+                          isDragging
                             ? 'border-primary-400 bg-primary-50/50'
                             : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                          }`}
-                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        }`}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setIsDragging(true);
+                        }}
                         onDragLeave={() => setIsDragging(false)}
-                        onDrop={(e) => { handleDrop(e); setErrors(prev => ({ ...prev, hasResume: '' })); }}
+                        onDrop={(e) => {
+                          handleDrop(e);
+                          setErrors((prev) => ({ ...prev, hasResume: '' }));
+                        }}
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <UploadCloud
-                          className={`mx-auto h-7 w-7 mb-2 ${isDragging ? 'text-primary-500' : 'text-slate-400'
-                            }`}
+                          className={`mx-auto h-7 w-7 mb-2 ${
+                            isDragging ? 'text-primary-500' : 'text-slate-400'
+                          }`}
                         />
                         <p className="text-sm font-medium text-slate-700">
                           {isDragging ? 'Drop your PDF here' : 'Drag & drop or click to upload'}
@@ -650,7 +746,10 @@ export const MyProfile = () => {
                           className="sr-only"
                           accept=".pdf"
                           ref={fileInputRef}
-                          onChange={(e) => { handleFileChange(e); setErrors(prev => ({ ...prev, hasResume: '' })); }}
+                          onChange={(e) => {
+                            handleFileChange(e);
+                            setErrors((prev) => ({ ...prev, hasResume: '' }));
+                          }}
                         />
                       </div>
                       {errors.hasResume && (
@@ -666,13 +765,21 @@ export const MyProfile = () => {
                             </span>
                           </div>
                           <div className="flex items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0">
-                            <Button size="sm" variant="outline" onClick={() => setSelectedFile(null)} className="flex-1 sm:flex-none">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedFile(null)}
+                              className="flex-1 sm:flex-none"
+                            >
                               Cancel
                             </Button>
                             <Button
                               size="sm"
                               isLoading={isUploading}
-                              onClick={(e) => { e.stopPropagation(); handleUpload(); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpload();
+                              }}
                               className="flex-1 sm:flex-none"
                             >
                               Upload
@@ -690,7 +797,10 @@ export const MyProfile = () => {
       )}
 
       {/* ── Danger Zone ─────────────────────────────────────── */}
-      <Card className="animate-fade-in-up border-red-100 dark:border-red-900/30" style={{ animationDelay: '300ms' }}>
+      <Card
+        className="animate-fade-in-up border-red-100 dark:border-red-900/30"
+        style={{ animationDelay: '300ms' }}
+      >
         <CardHeader className="border-b border-red-100 bg-red-50/30">
           <SectionHeader
             icon={Trash2}
@@ -728,7 +838,8 @@ export const MyProfile = () => {
               </Button>
             </div>
             <p className="text-[10px] text-slate-400 mt-4 leading-tight italic">
-              * Deactivation hides your profile temporarily. Permanent deletion wipes all your data forever.
+              * Deactivation hides your profile temporarily. Permanent deletion wipes all your data
+              forever.
             </p>
           </div>
         </CardContent>

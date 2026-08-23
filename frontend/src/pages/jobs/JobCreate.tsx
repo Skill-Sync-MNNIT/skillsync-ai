@@ -64,13 +64,21 @@ export const JobCreate = () => {
       toast(response.data.message || 'Job opportunity posted successfully!', 'success');
       navigate('/jobs');
     } catch (error: any) {
-      let message = error.response?.data?.message || 'Failed to submit job. Please check if your account has any violations.';
+      let message =
+        error.response?.data?.message ||
+        'Failed to submit job. Please check if your account has any violations.';
       // Fallback: if message is technical JSON, parse it for the user
-      if (typeof message === 'string' && message.startsWith('[') && message.includes('"message":')) {
+      if (
+        typeof message === 'string' &&
+        message.startsWith('[') &&
+        message.includes('"message":')
+      ) {
         try {
           const parsed = JSON.parse(message);
           if (Array.isArray(parsed) && parsed[0]?.message) message = parsed[0].message;
-        } catch (e) { /* keep original */ }
+        } catch (e) {
+          /* keep original */
+        }
       }
       toast(message, 'error');
     } finally {
@@ -81,8 +89,12 @@ export const JobCreate = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Post a Job</h1>
-        <p className="mt-1 text-slate-500">Create a new opportunity for MNNIT students. All posts are subject to AI moderation.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Post a Job
+        </h1>
+        <p className="mt-1 text-slate-500">
+          Create a new opportunity for MNNIT students. All posts are subject to AI moderation.
+        </p>
       </div>
 
       <Card>
@@ -111,7 +123,9 @@ export const JobCreate = () => {
                   placeholder="Describe the opportunity, responsibilities, and team..."
                   {...register('description')}
                 />
-                {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
+                )}
               </div>
 
               <div>
@@ -120,9 +134,16 @@ export const JobCreate = () => {
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {skills.map((skill) => (
-                    <span key={skill} className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800">
+                    <span
+                      key={skill}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800"
+                    >
                       {skill}
-                      <button type="button" onClick={() => setSkills(skills.filter(s => s !== skill))} className="ml-1.5 text-slate-400 hover:text-slate-600">
+                      <button
+                        type="button"
+                        onClick={() => setSkills(skills.filter((s) => s !== skill))}
+                        className="ml-1.5 text-slate-400 hover:text-slate-600"
+                      >
                         <X size={14} />
                       </button>
                     </span>
@@ -135,7 +156,9 @@ export const JobCreate = () => {
                   onChange={(e) => setNewSkill(e.target.value)}
                   onKeyDown={handleAddSkill}
                   error={skillError}
-                  onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
+                  onKeyPress={(e) => {
+                    e.key === 'Enter' && e.preventDefault();
+                  }}
                 />
               </div>
 
@@ -156,20 +179,28 @@ export const JobCreate = () => {
                   {...register('jobLink')}
                 />
                 <p className="mt-1 text-xs text-slate-500 italic">
-                  Note: If provided, students will be redirected to this link instead of applying through SkillSync AI.
+                  Note: If provided, students will be redirected to this link instead of applying
+                  through SkillSync AI.
                 </p>
               </div>
             </div>
 
             <div className="rounded-md bg-blue-50 p-4 border border-blue-200 flex mt-6">
-               <ShieldAlert className="h-5 w-5 text-blue-400 mt-0.5" />
-               <div className="ml-3 text-sm text-blue-700">
-                  By posting this job, you agree to our moderation policies. Content containing spam or offensive language will lead to a 3-day ban, and repeated offenses will result in a permanent ban.
-               </div>
+              <ShieldAlert className="h-5 w-5 text-blue-400 mt-0.5" />
+              <div className="ml-3 text-sm text-blue-700">
+                By posting this job, you agree to our moderation policies. Content containing spam
+                or offensive language will lead to a 3-day ban, and repeated offenses will result in
+                a permanent ban.
+              </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
-              <Button type="button" variant="ghost" onClick={() => navigate('/jobs')} className="mr-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate('/jobs')}
+                className="mr-3"
+              >
                 Cancel
               </Button>
               <Button type="submit" isLoading={isSubmitting}>

@@ -46,8 +46,7 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-
-// old code 
+// old code
 // import { create } from 'zustand';
 
 // interface User {

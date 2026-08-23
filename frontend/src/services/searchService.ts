@@ -6,9 +6,9 @@ export interface SearchResult {
   email: string;
   branch: string | null;
   year: number | null;
-  matchScore: number;      
+  matchScore: number;
   explanation: string;
-  matchedSkills: string[];  
+  matchedSkills: string[];
   detailedReasoning?: string;
 }
 
@@ -29,24 +29,26 @@ export const searchService = {
     });
 
     // Map backend field names → frontend field names
-    return (response.data.results ?? []).map((item: {
-      userId: string;
-      name: string;
-      email: string;
-      branch: string | null;
-      year: number | null;
-      matchPercent: number;
-      explanation: string;
-      skills: string[];
-    }): SearchResult => ({
-      userId: item.userId,
-      name: item.name,
-      email: item.email,
-      branch: item.branch,
-      year: item.year,
-      matchScore: item.matchPercent,       
-      explanation: item.explanation,
-      matchedSkills: item.skills ?? [], 
-    }));
+    return (response.data.results ?? []).map(
+      (item: {
+        userId: string;
+        name: string;
+        email: string;
+        branch: string | null;
+        year: number | null;
+        matchPercent: number;
+        explanation: string;
+        skills: string[];
+      }): SearchResult => ({
+        userId: item.userId,
+        name: item.name,
+        email: item.email,
+        branch: item.branch,
+        year: item.year,
+        matchScore: item.matchPercent,
+        explanation: item.explanation,
+        matchedSkills: item.skills ?? [],
+      })
+    );
   },
 };

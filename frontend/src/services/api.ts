@@ -25,7 +25,11 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // If error is 401 and we haven't already retried
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -45,9 +49,11 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         // Refresh failed (e.g., refresh token expired)
-        window.dispatchEvent(new CustomEvent('app:toast', {
-          detail: { message: 'Session expired. Please log in again.', type: 'error' }
-        }));
+        window.dispatchEvent(
+          new CustomEvent('app:toast', {
+            detail: { message: 'Session expired. Please log in again.', type: 'error' },
+          })
+        );
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }

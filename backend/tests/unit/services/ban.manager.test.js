@@ -5,7 +5,7 @@ jest.unstable_mockModule('../../../src/models/User.js', () => {
     default: {
       findById: jest.fn(),
       findByIdAndUpdate: jest.fn(),
-    }
+    },
   };
 });
 
@@ -27,9 +27,12 @@ describe('BanManager Unit Tests', () => {
 
       expect(result.violationCount).toBe(1);
       expect(result.banUntil).toBeInstanceOf(Date);
-      expect(User.findByIdAndUpdate).toHaveBeenCalledWith('user123', expect.objectContaining({
-        violationCount: 1,
-      }));
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'user123',
+        expect.objectContaining({
+          violationCount: 1,
+        })
+      );
     });
 
     it('should apply a permanent ban for the third violation', async () => {
@@ -41,9 +44,12 @@ describe('BanManager Unit Tests', () => {
 
       expect(result.violationCount).toBe(3);
       expect(result.isBanned).toBe(true);
-      expect(User.findByIdAndUpdate).toHaveBeenCalledWith('user123', expect.objectContaining({
-        isBanned: true,
-      }));
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'user123',
+        expect.objectContaining({
+          isBanned: true,
+        })
+      );
     });
   });
 

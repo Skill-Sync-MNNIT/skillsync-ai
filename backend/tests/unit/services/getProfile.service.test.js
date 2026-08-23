@@ -31,7 +31,12 @@ describe('getProfile Service Unit Tests', () => {
 
   describe('lookup by MongoDB ObjectId', () => {
     it('should return merged user + profile data for a valid ID', async () => {
-      const mockUser = { name: 'Alice', email: 'alice@test.com', role: 'student', isVerified: true };
+      const mockUser = {
+        name: 'Alice',
+        email: 'alice@test.com',
+        role: 'student',
+        isVerified: true,
+      };
       const mockProfile = { _doc: { bio: 'Developer', skills: ['JS'] } };
 
       findUserById.mockResolvedValue(mockUser);
@@ -59,7 +64,13 @@ describe('getProfile Service Unit Tests', () => {
 
   describe('lookup by email prefix', () => {
     it('should find a user by email prefix and return their profile', async () => {
-      const mockUser = { _id: 'u1', name: 'Bob', email: 'bob@test.com', role: 'professor', isVerified: false };
+      const mockUser = {
+        _id: 'u1',
+        name: 'Bob',
+        email: 'bob@test.com',
+        role: 'professor',
+        isVerified: false,
+      };
       const mockProfile = { _doc: { department: 'CS' } };
 
       User.findOne.mockResolvedValue(mockUser);

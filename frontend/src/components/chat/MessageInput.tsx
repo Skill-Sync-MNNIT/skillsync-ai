@@ -153,7 +153,9 @@ export const MessageInput = ({
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 'p-1.5 sm:p-2 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-[#343541]',
-                isUploading ? 'animate-spin text-primary-600' : 'text-slate-400 hover:text-primary-600'
+                isUploading
+                  ? 'animate-spin text-primary-600'
+                  : 'text-slate-400 hover:text-primary-600'
               )}
               disabled={isUploading}
             >

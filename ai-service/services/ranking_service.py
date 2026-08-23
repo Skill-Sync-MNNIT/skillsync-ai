@@ -104,15 +104,7 @@ class RankingService:
         else:
              summary += "."
 
-        return {
-            "candidates": ranked,
-            "summary": summary,
-            "filters": {
-                "limit": limit,
-                "min_cpi": min_cpi,
-                "core_query": core_query
-            }
-        }
+        return ranked
 
     async def get_detail(self, user_id: str, query: str) -> dict | None:
         record = self.repo.fetch(user_id)

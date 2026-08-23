@@ -9,7 +9,13 @@ interface MessageActionsProps {
   onDeleteEveryone?: () => void;
 }
 
-export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEveryone }: MessageActionsProps) => {
+export const MessageActions = ({
+  isMe,
+  onReply,
+  onEdit,
+  onDeleteMe,
+  onDeleteEveryone,
+}: MessageActionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState<'top' | 'bottom'>('top');
   const menuRef = useRef<HTMLDivElement>(null);
@@ -41,7 +47,7 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
 
   return (
     <div className="relative" ref={menuRef}>
-      <button 
+      <button
         ref={buttonRef}
         onClick={handleToggle}
         className="p-1.5 hover:bg-slate-100 dark:hover:bg-[#2a2b32] rounded-full transition-colors text-slate-400 hover:text-slate-600"
@@ -50,25 +56,29 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
       </button>
 
       {isOpen && (
-        <div 
+        <div
           className={`absolute z-[50] ${
-            menuPosition === 'top' 
-              ? 'bottom-full mb-2 origin-bottom' 
-              : 'top-full mt-2 origin-top'
+            menuPosition === 'top' ? 'bottom-full mb-2 origin-bottom' : 'top-full mt-2 origin-top'
           } w-48 bg-white dark:bg-[#2a2b32] rounded-xl shadow-xl border border-slate-100 dark:border-[#565869] py-1 animate-in fade-in zoom-in-95 ${
             isMe ? 'right-0 origin-right' : 'left-0 origin-left'
           }`}
         >
-          <button 
-            onClick={() => { onReply(); setIsOpen(false); }}
+          <button
+            onClick={() => {
+              onReply();
+              setIsOpen(false);
+            }}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#343541] transition-colors"
           >
             <Reply size={14} /> Reply
           </button>
-          
+
           {isMe && onEdit && (
-            <button 
-              onClick={() => { onEdit(); setIsOpen(false); }}
+            <button
+              onClick={() => {
+                onEdit();
+                setIsOpen(false);
+              }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#343541] transition-colors"
             >
               <Edit2 size={14} /> Edit
@@ -77,16 +87,22 @@ export const MessageActions = ({ isMe, onReply, onEdit, onDeleteMe, onDeleteEver
 
           <div className="h-px bg-slate-100 dark:bg-slate-700 my-1" />
 
-          <button 
-            onClick={() => { onDeleteMe(); setIsOpen(false); }}
+          <button
+            onClick={() => {
+              onDeleteMe();
+              setIsOpen(false);
+            }}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
           >
             <UserMinus size={14} /> Delete for me
           </button>
 
           {isMe && onDeleteEveryone && (
-            <button 
-              onClick={() => { onDeleteEveryone(); setIsOpen(false); }}
+            <button
+              onClick={() => {
+                onDeleteEveryone();
+                setIsOpen(false);
+              }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 font-semibold hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
             >
               <Trash2 size={14} /> Delete for everyone

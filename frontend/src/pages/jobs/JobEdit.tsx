@@ -44,16 +44,16 @@ export const JobEdit = () => {
       try {
         const response = await api.get(`/jobs/${jobId}`);
         const job = response.data;
-        
+
         // Populate form
         setValue('title', job.title);
         setValue('description', job.description);
         setValue('jobLink', job.jobLink || '');
-        
+
         // Format date for input[type="date"]
         const date = new Date(job.deadline);
         setValue('deadline', date.toISOString().split('T')[0]);
-        
+
         setSkills(job.requiredSkills || []);
 
         // Edit Lock: Prevent editing if job is already withdrawn or expired
@@ -102,13 +102,21 @@ export const JobEdit = () => {
       toast(response.data.message || 'Job updated successfully!', 'success');
       navigate(`/jobs/${jobId}`);
     } catch (error: any) {
-      let message = error.response?.data?.message || 'Failed to submit job. Please check if your account has any violations.';
+      let message =
+        error.response?.data?.message ||
+        'Failed to submit job. Please check if your account has any violations.';
       // Fallback: if message is technical JSON, parse it for the user
-      if (typeof message === 'string' && message.startsWith('[') && message.includes('"message":')) {
+      if (
+        typeof message === 'string' &&
+        message.startsWith('[') &&
+        message.includes('"message":')
+      ) {
         try {
           const parsed = JSON.parse(message);
           if (Array.isArray(parsed) && parsed[0]?.message) message = parsed[0].message;
-        } catch (e) { /* keep original */ }
+        } catch (e) {
+          /* keep original */
+        }
       }
       toast(message, 'error');
     } finally {
@@ -122,16 +130,20 @@ export const JobEdit = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <button 
-        onClick={() => navigate(`/jobs/${jobId}`)} 
+      <button
+        onClick={() => navigate(`/jobs/${jobId}`)}
         className="flex items-center text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
       >
         <ArrowLeft size={16} className="mr-1" /> Back to Details
       </button>
 
       <div className="mb-4">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Edit Job</h1>
-        <p className="mt-1 text-slate-500">Update your job opportunity. Significant changes will trigger re-moderation.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Edit Job
+        </h1>
+        <p className="mt-1 text-slate-500">
+          Update your job opportunity. Significant changes will trigger re-moderation.
+        </p>
       </div>
 
       <Card>
@@ -160,7 +172,9 @@ export const JobEdit = () => {
                   placeholder="Describe the opportunity, responsibilities, and team..."
                   {...register('description')}
                 />
-                {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
+                )}
               </div>
 
               <div>
@@ -169,9 +183,16 @@ export const JobEdit = () => {
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {skills.map((skill) => (
-                    <span key={skill} className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800">
+                    <span
+                      key={skill}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800"
+                    >
                       {skill}
-                      <button type="button" onClick={() => setSkills(skills.filter(s => s !== skill))} className="ml-1.5 text-slate-400 hover:text-slate-600">
+                      <button
+                        type="button"
+                        onClick={() => setSkills(skills.filter((s) => s !== skill))}
+                        className="ml-1.5 text-slate-400 hover:text-slate-600"
+                      >
                         <X size={14} />
                       </button>
                     </span>
@@ -184,7 +205,9 @@ export const JobEdit = () => {
                   onChange={(e) => setNewSkill(e.target.value)}
                   onKeyDown={handleAddSkill}
                   error={skillError}
-                  onKeyPress={(e) => { e.key === 'Enter' && e.preventDefault(); }}
+                  onKeyPress={(e) => {
+                    e.key === 'Enter' && e.preventDefault();
+                  }}
                 />
               </div>
 
@@ -208,14 +231,19 @@ export const JobEdit = () => {
             </div>
 
             <div className="rounded-md bg-blue-50 p-4 border border-blue-200 flex mt-6">
-               <ShieldAlert className="h-5 w-5 text-blue-400 mt-0.5" />
-               <div className="ml-3 text-sm text-blue-700">
-                  Updating the title or description will re-submit this job for AI moderation.
-               </div>
+              <ShieldAlert className="h-5 w-5 text-blue-400 mt-0.5" />
+              <div className="ml-3 text-sm text-blue-700">
+                Updating the title or description will re-submit this job for AI moderation.
+              </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
-              <Button type="button" variant="ghost" onClick={() => navigate(`/jobs/${jobId}`)} className="mr-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => navigate(`/jobs/${jobId}`)}
+                className="mr-3"
+              >
                 Cancel
               </Button>
               <Button type="submit" isLoading={isSubmitting}>

@@ -21,9 +21,9 @@ The platform is restricted to verified MNNIT users only.
 
 To build an internal AI-powered discovery engine that intelligently connects:
 
-* Students
-* Alumni
-* Professors
+- Students
+- Alumni
+- Professors
 
 within the MNNIT ecosystem through secure, explainable talent matching.
 
@@ -33,11 +33,11 @@ within the MNNIT ecosystem through secure, explainable talent matching.
 
 Current academic networking lacks:
 
-* Semantic resume understanding
-* Intelligent student discovery
-* Transparent ranking explanations
-* Centralized alumni recruitment infrastructure
-* Insight into in-demand skills
+- Semantic resume understanding
+- Intelligent student discovery
+- Transparent ranking explanations
+- Centralized alumni recruitment infrastructure
+- Insight into in-demand skills
 
 Manual screening is inefficient and keyword-based. No institutional AI intelligence layer exists.
 
@@ -47,24 +47,24 @@ Manual screening is inefficient and keyword-based. No institutional AI intellige
 
 ### 4.1 In Scope (v1)
 
-* Role-based authentication
-* Resume upload and skill extraction
-* Vector-based semantic ranking
-* Alumni-only job posting
-* AI-based job moderation
-* Skill analytics (last 6 months)
-* Preference-based notifications
-* Resume download logging
-* Soft delete model
+- Role-based authentication
+- Resume upload and skill extraction
+- Vector-based semantic ranking
+- Alumni-only job posting
+- AI-based job moderation
+- Skill analytics (last 6 months)
+- Preference-based notifications
+- Resume download logging
+- Soft delete model
 
 ### 4.2 Out of Scope (v1)
 
-* Public access
-* Internal messaging
-* Admin dashboard
-* Real-time push notifications
-* Interview scheduling
-* Ranking feedback loops
+- Public access
+- Internal messaging
+- Admin dashboard
+- Real-time push notifications
+- Interview scheduling
+- Ranking feedback loops
 
 ---
 
@@ -127,17 +127,17 @@ graph TD
 
 The system shall:
 
-* Require email verification during registration
-* Enforce mandatory role selection
-* Issue JWT-based authentication
-* Implement role-based access control
-* Store and enforce ban status
+- Require email verification during registration
+- Enforce mandatory role selection
+- Issue JWT-based authentication
+- Implement role-based access control
+- Store and enforce ban status
 
 Acceptance Criteria:
 
-* Unverified users cannot access platform features
-* Only alumni accounts can create job postings
-* Banned users cannot log in
+- Unverified users cannot access platform features
+- Only alumni accounts can create job postings
+- Banned users cannot log in
 
 ### 6.1.1 Authentication Flow Diagram
 
@@ -188,19 +188,19 @@ sequenceDiagram
 
 Students shall be able to:
 
-* Upload PDF resume
-* Auto-extract skills
-* Manually edit skills
-* Add branch and year
-* Soft delete account
+- Upload PDF resume
+- Auto-extract skills
+- Manually edit skills
+- Add branch and year
+- Soft delete account
 
 Branch and year shall function as filters only.
 
 Acceptance Criteria:
 
-* Resume upload triggers embedding generation
-* Soft-deleted users are excluded from search
-* Embeddings for inactive users are ignored
+- Resume upload triggers embedding generation
+- Soft-deleted users are excluded from search
+- Embeddings for inactive users are ignored
 
 ---
 
@@ -208,19 +208,19 @@ Acceptance Criteria:
 
 The system shall:
 
-* Extract text from uploaded PDF resumes
-* Chunk resume content
-* Generate vector embeddings
-* Store embeddings in vector database
-* Link embeddings via userId
-* Regenerate embeddings on resume upload
-* Perform midnight batch updates for minor profile edits
+- Extract text from uploaded PDF resumes
+- Chunk resume content
+- Generate vector embeddings
+- Store embeddings in vector database
+- Link embeddings via userId
+- Regenerate embeddings on resume upload
+- Perform midnight batch updates for minor profile edits
 
 Acceptance Criteria:
 
-* Only active users are indexed
-* Search response time < 2 seconds
-* Embedding regeneration optimized for cost
+- Only active users are indexed
+- Search response time < 2 seconds
+- Embedding regeneration optimized for cost
 
 ### 6.3.1 Resume Processing Pipeline Diagram
 
@@ -266,9 +266,9 @@ Final Score = Vector Similarity Score Only
 
 Acceptance Criteria:
 
-* Filters do not influence similarity score
-* Each result displays match percentage
-* Explanation is generated for each result
+- Filters do not influence similarity score
+- Each result displays match percentage
+- Explanation is generated for each result
 
 ### 6.4.1 AI Ranking Flow Diagram
 
@@ -308,9 +308,9 @@ sequenceDiagram
 
 The system shall provide:
 
-* Structured explanation of match
-* Bullet list of matched skills
-* Experience relevance summary
+- Structured explanation of match
+- Bullet list of matched skills
+- Experience relevance summary
 
 ---
 
@@ -318,19 +318,19 @@ The system shall provide:
 
 The system shall allow alumni to:
 
-* Create job postings
-* Add required skills
-* Set application deadline
+- Create job postings
+- Add required skills
+- Set application deadline
 
 The system shall:
 
-* Automatically hide expired jobs
-* Retain expired jobs for analytics
+- Automatically hide expired jobs
+- Retain expired jobs for analytics
 
 Acceptance Criteria:
 
-* Only alumni role can access job creation
-* Expired jobs are not visible in active listings
+- Only alumni role can access job creation
+- Expired jobs are not visible in active listings
 
 ### 6.6.1 Job Posting Lifecycle Diagram
 
@@ -354,10 +354,10 @@ stateDiagram-v2
 
 The system shall:
 
-* Analyze job postings from last 6 months
-* Extract required skills
-* Identify trending skills
-* Display “Important Skills” section
+- Analyze job postings from last 6 months
+- Extract required skills
+- Identify trending skills
+- Display “Important Skills” section
 
 ---
 
@@ -365,14 +365,14 @@ The system shall:
 
 The system shall:
 
-* Allow users to set skill preferences
-* Match new jobs against preferences
-* Store notifications in database
+- Allow users to set skill preferences
+- Match new jobs against preferences
+- Store notifications in database
 
 Acceptance Criteria:
 
-* Notifications visible on dashboard
-* No real-time push required in v1
+- Notifications visible on dashboard
+- No real-time push required in v1
 
 ### 6.8.1 Notification Flow Diagram
 
@@ -411,8 +411,8 @@ sequenceDiagram
 
 The system shall:
 
-* Allow verified users to download resumes
-* Log downloaderId, resumeOwnerId, and timestamp
+- Allow verified users to download resumes
+- Log downloaderId, resumeOwnerId, and timestamp
 
 ---
 
@@ -422,19 +422,19 @@ All job postings shall be scanned by AI.
 
 Checks include:
 
-* Offensive language
-* Spam content
-* Malicious links
+- Offensive language
+- Spam content
+- Malicious links
 
 Violation Policy:
 
-* 1st violation → 3-day ban
-* 2nd violation → Lifetime ban
+- 1st violation → 3-day ban
+- 2nd violation → Lifetime ban
 
 Acceptance Criteria:
 
-* Ban status stored in user record
-* Banned users cannot post jobs
+- Ban status stored in user record
+- Banned users cannot post jobs
 
 ### 6.10.1 AI Moderation & Ban System Diagram
 
@@ -462,32 +462,32 @@ flowchart TD
 
 ## 7. Non-Functional Requirements
 
-* Query response time < 2 seconds
-* Secure resume storage
-* Scalable for full MNNIT student base
-* Controlled API usage
-* Closed ecosystem (no public endpoints)
-* Embedding updates optimized via batching
+- Query response time < 2 seconds
+- Secure resume storage
+- Scalable for full MNNIT student base
+- Controlled API usage
+- Closed ecosystem (no public endpoints)
+- Embedding updates optimized via batching
 
 ---
 
 ## 8. Security & Privacy
 
-* Verified access only
-* Role-based visibility
-* Resume download logging enforced
-* Soft delete hides from search but preserves data
-* Embeddings excluded for inactive users
+- Verified access only
+- Role-based visibility
+- Resume download logging enforced
+- Soft delete hides from search but preserves data
+- Embeddings excluded for inactive users
 
 ---
 
 ## 9. Success Metrics
 
-* Average query latency < 2 seconds
-* Resume processing success rate > 99%
-* Moderation accuracy > 95%
-* Monthly active search users growth
-* Job-to-search conversion rate
+- Average query latency < 2 seconds
+- Resume processing success rate > 99%
+- Moderation accuracy > 95%
+- Monthly active search users growth
+- Job-to-search conversion rate
 
 ---
 
@@ -495,17 +495,17 @@ flowchart TD
 
 ### High-Level Components
 
-* React Frontend (Role-based UI)
-* Node.js + Express Backend
-* Authentication Service
-* Resume Processing Service
-* Embedding Service
-* Ranking Service
-* AI Moderation Service
-* Notification Engine
-* Skill Analytics Service
-* MongoDB (Structured Data)
-* Vector Database (Embeddings)
+- React Frontend (Role-based UI)
+- Node.js + Express Backend
+- Authentication Service
+- Resume Processing Service
+- Embedding Service
+- Ranking Service
+- AI Moderation Service
+- Notification Engine
+- Skill Analytics Service
+- MongoDB (Structured Data)
+- Vector Database (Embeddings)
 
 ---
 
@@ -608,25 +608,25 @@ erDiagram
 
 ### MVP
 
-* Authentication & role management
-* Resume upload & embeddings
-* AI search & ranking
-* Alumni job posting
-* Moderation system
-* Stored notifications
+- Authentication & role management
+- Resume upload & embeddings
+- AI search & ranking
+- Alumni job posting
+- Moderation system
+- Stored notifications
 
 ### V1
 
-* Skill analytics dashboard
-* Structured explanation engine
-* Ranking optimization
+- Skill analytics dashboard
+- Structured explanation engine
+- Ranking optimization
 
 ### V2
 
-* Skill gap insights
-* Search history
-* Admin panel
-* Ranking feedback refinement
+- Skill gap insights
+- Search history
+- Admin panel
+- Ranking feedback refinement
 
 ### 12.1 Product Roadmap Gantt Chart
 

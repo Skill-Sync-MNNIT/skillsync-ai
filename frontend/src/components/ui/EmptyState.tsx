@@ -19,12 +19,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   actionLabel,
   onAction,
   className,
-  height
+  height,
 }) => {
   return (
-    <div 
+    <div
       className={cn(
-        "flex flex-col items-center justify-center p-8 text-center animate-fade-in", 
+        'flex flex-col items-center justify-center p-8 text-center animate-fade-in',
         className
       )}
       style={height ? { height } : undefined}
@@ -39,9 +39,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {description}
       </p>
       {actionLabel && onAction && (
-        <Button 
-          size="sm" 
-          onClick={onAction} 
+        <Button
+          size="sm"
+          onClick={onAction}
           variant="outline"
           className="rounded-xl px-6 border-primary-200 text-primary-600 hover:bg-primary-50 transition-all duration-300"
         >

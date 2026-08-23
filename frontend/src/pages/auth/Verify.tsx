@@ -20,7 +20,7 @@ export const Verify = () => {
   const { toast } = useToast();
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
   // Retrieve the email passed securely from the Register page via router state
@@ -45,22 +45,24 @@ export const Verify = () => {
     if (!email) return;
     setIsLoading(true);
 
-  try {
-    const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
+    try {
+      const response = await api.post('/auth/verify-otp', { email, otp: data.otp });
 
-    // Auto-login: store the user and token in auth state
-    login(response.data.user, response.data.token);
+      // Auto-login: store the user and token in auth state
+      login(response.data.user, response.data.token);
 
-    toast(response.data.message || 'Email verified! Welcome to SkillSync', 'success');
-    navigate('/dashboard', { replace: true });
-
-  } catch (error: any) {
-    const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Invalid or expired OTP. Please try again.';
-    toast(errorMsg, 'error');
-  } finally {
-    setIsLoading(false);
-  }
-};
+      toast(response.data.message || 'Email verified! Welcome to SkillSync', 'success');
+      navigate('/dashboard', { replace: true });
+    } catch (error: any) {
+      const errorMsg =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Invalid or expired OTP. Please try again.';
+      toast(errorMsg, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#202123] px-4 py-12 sm:px-6 lg:px-8">
@@ -69,9 +71,12 @@ export const Verify = () => {
           <div className="mx-auto h-12 w-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <ShieldCheck size={24} />
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Verify Email</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Verify Email
+          </h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            We sent a 6-digit code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
+            We sent a 6-digit code to{' '}
+            <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
           </p>
         </div>
 
@@ -94,10 +99,13 @@ export const Verify = () => {
               Verify Account
             </Button>
           </div>
-          
+
           <div className="text-sm text-center">
-             <span className="text-slate-600 dark:text-slate-400">Entered the wrong email? </span>
-            <Link to="/auth/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500">
+            <span className="text-slate-600 dark:text-slate-400">Entered the wrong email? </span>
+            <Link
+              to="/auth/register"
+              className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500"
+            >
               Go back
             </Link>
           </div>

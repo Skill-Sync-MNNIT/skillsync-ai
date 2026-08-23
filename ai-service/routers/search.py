@@ -32,30 +32,29 @@ async def search_students(request: SearchRequest):
         history=request.history
     )
 
-    candidates = result.get("candidates", [])
+    if isinstance(result, list):
+        candidates = result
+    else:
+        candidates = result.get("candidates", [])
 
     explanations = await asyncio.gather(*[
         explanation_engine.explain(
             query=request.query,
-            skills=candidate["metadata"].get("skills",[])
+            skills=candidate["metadata"].get("skills", [])
         ) for candidate in candidates
     ])
 
     formatted_candidates = [
         {
             "user_id": candidate["user_id"],
-            "score": round(candidate["score"],4),
+            "score": round(candidate["score"], 4),
             "explanation": explanations[i],
             "metadata": candidate["metadata"],
         }
         for i, candidate in enumerate(candidates)
     ]
 
-    return {
-        "candidates": formatted_candidates,
-        "summary": result.get("summary", ""),
-        "filters": result.get("filters", {})
-    }
+    return formatted_candidates
 
 
 @router.get("/{user_id}/detail")

@@ -54,6 +54,7 @@ Dev 4 – Frontend Engineer             React + Vite (all pages, API integration
 ### Sprint 1 – Foundation (Week 1)
 
 #### Backend Project Setup
+
 - [ ] **1.1.1** Initialize Node.js + Express project in `/backend`
 - [ ] **1.1.2** Install core dependencies: `express`, `mongoose`, `dotenv`, `cors`, `helmet`, `zod`
 - [ ] **1.1.3** Set up folder structure:
@@ -76,6 +77,7 @@ Dev 4 – Frontend Engineer             React + Vite (all pages, API integration
 - [ ] **1.1.9** Set up Winston/Pino structured logging
 
 #### MongoDB Schemas
+
 - [ ] **1.1.10** Create `User` Mongoose model with all fields + indexes
 - [ ] **1.1.11** Create `StudentProfile` Mongoose model + indexes
 - [ ] **1.1.12** Create `DownloadLog` Mongoose model
@@ -138,6 +140,7 @@ Dev 4 – Frontend Engineer             React + Vite (all pages, API integration
 ### Sprint 2 – Embedding Service (Week 1–2)
 
 #### LangChain + Pinecone Setup
+
 - [ ] **2.1.1** Create Pinecone index: dimension=768 (`text-embedding-004`), metric=cosine
 - [ ] **2.1.2** Define vector metadata schema: `{ user_id, branch, year, is_active, skills[] }`
 - [ ] **2.1.3** Implement `PineconeRepository` in `services/pinecone_repo.py`:
@@ -147,6 +150,7 @@ Dev 4 – Frontend Engineer             React + Vite (all pages, API integration
 - [ ] **2.1.4** Test upsert + query with 3 dummy vectors
 
 #### PDF Processing + Embeddings
+
 - [ ] **2.1.5** Implement `EmbeddingService` in `services/embedding_service.py`:
   - `extract_text(pdf_bytes)` – use **PyMuPDF** (`fitz`) to extract text from PDF
   - `chunk_text(text)` – use LangChain `RecursiveCharacterTextSplitter` (chunk=512, overlap=50)
@@ -416,20 +420,20 @@ Dev 4 – Frontend Engineer             React + Vite (all pages, API integration
 
 ## Quick Reference: Who Owns What
 
-| Module | Owner | Language | Key Files |
-|--------|-------|----------|-----------|
-| Auth (register, login, JWT) | **Dev 1** | Node.js | `AuthController`, `AuthService`, `OTPService` |
-| User Profile & Resume Upload | **Dev 1** | Node.js | `ProfileService`, `ResumeService` (Cloudinary) |
-| MongoDB Models & Indexes | **Dev 1** (with Dev 3) | Node.js | `User`, `StudentProfile`, `DownloadLog` models |
-| Python AI Microservice setup | **Dev 2** | Python | `main.py`, `Dockerfile`, `requirements.txt` |
-| PDF Parsing + Embedding Pipeline | **Dev 2** | Python | `services/embedding_service.py`, PyMuPDF, LangChain |
-| Semantic Search & Ranking | **Dev 2** | Python | `services/ranking_service.py`, `services/explanation_engine.py` |
-| AI Moderation (LLM check) | **Dev 2** | Python | `services/moderation_service.py` |
-| Skill Analytics | **Dev 2** | Python | `services/analytics_service.py` |
-| Midnight Batch Worker | **Dev 2** | Python | `/workers/batch_embed.py` |
-| Job Posting Lifecycle | **Dev 3** | Node.js | `JobService`, `JobController`, expiry cron |
-| Moderation Orchestration & Ban | **Dev 3** | Node.js | `BanManager` (calls Dev 2's Python service) |
-| Notifications Engine | **Dev 3** | Node.js | `NotificationEngine`, `NotificationController` |
-| React Frontend (all pages) | **Dev 4** | React | All `/frontend/src/pages/**` |
-| CI/CD & Deployment | **Dev 1 + Dev 4** | — | GitHub Actions, Dockerfiles |
-| Integration Testing | **All** | — | `/tests/integration/**` |
+| Module                           | Owner                  | Language | Key Files                                                       |
+| -------------------------------- | ---------------------- | -------- | --------------------------------------------------------------- |
+| Auth (register, login, JWT)      | **Dev 1**              | Node.js  | `AuthController`, `AuthService`, `OTPService`                   |
+| User Profile & Resume Upload     | **Dev 1**              | Node.js  | `ProfileService`, `ResumeService` (Cloudinary)                  |
+| MongoDB Models & Indexes         | **Dev 1** (with Dev 3) | Node.js  | `User`, `StudentProfile`, `DownloadLog` models                  |
+| Python AI Microservice setup     | **Dev 2**              | Python   | `main.py`, `Dockerfile`, `requirements.txt`                     |
+| PDF Parsing + Embedding Pipeline | **Dev 2**              | Python   | `services/embedding_service.py`, PyMuPDF, LangChain             |
+| Semantic Search & Ranking        | **Dev 2**              | Python   | `services/ranking_service.py`, `services/explanation_engine.py` |
+| AI Moderation (LLM check)        | **Dev 2**              | Python   | `services/moderation_service.py`                                |
+| Skill Analytics                  | **Dev 2**              | Python   | `services/analytics_service.py`                                 |
+| Midnight Batch Worker            | **Dev 2**              | Python   | `/workers/batch_embed.py`                                       |
+| Job Posting Lifecycle            | **Dev 3**              | Node.js  | `JobService`, `JobController`, expiry cron                      |
+| Moderation Orchestration & Ban   | **Dev 3**              | Node.js  | `BanManager` (calls Dev 2's Python service)                     |
+| Notifications Engine             | **Dev 3**              | Node.js  | `NotificationEngine`, `NotificationController`                  |
+| React Frontend (all pages)       | **Dev 4**              | React    | All `/frontend/src/pages/**`                                    |
+| CI/CD & Deployment               | **Dev 1 + Dev 4**      | —        | GitHub Actions, Dockerfiles                                     |
+| Integration Testing              | **All**                | —        | `/tests/integration/**`                                         |
