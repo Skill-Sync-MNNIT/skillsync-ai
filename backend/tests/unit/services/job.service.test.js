@@ -5,6 +5,7 @@ jest.unstable_mockModule('../../../src/models/JobPosting.js', () => {
     default: {
       create: jest.fn(),
       find: jest.fn(),
+      findOne: jest.fn(),
       countDocuments: jest.fn(),
       findById: jest.fn(),
       findOneAndUpdate: jest.fn(),
@@ -23,7 +24,6 @@ jest.unstable_mockModule('bullmq', () => {
 });
 
 const { default: JobPosting } = await import('../../../src/models/JobPosting.js');
-const { Queue } = await import('bullmq');
 const { JobService } = await import('../../../src/services/jobs/job.service.js');
 
 describe('JobService Unit Tests', () => {
@@ -37,12 +37,14 @@ describe('JobService Unit Tests', () => {
       const mockUserId = 'user123';
       const mockJob = { ...mockJobData, _id: 'job123', status: 'pending_moderation' };
 
+      JobPosting.findOne.mockResolvedValue(null);
       JobPosting.create.mockResolvedValue(mockJob);
 
       const result = await JobService.createJob(mockJobData, mockUserId);
 
       expect(JobPosting.create).toHaveBeenCalledWith({
         ...mockJobData,
+        requiredSkills: ['skill1'],
         postedBy: mockUserId,
         status: 'pending_moderation',
       });
@@ -75,13 +77,14 @@ describe('JobService Unit Tests', () => {
   describe('getJobById', () => {
     it('should return a job by ID', async () => {
       const mockJob = { title: 'Test Job', _id: 'job123' };
+      const mockDoc = { ...mockJob, toObject: () => mockJob };
       JobPosting.findById.mockReturnValue({
-        populate: jest.fn().mockResolvedValue(mockJob),
+        populate: jest.fn().mockResolvedValue(mockDoc),
       });
 
       const result = await JobService.getJobById('job123');
 
-      expect(result).toEqual(mockJob);
+      expect(result).toEqual({ ...mockJob, hasApplied: false, status: undefined });
     });
 
     it('should throw an error if job is not found', async () => {
@@ -103,7 +106,7 @@ describe('JobService Unit Tests', () => {
       expect(JobPosting.findOneAndUpdate).toHaveBeenCalledWith(
         { _id: 'job123', postedBy: 'user123' },
         { status: 'withdrawn' },
-        { new: true }
+        { returnDocument: 'after' }
       );
       expect(result).toEqual(mockJob);
     });

@@ -1,16 +1,38 @@
 import mongoose from 'mongoose';
-import { JobService } from '../../../src/services/jobs/job.service.js';
-import { NotificationEngine } from '../../../src/services/notifications/notification.engine.js';
-import JobPosting from '../../../src/models/JobPosting.js';
-import User from '../../../src/models/User.js';
-import Notification from '../../../src/models/Notification.js';
+import { jest } from '@jest/globals';
 
-// This is an integration test suite. In a real CI environment, 
-// we would use a test database. Here we mock the DB for the purpose of the flow test.
-jest.mock('../../../src/models/JobPosting.js');
-jest.mock('../../../src/models/User.js');
-jest.mock('../../../src/models/Notification.js');
-jest.mock('bullmq'); // Mock moderation queue
+jest.unstable_mockModule('../../src/models/JobPosting.js', () => ({
+  default: {
+    create: jest.fn(),
+    findOne: jest.fn(),
+    findById: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
+  }
+}));
+
+jest.unstable_mockModule('../../src/models/User.js', () => ({
+  default: {
+    find: jest.fn(),
+  }
+}));
+
+jest.unstable_mockModule('../../src/models/Notification.js', () => ({
+  default: {
+    insertMany: jest.fn(),
+  }
+}));
+
+jest.unstable_mockModule('bullmq', () => ({
+  Queue: class Queue {
+    constructor() { this.add = jest.fn(); }
+  }
+}));
+
+const { JobService } = await import('../../src/services/jobs/job.service.js');
+const { NotificationEngine } = await import('../../src/services/notifications/notification.engine.js');
+const { default: JobPosting } = await import('../../src/models/JobPosting.js');
+const { default: User } = await import('../../src/models/User.js');
+const { default: Notification } = await import('../../src/models/Notification.js');
 
 describe('Dev 3 Module E2E Flow Test', () => {
   const mockUserId = new mongoose.Types.ObjectId().toString();
