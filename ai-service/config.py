@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     pinecone_api_key: str = "mock-pinecone-key"
     pinecone_index: str = "mnnit-student-embeddings"
     embedding_model: str = "gemini-embedding-001"
-    llm_model: str = "gemini-2.0-flash-lite"
-    llm_model_primary: str = "llama-3.3-70b-versatile"
-    llm_model_fast: str = "llama-3.1-8b-instant"
+    llm_model: str = "gemini-2.5-flash"
+    llm_model_primary: str = "gemini-2.5-flash"
+    llm_model_fast: str = "gemini-2.5-flash"
     top_k_results: int = 10
     # mongo_uri: str
 

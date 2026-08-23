@@ -1,3 +1,4 @@
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -16,19 +17,19 @@ PROMPT = PromptTemplate.from_template(
 
 class ExplanationEngine:
     def __init__(self):
-        llm = ChatGroq(
-            model=settings.llm_model_primary,
-            api_key=settings.groq_api_key,
-            temperature=0.3,
-        )
-        if getattr(settings, "groq_api_key_2", ""):
-            f_llm = ChatGroq(
+        try:
+            llm = ChatGoogleGenerativeAI(
                 model=settings.llm_model_primary,
-                api_key=settings.groq_api_key_2,
+                google_api_key=settings.gemini_api_key,
                 temperature=0.3,
             )
-            llm = llm.with_fallbacks([f_llm])
-        self.chain=PROMPT | llm | StrOutputParser()
+        except Exception:
+            llm = ChatGroq(
+                model="groq/compound-mini",
+                api_key=settings.groq_api_key or "mock_key",
+                temperature=0.3,
+            )
+        self.chain = PROMPT | llm | StrOutputParser()
 
     async def explain(self, query: str, skills: list[str]) -> str:
         try:
@@ -36,7 +37,11 @@ class ExplanationEngine:
                 "query": query,
                 "skills": ", ".join(skills) if skills else "not specified",
             })
-            return result.strip()
+            if result and result.strip():
+                return result.strip()
         except Exception as e:
-            print(f"[ExplanationEngine] Error: {e}")
-            return ""
+            print(f"[ExplanationEngine] Error generating explanation: {e}")
+        
+        # Fallback explanation if LLM generation fails or key is unconfigured
+        skills_str = ", ".join(skills[:5]) if skills else "matching academic profile"
+        return f"Strong candidate for '{query}' with background in {skills_str}."
