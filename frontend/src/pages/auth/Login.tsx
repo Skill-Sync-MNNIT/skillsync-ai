@@ -33,35 +33,35 @@ export const Login = () => {
   });
 
   const onSubmit = async (data: LoginForm) => {
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const response = await api.post('/auth/login', data);
+    try {
+      const response = await api.post('/auth/login', data);
 
-    const { user, token } = response.data;
+      const { user, token } = response.data;
 
-    if (!user || !token) {
-      throw new Error('Invalid email or password. Please try again.');
+      if (!user || !token) {
+        throw new Error('Invalid email or password. Please try again.');
+      }
+
+      login(user, token);
+      toast(response.data.message || 'Welcome back to SkillSync AI!', 'success');
+
+      // Redirect to home/search by default, or specific redirect if provided
+      const redirectTo = searchParams.get('redirect') || '/';
+      const pendingQuery = searchParams.get('q');
+
+      // If there's a pending query, always go to home (search page)
+      const finalUrl = pendingQuery ? `/?q=${encodeURIComponent(pendingQuery)}` : redirectTo;
+      navigate(finalUrl);
+    } catch (error: any) {
+      const errorMsg =
+        error.response?.data?.message || 'Invalid email or password. Please try again.';
+      toast(errorMsg, 'error');
+    } finally {
+      setIsLoading(false);
     }
-
-    login(user, token);
-    toast(response.data.message || 'Welcome back to SkillSync AI!', 'success');
-
-    // Redirect to home/search by default, or specific redirect if provided
-    const redirectTo = searchParams.get('redirect') || '/';
-    const pendingQuery = searchParams.get('q');
-    
-    // If there's a pending query, always go to home (search page)
-    const finalUrl = pendingQuery ? `/?q=${encodeURIComponent(pendingQuery)}` : redirectTo;
-    navigate(finalUrl);
-
-  } catch (error: any) {
-    const errorMsg = error.response?.data?.message || 'Invalid email or password. Please try again.';
-    toast(errorMsg, 'error');
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50/50 dark:bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
@@ -70,7 +70,9 @@ export const Login = () => {
           <div className="mx-auto h-12 w-12 bg-primary-100 dark:bg-primary-900/30 text-primary-600 rounded-full flex items-center justify-center mb-4 shadow-inner ring-1 ring-primary-200/50 dark:ring-primary-800/50">
             <LogIn size={24} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Sign in to SkillSync</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Sign in to SkillSync
+          </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Exclusive academic networking for MNNIT
           </p>
@@ -110,10 +112,13 @@ export const Login = () => {
               Sign In
             </Button>
           </div>
-          
+
           <div className="text-sm text-center">
             <span className="text-slate-500 dark:text-slate-400">Don't have an account? </span>
-            <Link to="/auth/register" className="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-500">
+            <Link
+              to="/auth/register"
+              className="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-500"
+            >
               Register here
             </Link>
           </div>

@@ -165,11 +165,9 @@ export const manageGroupMember = async (req, res, next) => {
     // Guard: Prevent demoting/removing yourself if you are the last admin
     if (userId === adminId && (action === 'demote' || action === 'remove')) {
       if (room.admins.length === 1) {
-        return res
-          .status(400)
-          .json({
-            message: 'You are the only admin. Please promote someone else before resigning.',
-          });
+        return res.status(400).json({
+          message: 'You are the only admin. Please promote someone else before resigning.',
+        });
       }
     }
 

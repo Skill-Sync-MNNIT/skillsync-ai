@@ -29,7 +29,9 @@ export const AuthModal = ({ isOpen, onClose, pendingQuery }: AuthModalProps) => 
     } else {
       document.body.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -42,7 +44,9 @@ export const AuthModal = ({ isOpen, onClose, pendingQuery }: AuthModalProps) => 
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
-      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+      onClick={(e) => {
+        if (e.target === overlayRef.current) onClose();
+      }}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
@@ -71,12 +75,15 @@ export const AuthModal = ({ isOpen, onClose, pendingQuery }: AuthModalProps) => 
             Sign in to discover talent
           </h2>
           <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-            Create a free account to unlock AI-powered search and find the perfect candidates from the MNNIT talent pool.
+            Create a free account to unlock AI-powered search and find the perfect candidates from
+            the MNNIT talent pool.
           </p>
 
           {pendingQuery && (
             <div className="mt-5 px-4 py-3 bg-slate-50 dark:bg-[#2a2b32] border border-slate-100 dark:border-[#565869] rounded-xl text-left">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Your search</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                Your search
+              </p>
               <p className="text-sm text-slate-700 dark:text-slate-300 italic">"{pendingQuery}"</p>
             </div>
           )}

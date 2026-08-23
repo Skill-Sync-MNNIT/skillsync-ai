@@ -20,7 +20,7 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,22 +39,22 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
           {label}
         </label>
       )}
-      
+
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-[#565869] bg-white dark:bg-[#202123] px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-all duration-200",
-          error && "border-red-400 focus:ring-red-500/40 focus:border-red-400 dark:border-red-500",
-          isOpen && "ring-2 ring-primary-500/40 border-primary-400"
+          'flex h-11 w-full items-center justify-between rounded-xl border border-slate-200 dark:border-[#565869] bg-white dark:bg-[#202123] px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40 focus:border-primary-400 transition-all duration-200',
+          error && 'border-red-400 focus:ring-red-500/40 focus:border-red-400 dark:border-red-500',
+          isOpen && 'ring-2 ring-primary-500/40 border-primary-400'
         )}
       >
-        <span className={cn(!selectedOption && "text-slate-400")}>
-          {selectedOption ? selectedOption.label : placeholder || "Select option"}
+        <span className={cn(!selectedOption && 'text-slate-400')}>
+          {selectedOption ? selectedOption.label : placeholder || 'Select option'}
         </span>
-        <ChevronDown 
-          size={18} 
-          className={cn("text-slate-400 transition-transform duration-200", isOpen && "rotate-180")} 
+        <ChevronDown
+          size={18}
+          className={cn('text-slate-400 transition-transform duration-200', isOpen && 'rotate-180')}
         />
       </button>
 
@@ -70,8 +70,10 @@ export const Select = ({ label, value, onChange, options, error, placeholder }: 
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-50 dark:hover:bg-[#2a2b32]",
-                  option.value === value ? "text-primary-600 bg-primary-50/50 dark:bg-primary-900/10" : "text-slate-700 dark:text-slate-200"
+                  'flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-50 dark:hover:bg-[#2a2b32]',
+                  option.value === value
+                    ? 'text-primary-600 bg-primary-50/50 dark:bg-primary-900/10'
+                    : 'text-slate-700 dark:text-slate-200'
                 )}
               >
                 {option.label}

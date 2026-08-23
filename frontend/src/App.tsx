@@ -5,27 +5,54 @@ import PrivateRoute from './components/layout/PrivateRoute';
 import { ToastProvider } from './context/ToastContext';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 
-const Login = lazy(() => import('./pages/auth/Login').then(m => ({ default: m.Login })));
-const Register = lazy(() => import('./pages/auth/Register').then(m => ({ default: m.Register })));
-const Verify = lazy(() => import('./pages/auth/Verify').then(m => ({ default: m.Verify })));
-const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
-const HomeLayout = lazy(() => import('./layouts/HomeLayout').then(m => ({ default: m.HomeLayout })));
-const DashboardLayout = lazy(() => import('./layouts/DashboardLayout').then(m => ({ default: m.DashboardLayout })));
-const Dashboard = lazy(() => import('./pages/dashboard/Dashboard').then(m => ({ default: m.Dashboard })));
-const MyProfile = lazy(() => import('./pages/profile/MyProfile').then(m => ({ default: m.MyProfile })));
-const ViewProfile = lazy(() => import('./pages/profile/ViewProfile').then(m => ({ default: m.ViewProfile })));
-const Search = lazy(() => import('./pages/search/Search').then(m => ({ default: m.Search })));
-const JobListing = lazy(() => import('./pages/jobs/JobListing').then(m => ({ default: m.JobListing })));
-const JobCreate = lazy(() => import('./pages/jobs/JobCreate').then(m => ({ default: m.JobCreate })));
-const JobDetail = lazy(() => import('./pages/jobs/JobDetail').then(m => ({ default: m.JobDetail })));
-const JobEdit = lazy(() => import('./pages/jobs/JobEdit').then(m => ({ default: m.JobEdit })));
-const Notifications = lazy(() => import('./pages/notifications/Notifications').then(m => ({ default: m.Notifications })));
-const Settings = lazy(() => import('./pages/settings/Settings').then(m => ({ default: m.Settings })));
-const Connections = lazy(() => import('./pages/Connections/Connections').then(m => ({ default: m.Connections })));
-const ConnectionRequests = lazy(() => import('./pages/Connections/ConnectionRequests').then(m => ({ default: m.ConnectionRequests })));
-const Messages = lazy(() => import('./pages/chat/Messages').then(m => ({ default: m.Messages })));
-const ProjectBoard = lazy(() => import('./pages/jobs/ProjectBoard').then(m => ({ default: m.ProjectBoard })));
-
+const Login = lazy(() => import('./pages/auth/Login').then((m) => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/auth/Register').then((m) => ({ default: m.Register })));
+const Verify = lazy(() => import('./pages/auth/Verify').then((m) => ({ default: m.Verify })));
+const ForgotPassword = lazy(() =>
+  import('./pages/auth/ForgotPassword').then((m) => ({ default: m.ForgotPassword }))
+);
+const HomeLayout = lazy(() =>
+  import('./layouts/HomeLayout').then((m) => ({ default: m.HomeLayout }))
+);
+const DashboardLayout = lazy(() =>
+  import('./layouts/DashboardLayout').then((m) => ({ default: m.DashboardLayout }))
+);
+const Dashboard = lazy(() =>
+  import('./pages/dashboard/Dashboard').then((m) => ({ default: m.Dashboard }))
+);
+const MyProfile = lazy(() =>
+  import('./pages/profile/MyProfile').then((m) => ({ default: m.MyProfile }))
+);
+const ViewProfile = lazy(() =>
+  import('./pages/profile/ViewProfile').then((m) => ({ default: m.ViewProfile }))
+);
+const Search = lazy(() => import('./pages/search/Search').then((m) => ({ default: m.Search })));
+const JobListing = lazy(() =>
+  import('./pages/jobs/JobListing').then((m) => ({ default: m.JobListing }))
+);
+const JobCreate = lazy(() =>
+  import('./pages/jobs/JobCreate').then((m) => ({ default: m.JobCreate }))
+);
+const JobDetail = lazy(() =>
+  import('./pages/jobs/JobDetail').then((m) => ({ default: m.JobDetail }))
+);
+const JobEdit = lazy(() => import('./pages/jobs/JobEdit').then((m) => ({ default: m.JobEdit })));
+const Notifications = lazy(() =>
+  import('./pages/notifications/Notifications').then((m) => ({ default: m.Notifications }))
+);
+const Settings = lazy(() =>
+  import('./pages/settings/Settings').then((m) => ({ default: m.Settings }))
+);
+const Connections = lazy(() =>
+  import('./pages/Connections/Connections').then((m) => ({ default: m.Connections }))
+);
+const ConnectionRequests = lazy(() =>
+  import('./pages/Connections/ConnectionRequests').then((m) => ({ default: m.ConnectionRequests }))
+);
+const Messages = lazy(() => import('./pages/chat/Messages').then((m) => ({ default: m.Messages })));
+const ProjectBoard = lazy(() =>
+  import('./pages/jobs/ProjectBoard').then((m) => ({ default: m.ProjectBoard }))
+);
 
 const NotFound = () => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center text-center px-4">
@@ -38,8 +65,15 @@ const NotFound = () => (
       />
     </div>
     <h2 className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">Page Not Found</h2>
-    <p className="mt-2 text-slate-500">The page you are looking for doesn't exist or has been moved.</p>
-    <a href="/" className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors">Return to Home</a>
+    <p className="mt-2 text-slate-500">
+      The page you are looking for doesn't exist or has been moved.
+    </p>
+    <a
+      href="/"
+      className="mt-8 font-medium text-primary-600 hover:text-primary-500 transition-colors"
+    >
+      Return to Home
+    </a>
   </div>
 );
 
@@ -48,7 +82,9 @@ function App() {
     <ToastProvider>
       <BrowserRouter>
         <div className="min-h-screen font-sans bg-slate-50/50 text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-200">
-          <Suspense fallback={<LoadingSpinner fullPage message="Securely loading your workspace..." />}>
+          <Suspense
+            fallback={<LoadingSpinner fullPage message="Securely loading your workspace..." />}
+          >
             <Routes>
               {/* Public: AI Search Home Page */}
               <Route element={<HomeLayout />}>

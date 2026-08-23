@@ -5,10 +5,7 @@ import { profileService } from '../services/profileService';
  * Manages the polling loop that checks the AI embedding status of a user's resume.
  * Polling stops automatically when the status reaches 'indexed' or 'failed'.
  */
-export const useProfilePolling = (
-  onData: (data: any) => void,
-  onStop?: () => void
-) => {
+export const useProfilePolling = (onData: (data: any) => void, onStop?: () => void) => {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startPoll = (userId: string) => {
@@ -21,7 +18,9 @@ export const useProfilePolling = (
           stopPoll();
           onStop?.();
         }
-      } catch { /* silent — network hiccup during poll */ }
+      } catch {
+        /* silent — network hiccup during poll */
+      }
     }, 4000);
   };
 

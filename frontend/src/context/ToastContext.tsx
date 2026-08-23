@@ -23,7 +23,11 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const toast = useCallback((message: string, type: ToastType = 'success') => {
     // Prevent duplicate toasts within 1000ms using a ref for synchronous checks
     const now = Date.now();
-    if (lastToastRef.current && lastToastRef.current.message === message && now - lastToastRef.current.time < 1000) {
+    if (
+      lastToastRef.current &&
+      lastToastRef.current.message === message &&
+      now - lastToastRef.current.time < 1000
+    ) {
       return;
     }
     lastToastRef.current = { message, time: now };
@@ -62,8 +66,8 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
               t.type === 'success'
                 ? 'bg-white border-green-100 text-green-800'
                 : t.type === 'error'
-                ? 'bg-white border-red-100 text-red-800'
-                : 'bg-white border-blue-100 text-blue-800'
+                  ? 'bg-white border-red-100 text-red-800'
+                  : 'bg-white border-blue-100 text-blue-800'
             }`}
           >
             <div className="flex items-center gap-3">

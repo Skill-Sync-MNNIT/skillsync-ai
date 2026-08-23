@@ -3,10 +3,16 @@ from config import settings
 
 class PineconeRepository:
     def __init__(self):
-        pc = Pinecone(api_key=settings.pinecone_api_key)
-        self.index = pc.Index(settings.pinecone_index)
+        try:
+            pc = Pinecone(api_key=settings.pinecone_api_key)
+            self.index = pc.Index(settings.pinecone_index)
+        except Exception as e:
+            print(f"[PineconeRepository] Warning: Could not connect to Pinecone index: {e}")
+            self.index = None
 
-    def upsert(self,user_id: str, vector: list[float], metadata: dict) -> None:
+    def upsert(self, user_id: str, vector: list[float], metadata: dict) -> None:
+        if not self.index:
+            return
         self.index.upsert(
             vectors=[
                 {
@@ -25,7 +31,9 @@ class PineconeRepository:
             ]
         )
     
-    def search(self,vector: list[float],top_k: int=50,course: str|None=None, branch: str|None=None, year:int|None=None, min_cpi:float=0.0) -> list[dict]:
+    def search(self, vector: list[float], top_k: int=50, course: str|None=None, branch: str|None=None, year:int|None=None, min_cpi:float=0.0) -> list[dict]:
+        if not self.index:
+            return []
         filter_dict : dict = {"is_active":{"$eq": True}}
         if course:
             filter_dict["course"] = {"$eq": course}
@@ -51,16 +59,22 @@ class PineconeRepository:
         ]
         
     def update_metadata(self, user_id: str, metadata: dict) -> None:
+        if not self.index:
+            return
         try:
             self.index.update(id=user_id, set_metadata=metadata)
         except Exception as e:
             # Might throw if vector doesn't exist yet, we can silently swallow or raise
             print(f"[Pinecone] Failed to update metadata for {user_id}: {e}")
 
-    def delete(self, user_id:str)->None:
+    def delete(self, user_id: str) -> None:
+        if not self.index:
+            return
         self.index.delete(ids=[user_id])
 
-    def fetch(self,user_id:str)->dict | None:
+    def fetch(self, user_id: str) -> dict | None:
+        if not self.index:
+            return None
         results = self.index.fetch(ids=[user_id])
         return results.vectors.get(user_id)
 

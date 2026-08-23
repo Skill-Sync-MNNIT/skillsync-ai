@@ -77,7 +77,6 @@ export const initModerationWorker = () => {
           throw error; // Re-queue if it fails
         }
       },
-      { connection: redis }
       {
         connection: redis,
 

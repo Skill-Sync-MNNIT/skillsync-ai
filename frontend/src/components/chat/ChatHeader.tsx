@@ -44,9 +44,7 @@ export const ChatHeader = ({
         );
       }
       return (
-        <span className="text-slate-500">
-          {currentRoom?.participants?.length || 0} members
-        </span>
+        <span className="text-slate-500">{currentRoom?.participants?.length || 0} members</span>
       );
     }
 
@@ -107,9 +105,11 @@ export const ChatHeader = ({
             }
           }}
         >
-          {currentRoom?.isGroup
-            ? <Users size={22} />
-            : currentRoom?.participants.find((p: any) => p._id !== user?._id)?.name?.charAt(0) || 'U'}
+          {currentRoom?.isGroup ? (
+            <Users size={22} />
+          ) : (
+            currentRoom?.participants.find((p: any) => p._id !== user?._id)?.name?.charAt(0) || 'U'
+          )}
         </div>
 
         <div

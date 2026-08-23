@@ -51,7 +51,11 @@ export const ViewProfileSkeleton = () => (
           </div>
           <div className="flex flex-wrap gap-2.5">
             {[80, 100, 70, 90, 60, 110, 75].map((w, i) => (
-              <div key={i} className="h-9 bg-slate-100 dark:bg-[#40414f] rounded-2xl" style={{ width: w }} />
+              <div
+                key={i}
+                className="h-9 bg-slate-100 dark:bg-[#40414f] rounded-2xl"
+                style={{ width: w }}
+              />
             ))}
           </div>
         </div>

@@ -19,10 +19,12 @@ const sender = {
 const accountInstance = new AccountApi();
 accountInstance.setApiKey(AccountApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
-accountInstance.getAccount().then(
-  () => console.log('Brevo Email Service Connected.'),
-  (err) => console.error('Brevo Connection Error:', err.message)
-);
+if (process.env.NODE_ENV !== 'test' && process.env.BREVO_API_KEY) {
+  accountInstance.getAccount().then(
+    () => console.log('Brevo Email Service Connected.'),
+    (err) => console.error('Brevo Connection Error:', err.message)
+  );
+}
 
 export const sendOTPEmail = async (email, otp, name = 'User') => {
   try {

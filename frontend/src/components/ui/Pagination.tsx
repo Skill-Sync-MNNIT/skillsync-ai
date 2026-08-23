@@ -9,7 +9,12 @@ interface PaginationProps {
   className?: string;
 }
 
-export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange, className }) => {
+export const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className,
+}) => {
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
@@ -55,7 +60,9 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className={`flex justify-center items-center gap-2 mt-12 pb-8 animate-fade-in ${className || ''}`}>
+    <div
+      className={`flex justify-center items-center gap-2 mt-12 pb-8 animate-fade-in ${className || ''}`}
+    >
       <Button
         variant="outline"
         size="sm"
@@ -70,7 +77,10 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
         {pageNumbers.map((page, index) => {
           if (page === '...') {
             return (
-              <span key={`ellipsis-${index}`} className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-slate-400 font-bold">
+              <span
+                key={`ellipsis-${index}`}
+                className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-slate-400 font-bold"
+              >
                 ...
               </span>
             );
@@ -83,10 +93,11 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
             <button
               key={pageNumber}
               onClick={() => onPageChange(pageNumber)}
-              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center ${isActive
+              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl text-sm font-bold transition-all duration-200 flex items-center justify-center ${
+                isActive
                   ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30 scale-105'
                   : 'bg-white dark:bg-[#202123] text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-[#383942] hover:border-primary-400 hover:text-primary-600 shadow-sm'
-                }`}
+              }`}
             >
               {pageNumber}
             </button>

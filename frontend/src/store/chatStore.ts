@@ -57,7 +57,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         role: m.role,
         content: m.content,
         results: m.results,
-        filters: m.filters
+        filters: m.filters,
       }));
       set({ activeMessages: loadedMessages, isLoading: false });
     } catch (err) {
@@ -71,19 +71,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
       await api.delete(`/conversations/${id}`);
       const { activeId } = get();
       if (activeId === id) set({ activeId: null, activeMessages: [] });
-      set(state => ({
-        conversations: state.conversations.filter(c => c._id !== id)
+      set((state) => ({
+        conversations: state.conversations.filter((c) => c._id !== id),
       }));
     } catch (err) {
       console.error('Failed to delete', err);
     }
   },
-  
+
   clearActive: () => set({ activeId: null, activeMessages: [] }),
 
   sendMessage: async (query, branch, year, top_k) => {
     const { activeId, activeMessages } = get();
-    
+
     const userMsg: Message = { id: Date.now().toString(), role: 'user', content: query };
     set({ activeMessages: [...activeMessages, userMsg], isLoading: true });
 
@@ -93,7 +93,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         branch,
         year,
         top_k,
-        conversationId: activeId
+        conversationId: activeId,
       });
 
       const aiMsg: Message = {
@@ -101,13 +101,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         role: 'assistant',
         content: res.data.summary || 'Search complete.',
         results: res.data.results,
-        filters: res.data.filters
+        filters: res.data.filters,
       };
 
-      set(state => ({
-        activeId: res.data.conversationId, 
+      set((state) => ({
+        activeId: res.data.conversationId,
         activeMessages: [...state.activeMessages, aiMsg],
-        isLoading: false
+        isLoading: false,
       }));
 
       // Refresh sidebar titles list implicitly tracking new created ones or shifting order
@@ -116,5 +116,5 @@ export const useChatStore = create<ChatState>((set, get) => ({
       console.error(err);
       set({ isLoading: false });
     }
-  }
+  },
 }));

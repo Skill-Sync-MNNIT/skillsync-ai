@@ -104,7 +104,9 @@ export const ConfirmDialog = ({
 
         {/* Icon + Title */}
         <div className="flex items-start gap-4 mb-4">
-          <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${config.iconBg}`}>
+          <div
+            className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${config.iconBg}`}
+          >
             {config.icon}
           </div>
           <div>
@@ -135,7 +137,9 @@ export const ConfirmDialog = ({
             onClick={onConfirm}
             isLoading={isLoading}
             className={`rounded-xl px-6 ${config.confirmClass || ''}`}
-            variant={variant === 'default' ? 'primary' : variant === 'danger' ? 'danger' : 'outline'}
+            variant={
+              variant === 'default' ? 'primary' : variant === 'danger' ? 'danger' : 'outline'
+            }
           >
             {confirmLabel}
           </Button>

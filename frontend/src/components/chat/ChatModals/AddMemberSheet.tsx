@@ -31,21 +31,13 @@ export const AddMemberSheet = ({
 }: AddMemberSheetProps) => {
   const eligibleConnections = myConnections
     .map((conn: any) => {
-      const other =
-        conn.requester?._id === user?._id ? conn.recipient : conn.requester;
+      const other = conn.requester?._id === user?._id ? conn.recipient : conn.requester;
       return other;
     })
-    .filter(
-      (u: any) =>
-        u && !currentRoom?.participants?.some((p: any) => p._id === u._id)
-    );
+    .filter((u: any) => u && !currentRoom?.participants?.some((p: any) => p._id === u._id));
 
   return (
-    <BottomSheet
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Add to Group"
-    >
+    <BottomSheet isOpen={isOpen} onClose={onClose} title="Add to Group">
       <div className="flex flex-col h-[70vh] max-h-[600px]">
         <div className="p-4 border-b dark:border-[#383942] space-y-4">
           <div className="relative group">

@@ -31,8 +31,8 @@ export const Notifications = () => {
       const response = await api.get('/notifications');
       setNotifications(response.data.notifications || []);
     } catch (error) {
-       console.error('Failed to fetch notifications', error);
-       toast('Failed to load notifications', 'error');
+      console.error('Failed to fetch notifications', error);
+      toast('Failed to load notifications', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -46,15 +46,15 @@ export const Notifications = () => {
     if (!notif.isRead) {
       try {
         await api.patch(`/notifications/${notif._id}/read`);
-        setNotifications((prev) => 
+        setNotifications((prev) =>
           prev.map((n) => (n._id === notif._id ? { ...n, isRead: true } : n))
         );
       } catch (e) {
-         console.error('Failed to mark as read', e);
-         toast('Failed to mark notification as read', 'error');
+        console.error('Failed to mark as read', e);
+        toast('Failed to mark notification as read', 'error');
       }
     }
-    
+
     if (notif.jobId) {
       navigate(`/jobs/${notif.jobId}`);
     }
@@ -62,16 +62,16 @@ export const Notifications = () => {
 
   const markAllAsRead = async () => {
     try {
-       const unread = notifications.filter(n => !n.isRead);
-       if (unread.length === 0) return;
-       
-       // Optimization: Could use a single backend call if available, but for now this works
-       await Promise.all(unread.map(n => api.patch(`/notifications/${n._id}/read`)));
-       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-       toast('All notifications marked as read', 'success');
+      const unread = notifications.filter((n) => !n.isRead);
+      if (unread.length === 0) return;
+
+      // Optimization: Could use a single backend call if available, but for now this works
+      await Promise.all(unread.map((n) => api.patch(`/notifications/${n._id}/read`)));
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      toast('All notifications marked as read', 'success');
     } catch (e) {
-       console.error('Failed to mark all as read', e);
-       toast('Failed to mark all as read', 'error');
+      console.error('Failed to mark all as read', e);
+      toast('Failed to mark all as read', 'error');
     }
   };
 
@@ -79,7 +79,7 @@ export const Notifications = () => {
     e.stopPropagation();
     try {
       await api.delete(`/notifications/${id}`);
-      setNotifications(prev => prev.filter(n => n._id !== id));
+      setNotifications((prev) => prev.filter((n) => n._id !== id));
       toast('Notification deleted', 'success');
     } catch (e) {
       console.error('Failed to delete notification', e);
@@ -113,20 +113,22 @@ export const Notifications = () => {
           <div className="h-10 w-10 bg-primary-50 dark:bg-primary-900/20 rounded-xl flex items-center justify-center text-primary-600">
             <Bell size={20} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Notifications</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Notifications
+          </h1>
         </div>
         <div className="flex items-center gap-4">
           {notifications.length > 0 && (
             <>
-              {notifications.some(n => !n.isRead) && (
-                <button 
+              {notifications.some((n) => !n.isRead) && (
+                <button
                   onClick={markAllAsRead}
                   className="flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
                 >
                   <CheckCheck size={16} /> Mark all read
                 </button>
               )}
-              <button 
+              <button
                 onClick={handleClearAll}
                 className="flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors"
               >
@@ -153,24 +155,31 @@ export const Notifications = () => {
               onClick={() => handleNotificationClick(notif)}
             >
               <CardContent className="p-4 sm:p-5 flex gap-4">
-                <div className={`mt-1 shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${notif.jobId ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
+                <div
+                  className={`mt-1 shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
+                    notif.jobId ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                  }`}
+                >
                   {notif.jobId ? <Briefcase size={18} /> : <Info size={18} />}
                 </div>
-                
+
                 <div className="flex-1">
-                  <p className={`text-sm sm:text-base ${!notif.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}>
+                  <p
+                    className={`text-sm sm:text-base ${!notif.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}
+                  >
                     {notif.message}
                   </p>
                   <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {new Date(notif.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short', hour12: false })}
+                    {new Date(notif.createdAt).toLocaleString(undefined, {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                      hour12: false,
+                    })}
                   </p>
                 </div>
 
                 <div className="shrink-0 flex items-center gap-3">
-                  {!notif.isRead && (
-                    <div className="h-2.5 w-2.5 bg-primary-600 rounded-full"></div>
-                  )}
+                  {!notif.isRead && <div className="h-2.5 w-2.5 bg-primary-600 rounded-full"></div>}
                   <button
                     onClick={(e) => handleDeleteNotification(e, notif._id)}
                     className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"

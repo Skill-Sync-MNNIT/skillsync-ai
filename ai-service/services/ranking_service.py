@@ -14,6 +14,8 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import json
 
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 class RankingService:
     def __init__(self):
         self.embedder = GoogleGenerativeAIEmbeddings(
@@ -21,12 +23,18 @@ class RankingService:
             google_api_key=settings.gemini_api_key,
         )
         self.repo = PineconeRepository()
-        self.llm = ChatGroq(
-            model=settings.llm_model_fast,
-            api_key=settings.groq_api_key,
-            temperature=0.0,
-            model_kwargs={"response_format": {"type": "json_object"}}
-        )
+        try:
+            self.llm = ChatGoogleGenerativeAI(
+                model=settings.llm_model_fast,
+                google_api_key=settings.gemini_api_key,
+                temperature=0.0,
+            )
+        except Exception:
+            self.llm = ChatGroq(
+                model="groq/compound-mini",
+                api_key=settings.groq_api_key or "mock_key",
+                temperature=0.0,
+            )
         
         self.extract_prompt = PromptTemplate.from_template(
             "You are a recruitment AI processing a candidate search. Read the conversation history and the latest user query.\n"
@@ -104,15 +112,7 @@ class RankingService:
         else:
              summary += "."
 
-        return {
-            "candidates": ranked,
-            "summary": summary,
-            "filters": {
-                "limit": limit,
-                "min_cpi": min_cpi,
-                "core_query": core_query
-            }
-        }
+        return ranked
 
     async def get_detail(self, user_id: str, query: str) -> dict | None:
         record = self.repo.fetch(user_id)

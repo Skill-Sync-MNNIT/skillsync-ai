@@ -33,7 +33,9 @@ export const Messages = () => {
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const [roomOptionsOpen, setRoomOptionsOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<any>(null);
-  const [userStatuses, setUserStatuses] = useState<Record<string, { isOnline: boolean; lastSeen?: string }>>({});
+  const [userStatuses, setUserStatuses] = useState<
+    Record<string, { isOnline: boolean; lastSeen?: string }>
+  >({});
   const [isUploading, setIsUploading] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [newNameInput, setNewNameInput] = useState('');
@@ -54,7 +56,10 @@ export const Messages = () => {
 
   // ─── Connections search for Add Member ───────────────────
   useEffect(() => {
-    if (!isAddMemberModalOpen) { setAddMemberQuery(''); return; }
+    if (!isAddMemberModalOpen) {
+      setAddMemberQuery('');
+      return;
+    }
     const timer = setTimeout(async () => {
       try {
         setIsFetchingConnections(true);
@@ -90,8 +95,12 @@ export const Messages = () => {
       const res = await api.get('/chats/rooms');
       const roomsData = res.data;
       roomsData.sort((a: any, b: any) => {
-        const dateA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : new Date(a.updatedAt).getTime();
-        const dateB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : new Date(b.updatedAt).getTime();
+        const dateA = a.lastMessageAt
+          ? new Date(a.lastMessageAt).getTime()
+          : new Date(a.updatedAt).getTime();
+        const dateB = b.lastMessageAt
+          ? new Date(b.lastMessageAt).getTime()
+          : new Date(b.updatedAt).getTime();
         return dateB - dateA;
       });
       setRooms(roomsData);
@@ -100,8 +109,12 @@ export const Messages = () => {
         roomsData.forEach((room: any) => {
           const lastMsg = room.lastMessageDetails;
           if (lastMsg) {
-            const senderId = typeof lastMsg.senderId === 'object' ? lastMsg.senderId._id : lastMsg.senderId;
-            if (String(senderId) !== String(user._id) && !lastMsg.deliveredTo?.includes(String(user._id))) {
+            const senderId =
+              typeof lastMsg.senderId === 'object' ? lastMsg.senderId._id : lastMsg.senderId;
+            if (
+              String(senderId) !== String(user._id) &&
+              !lastMsg.deliveredTo?.includes(String(user._id))
+            ) {
               socket.emit('message_delivered', { messageId: lastMsg._id, roomId: room._id });
             }
           }
@@ -113,7 +126,7 @@ export const Messages = () => {
           initialStatuses[p._id] = { isOnline: p.isOnline, lastSeen: p.lastSeen };
         });
       });
-      setUserStatuses(prev => ({ ...initialStatuses, ...prev }));
+      setUserStatuses((prev) => ({ ...initialStatuses, ...prev }));
     } catch (err) {
       console.error('Fetch rooms error:', err);
       toast('Failed to load chat rooms', 'error');
@@ -130,7 +143,9 @@ export const Messages = () => {
         const undeliveredIds = res.data
           .filter((m: any) => {
             const senderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
-            return String(senderId) !== String(user?._id) && !m.deliveredTo?.includes(String(user?._id));
+            return (
+              String(senderId) !== String(user?._id) && !m.deliveredTo?.includes(String(user?._id))
+            );
           })
           .map((m: any) => m._id);
         if (undeliveredIds.length > 0) {
@@ -143,11 +158,13 @@ export const Messages = () => {
   };
 
   // ─── Initial load + URL param routing ────────────────────
-  useEffect(() => { fetchRooms(); }, []);
+  useEffect(() => {
+    fetchRooms();
+  }, []);
   useEffect(() => {
     const roomId = searchParams.get('roomId');
     if (roomId && rooms.length > 0 && currentRoom?._id !== roomId) {
-      const room = rooms.find(r => r._id === roomId);
+      const room = rooms.find((r) => r._id === roomId);
       if (room) setCurrentRoom(room);
     }
   }, [searchParams, rooms, currentRoom?._id]);
@@ -157,78 +174,117 @@ export const Messages = () => {
     if (!socket) return;
 
     socket.on('new_message', (message) => {
-      const senderId = typeof message.senderId === 'object' ? message.senderId._id : message.senderId;
+      const senderId =
+        typeof message.senderId === 'object' ? message.senderId._id : message.senderId;
       if (String(senderId) !== String(user?._id)) {
         socket.emit('message_delivered', { messageId: message._id, roomId: message.chatRoomId });
       }
       if (currentRoom?._id === message.chatRoomId) {
-        setMessages(prev => [...prev, message]);
-        setRooms(prev => prev.map(room =>
-          room._id === message.chatRoomId
-            ? { ...room, lastMessageAt: message.createdAt || new Date().toISOString(), lastMessage: message.content, lastMessageDetails: message }
-            : room
-        ));
+        setMessages((prev) => [...prev, message]);
+        setRooms((prev) =>
+          prev.map((room) =>
+            room._id === message.chatRoomId
+              ? {
+                  ...room,
+                  lastMessageAt: message.createdAt || new Date().toISOString(),
+                  lastMessage: message.content,
+                  lastMessageDetails: message,
+                }
+              : room
+          )
+        );
       } else {
-        setRooms(prev => prev.map(room =>
-          room._id === message.chatRoomId
-            ? { ...room, unreadCount: (room.unreadCount || 0) + 1, lastMessageAt: message.createdAt || new Date().toISOString(), lastMessage: message.content, lastMessageDetails: message }
-            : room
-        ));
+        setRooms((prev) =>
+          prev.map((room) =>
+            room._id === message.chatRoomId
+              ? {
+                  ...room,
+                  unreadCount: (room.unreadCount || 0) + 1,
+                  lastMessageAt: message.createdAt || new Date().toISOString(),
+                  lastMessage: message.content,
+                  lastMessageDetails: message,
+                }
+              : room
+          )
+        );
       }
     });
 
     socket.on('message_edited', (updatedMessage) => {
-      setMessages(prev => prev.map(m => m._id === updatedMessage._id ? updatedMessage : m));
+      setMessages((prev) => prev.map((m) => (m._id === updatedMessage._id ? updatedMessage : m)));
     });
 
     socket.on('message_deleted_everyone', ({ messageId }) => {
-      setMessages(prev => prev.map(m =>
-        m._id === messageId ? { ...m, content: 'This message was deleted', isDeletedForEveryone: true } : m
-      ));
+      setMessages((prev) =>
+        prev.map((m) =>
+          m._id === messageId
+            ? { ...m, content: 'This message was deleted', isDeletedForEveryone: true }
+            : m
+        )
+      );
     });
 
     socket.on('user_status_change', ({ userId, isOnline, lastSeen }) => {
-      setUserStatuses(prev => ({ ...prev, [userId]: { isOnline, lastSeen } }));
+      setUserStatuses((prev) => ({ ...prev, [userId]: { isOnline, lastSeen } }));
     });
 
     socket.on('group_renamed', ({ roomId, name }) => {
       if (currentRoom?._id === roomId) {
-        setCurrentRoom((prev: any) => prev ? { ...prev, name } : null);
+        setCurrentRoom((prev: any) => (prev ? { ...prev, name } : null));
         fetchRooms();
       }
     });
 
-    socket.on('user_typing', ({ userId: typingId, isTyping: typingStatus, roomId: typingRoomId, userName }) => {
-      if (String(currentRoom?._id) === String(typingRoomId) && String(typingId) !== String(user?._id)) {
-        setTypingUser(typingStatus ? (userName || 'Someone') : null);
+    socket.on(
+      'user_typing',
+      ({ userId: typingId, isTyping: typingStatus, roomId: typingRoomId, userName }) => {
+        if (
+          String(currentRoom?._id) === String(typingRoomId) &&
+          String(typingId) !== String(user?._id)
+        ) {
+          setTypingUser(typingStatus ? userName || 'Someone' : null);
+        }
       }
+    );
+
+    socket.on('connect', () => {
+      fetchRooms();
     });
 
-    socket.on('connect', () => { fetchRooms(); });
-
     socket.on('message_status_update', ({ messageId, deliveredTo, readBy }) => {
-      setMessages(prev => prev.map(m => m._id === messageId ? { ...m, deliveredTo, readBy } : m));
+      setMessages((prev) =>
+        prev.map((m) => (m._id === messageId ? { ...m, deliveredTo, readBy } : m))
+      );
     });
 
     socket.on('messages_marked_read', ({ roomId, userId }) => {
-      setRooms(prev => prev.map(room => room._id === roomId ? { ...room, unreadCount: 0 } : room));
-      setMessages(prev => prev.map(m => {
-        const pid = String(userId);
-        const senderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
-        if (String(m.chatRoomId) === String(roomId) && String(senderId) === String(user?._id) && !m.readBy?.includes(pid)) {
-          return { ...m, readBy: [...(m.readBy || []), pid] };
-        }
-        return m;
-      }));
+      setRooms((prev) =>
+        prev.map((room) => (room._id === roomId ? { ...room, unreadCount: 0 } : room))
+      );
+      setMessages((prev) =>
+        prev.map((m) => {
+          const pid = String(userId);
+          const senderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
+          if (
+            String(m.chatRoomId) === String(roomId) &&
+            String(senderId) === String(user?._id) &&
+            !m.readBy?.includes(pid)
+          ) {
+            return { ...m, readBy: [...(m.readBy || []), pid] };
+          }
+          return m;
+        })
+      );
     });
 
     socket.on('room_discarded', ({ roomId, adminId }) => {
-      setRooms(prev => prev.filter(r => r._id !== roomId));
+      setRooms((prev) => prev.filter((r) => r._id !== roomId));
       if (currentRoom?._id === roomId) {
         setCurrentRoom(null);
         setMessages([]);
         setSearchParams({});
-        if (String(adminId) !== String(user?._id)) toast('This group has been discarded by the admin', 'info');
+        if (String(adminId) !== String(user?._id))
+          toast('This group has been discarded by the admin', 'info');
       }
     });
 
@@ -250,7 +306,9 @@ export const Messages = () => {
     if (currentRoom) {
       fetchMessages(currentRoom._id);
       setTypingUser(null);
-      setRooms(prev => prev.map(room => room._id === currentRoom._id ? { ...room, unreadCount: 0 } : room));
+      setRooms((prev) =>
+        prev.map((room) => (room._id === currentRoom._id ? { ...room, unreadCount: 0 } : room))
+      );
       if (socket) {
         socket.emit('join_room', currentRoom._id);
         socket.emit('mark_read', { roomId: currentRoom._id });
@@ -260,7 +318,9 @@ export const Messages = () => {
     }
   }, [currentRoom, socket]);
 
-  useEffect(() => { scrollToBottom(); }, [messages, typingUser]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, typingUser]);
 
   // ─── Message handlers ─────────────────────────────────────
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,20 +356,28 @@ export const Messages = () => {
         socket.emit('typing', { roomId: currentRoom._id, isTyping: false, userName: myName });
       }
     } catch (err: any) {
-      toast(err.response?.data?.error || err.response?.data?.message || 'Failed to send message', 'error');
+      toast(
+        err.response?.data?.error || err.response?.data?.message || 'Failed to send message',
+        'error'
+      );
     }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !currentRoom) return;
-    if (file.size > 5 * 1024 * 1024) { toast('Image must be less than 5MB', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024) {
+      toast('Image must be less than 5MB', 'error');
+      return;
+    }
     setIsUploading(true);
     const formData = new FormData();
     formData.append('image', file);
     formData.append('roomId', currentRoom._id);
     try {
-      await api.post('/chats/messages/image', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      await api.post('/chats/messages/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       toast('Image sent', 'success');
     } catch {
       toast('Failed to upload image', 'error');
@@ -337,14 +405,14 @@ export const Messages = () => {
   const handleDeleteForMe = async (msgId: string) => {
     try {
       await api.delete(`/chats/messages/${msgId}/me`);
-      setMessages(prev => prev.filter(m => m._id !== msgId));
+      setMessages((prev) => prev.filter((m) => m._id !== msgId));
       toast('Deleted for me', 'success');
     } catch {
       toast('Failed to delete message', 'error');
     }
   };
 
-  const onEmojiClick = (emojiData: any) => setNewMessage(prev => prev + emojiData.emoji);
+  const onEmojiClick = (emojiData: any) => setNewMessage((prev) => prev + emojiData.emoji);
 
   // ─── Room action handlers ──────────────────────────────────
   const handleRenameRoom = async () => {
@@ -398,7 +466,11 @@ export const Messages = () => {
     }
   };
 
-  const handleManageMember = async (participantId: string, action: 'promote' | 'demote' | 'remove', isAdmin: boolean) => {
+  const handleManageMember = async (
+    participantId: string,
+    action: 'promote' | 'demote' | 'remove',
+    isAdmin: boolean
+  ) => {
     if (!currentRoom) return;
     try {
       if (action === 'remove') {
@@ -416,12 +488,14 @@ export const Messages = () => {
         if (!prev) return null;
         return {
           ...prev,
-          participants: action === 'remove'
-            ? prev.participants.filter((p: any) => p._id !== participantId)
-            : prev.participants,
-          admins: action === 'promote'
-            ? [...(prev.admins || []), { _id: participantId }]
-            : prev.admins?.filter((a: any) => (a._id || a) !== participantId),
+          participants:
+            action === 'remove'
+              ? prev.participants.filter((p: any) => p._id !== participantId)
+              : prev.participants,
+          admins:
+            action === 'promote'
+              ? [...(prev.admins || []), { _id: participantId }]
+              : prev.admins?.filter((a: any) => (a._id || a) !== participantId),
         };
       });
     } catch (err: any) {
@@ -448,7 +522,6 @@ export const Messages = () => {
 
   return (
     <div className="flex h-[calc(100vh-64px)] bg-white dark:bg-[#202123] overflow-hidden relative">
-
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <ChatSidebar
         rooms={rooms}
@@ -468,10 +541,12 @@ export const Messages = () => {
       />
 
       {/* ── Main Chat Panel ─────────────────────────────────── */}
-      <div className={cn(
-        'flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#343541] relative overflow-hidden transition-all duration-300',
-        !showMobileChat ? 'hidden md:flex' : 'flex'
-      )}>
+      <div
+        className={cn(
+          'flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#343541] relative overflow-hidden transition-all duration-300',
+          !showMobileChat ? 'hidden md:flex' : 'flex'
+        )}
+      >
         {currentRoom ? (
           <>
             {/* Chat Header */}
@@ -488,7 +563,9 @@ export const Messages = () => {
               <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0" />
               <div className="relative z-10 flex flex-col space-y-1 pt-2 min-h-full">
                 {(() => {
-                  const filteredMessages = messages.filter(m => !m.deletedBy?.includes(user?._id));
+                  const filteredMessages = messages.filter(
+                    (m) => !m.deletedBy?.includes(user?._id)
+                  );
                   if (filteredMessages.length === 0) {
                     return (
                       <EmptyState
@@ -502,11 +579,15 @@ export const Messages = () => {
                   return filteredMessages.map((msg, idx) => {
                     const isMe = msg.senderId?._id === user?._id || msg.senderId === user?._id;
                     const prevMsg = messages[idx - 1];
-                    const isConsecutive = prevMsg?.senderId?._id === (msg.senderId?._id || msg.senderId);
+                    const isConsecutive =
+                      prevMsg?.senderId?._id === (msg.senderId?._id || msg.senderId);
 
                     if (msg.messageType === 'system') {
                       return (
-                        <div key={msg._id} className="flex justify-center my-2 animate-in fade-in zoom-in duration-500">
+                        <div
+                          key={msg._id}
+                          className="flex justify-center my-2 animate-in fade-in zoom-in duration-500"
+                        >
                           <div className="bg-slate-100/50 dark:bg-[#40414f] backdrop-blur-sm px-4 py-1 rounded-full text-[11px] font-medium text-slate-500 dark:text-slate-400 border border-slate-200/30 dark:border-[#565869]/30 shadow-sm">
                             <span className="opacity-40 mr-2">—</span>
                             {msg.content}
@@ -528,7 +609,9 @@ export const Messages = () => {
                         onDeleteMe={() => handleDeleteForMe(msg._id)}
                         onDeleteEveryone={() => handleDeleteForEveryone(msg._id)}
                         onScrollToMessage={scrollToMessage}
-                        onSetRef={(el) => { messageRefs.current[msg._id] = el; }}
+                        onSetRef={(el) => {
+                          messageRefs.current[msg._id] = el;
+                        }}
                       />
                     );
                   });
@@ -539,8 +622,12 @@ export const Messages = () => {
                   <div className="flex items-start mt-1">
                     <div className="bg-white dark:bg-[#2a2b32] text-slate-500 text-xs px-4 py-2 rounded-2xl rounded-bl-none shadow-sm border dark:border-[#383942] flex items-center gap-2">
                       <span className="flex gap-1">
-                        {[0, 150, 300].map(d => (
-                          <span key={d} className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                        {[0, 150, 300].map((d) => (
+                          <span
+                            key={d}
+                            className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
+                            style={{ animationDelay: `${d}ms` }}
+                          />
                         ))}
                       </span>
                       <span className="font-medium text-slate-500">{typingUser} is typing...</span>
@@ -562,7 +649,10 @@ export const Messages = () => {
               isUploading={isUploading}
               editingMessage={editingMessage}
               replyTo={replyTo}
-              onCancelEdit={() => { setEditingMessage(null); setNewMessage(''); }}
+              onCancelEdit={() => {
+                setEditingMessage(null);
+                setNewMessage('');
+              }}
               onCancelReply={() => setReplyTo(null)}
             />
           </>
@@ -629,7 +719,6 @@ export const Messages = () => {
         isFetchingConnections={isFetchingConnections}
         onAddMember={handleAddMember}
       />
-
     </div>
   );
 };

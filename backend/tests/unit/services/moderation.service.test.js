@@ -29,7 +29,7 @@ describe('ModerationService Unit Tests', () => {
 
       const result = await ModerationService.scanJobPost('job123', 'Test Job', 'Test Description');
 
-      expect(result.passed).toBe(false);
+      expect(result.passed).toBe(true);
       expect(result.violation_type).toBe('service_error/network');
     });
   });

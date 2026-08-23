@@ -1,10 +1,8 @@
 {
-    "python.testing.pytestEnabled": true,
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestArgs": [
-        "tests"
-    ],
-    "python.testing.cwd": "${workspaceFolder}/ai-service",
-    "python.defaultInterpreterPath": "${workspaceFolder}/ai-service/.venv/bin/python",
-    "python.testing.pytestPath": "${workspaceFolder}/ai-service/.venv/bin/pytest"
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.cwd": "${workspaceFolder}/ai-service",
+  "python.defaultInterpreterPath": "${workspaceFolder}/ai-service/.venv/bin/python",
+  "python.testing.pytestPath": "${workspaceFolder}/ai-service/.venv/bin/pytest"
 }

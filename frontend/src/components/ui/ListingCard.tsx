@@ -30,14 +30,14 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   posterAvatar,
   date,
   skills,
-  actionText = "View Details",
+  actionText = 'View Details',
   actionIcon = <ChevronRight size={14} />,
   onActionClick,
   onCardClick,
   isOwner,
   onEdit,
   onDelete,
-  className = ""
+  className = '',
 }) => {
   return (
     <Card
@@ -59,7 +59,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               <span>{date}</span>
             </div>
           </div>
-          <div className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider ${statusColor || 'bg-slate-50 text-slate-600'}`}>
+          <div
+            className={`shrink-0 px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider ${statusColor || 'bg-slate-50 text-slate-600'}`}
+          >
             {status}
           </div>
         </div>
@@ -71,12 +73,17 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-[#383942]">
           <div className="flex gap-1.5">
             {skills.slice(0, 2).map((skill) => (
-              <span key={skill} className="text-[10px] font-semibold bg-slate-50 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-100 dark:border-[#383942]">
+              <span
+                key={skill}
+                className="text-[10px] font-semibold bg-slate-50 dark:bg-[#2a2b32] text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-md border border-slate-100 dark:border-[#383942]"
+              >
                 {skill}
               </span>
             ))}
             {skills.length > 2 && (
-              <span className="text-[9px] font-bold text-slate-400 self-center">+{skills.length - 2}</span>
+              <span className="text-[9px] font-bold text-slate-400 self-center">
+                +{skills.length - 2}
+              </span>
             )}
           </div>
 
@@ -85,7 +92,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               <div className="flex gap-1">
                 {onEdit && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); onEdit(e); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(e);
+                    }}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                   >
                     <Edit3 size={14} />
@@ -93,7 +103,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 )}
                 {onDelete && (
                   <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(e); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(e);
+                    }}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <Trash2 size={14} />
@@ -101,7 +114,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 )}
               </div>
             ) : (
-              <div 
+              <div
                 className="flex items-center gap-1 text-[11px] font-bold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-xl group-hover:bg-primary-600 group-hover:text-white transition-all"
                 onClick={onActionClick}
               >

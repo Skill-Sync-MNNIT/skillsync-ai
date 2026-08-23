@@ -75,8 +75,7 @@ export const MessageBubble = ({
           {msg.replyTo && !msg.isDeletedForEveryone && (
             <div
               onClick={() => {
-                const parentId =
-                  typeof msg.replyTo === 'string' ? msg.replyTo : msg.replyTo._id;
+                const parentId = typeof msg.replyTo === 'string' ? msg.replyTo : msg.replyTo._id;
                 onScrollToMessage(parentId);
               }}
               className={cn(
@@ -142,9 +141,7 @@ export const MessageBubble = ({
 
           {/* Timestamp + delivery ticks */}
           <div className="mt-1 flex items-center justify-end gap-1.5 opacity-60 select-none">
-            {msg.isEdited && (
-              <span className="text-[10px] font-medium italic mr-1">Edited</span>
-            )}
+            {msg.isEdited && <span className="text-[10px] font-medium italic mr-1">Edited</span>}
             <span className="text-[10px] leading-none font-medium">
               {new Date(msg.isEdited ? msg.updatedAt : msg.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -184,8 +181,7 @@ export const MessageBubble = ({
                 }
                 onDeleteMe={onDeleteMe}
                 onDeleteEveryone={
-                  isMe &&
-                  Date.now() - new Date(msg.createdAt).getTime() < 5 * 60 * 60 * 1000
+                  isMe && Date.now() - new Date(msg.createdAt).getTime() < 5 * 60 * 60 * 1000
                     ? onDeleteEveryone
                     : undefined
                 }
