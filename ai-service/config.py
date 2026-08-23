@@ -9,9 +9,9 @@ class Settings(BaseSettings):
         extra="ignore",       # silently skip any unrecognised env vars
     )
 
-    gemini_api_key: str
+    gemini_api_key: str = "mock-gemini-key"
     gemini_api_key_2: str = ""
-    pinecone_api_key: str
+    pinecone_api_key: str = "mock-pinecone-key"
     pinecone_index: str = "mnnit-student-embeddings"
     embedding_model: str = "gemini-embedding-001"
     llm_model: str = "gemini-2.0-flash-lite"
