@@ -62,8 +62,6 @@ export const Connections = () => {
     fetchData(page);
   }, [page, debouncedSearch]);
 
-
-
   const handleMessage = async (recipientId: string) => {
     try {
       const res = await api.post('/chats/rooms/1on1', { recipientId });
@@ -107,8 +105,13 @@ export const Connections = () => {
             className="gap-2 relative group hover:border-primary-500 hover:text-primary-600 transition-all duration-300 rounded-xl px-4 py-2 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] shadow-sm hover:shadow-primary-500/10 hover:ring-1 hover:ring-primary-500/20"
             onClick={() => navigate('/connections/requests')}
           >
-            <Bell size={18} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-slate-500 group-hover:text-primary-600" />
-            <span className="font-semibold text-slate-700 dark:text-slate-300 group-hover:text-primary-600">Invitations</span>
+            <Bell
+              size={18}
+              className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300 text-slate-500 group-hover:text-primary-600"
+            />
+            <span className="font-semibold text-slate-700 dark:text-slate-300 group-hover:text-primary-600">
+              Invitations
+            </span>
             {totalPending > 0 && (
               <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-black h-5 w-5 rounded-full flex items-center justify-center border-2 border-white dark:border-[#202123] shadow-md animate-bounce">
                 {totalPending > 99 ? '99+' : totalPending}
@@ -119,7 +122,10 @@ export const Connections = () => {
       </div>
 
       <div className="relative group w-full">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors duration-300" size={20} />
+        <Search
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors duration-300"
+          size={20}
+        />
         <Input
           placeholder="Search your connections."
           className="pl-11 h-12 bg-white dark:bg-[#202123] border-slate-200 dark:border-[#383942] rounded-2xl transition-all duration-300 shadow-sm focus:shadow-primary-500/5 group-hover:border-primary-400/30"
@@ -133,16 +139,19 @@ export const Connections = () => {
           <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-200">
             Connections
           </h2>
-          <span className="text-sm text-slate-500 font-medium">{totalConnections} connections found</span>
+          <span className="text-sm text-slate-500 font-medium">
+            {totalConnections} connections found
+          </span>
         </div>
 
         {connections.length === 0 ? (
           <NoData
             type="search"
-            title={debouncedSearch ? "No Connections Match" : "Your Network is Empty"}
-            description={debouncedSearch 
-              ? `No connections found searching for "${debouncedSearch}". Try a different name or email prefix.` 
-              : "Start building your network by connecting with students and alumni from MNNIT!"
+            title={debouncedSearch ? 'No Connections Match' : 'Your Network is Empty'}
+            description={
+              debouncedSearch
+                ? `No connections found searching for "${debouncedSearch}". Try a different name or email prefix.`
+                : 'Start building your network by connecting with students and alumni from MNNIT!'
             }
             action={null}
           />
@@ -152,29 +161,44 @@ export const Connections = () => {
               const otherUser = conn.requester?._id === user?._id ? conn.recipient : conn.requester;
               if (!otherUser) return null;
 
-              const connectedAt = new Date(conn.connectedAt || conn.updatedAt || Date.now()).toLocaleDateString('en-US', {
-                month: 'short', day: 'numeric', year: 'numeric'
+              const connectedAt = new Date(
+                conn.connectedAt || conn.updatedAt || Date.now()
+              ).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
               });
 
               return (
-                <Card key={conn._id} className="hover:shadow-md transition-all group hover:border-primary-100 dark:hover:border-primary-900/30">
+                <Card
+                  key={conn._id}
+                  className="hover:shadow-md transition-all group hover:border-primary-100 dark:hover:border-primary-900/30"
+                >
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4 min-w-0">
                       <div
                         className="h-14 w-14 rounded-full bg-slate-100 dark:bg-[#2a2b32] flex items-center justify-center font-bold text-xl text-slate-500 overflow-hidden border-2 border-white dark:border-[#565869] shadow-sm cursor-pointer"
-                        onClick={() => navigate(`/profile/${otherUser.email?.split('@')[0] || otherUser._id}`)}
+                        onClick={() =>
+                          navigate(`/profile/${otherUser.email?.split('@')[0] || otherUser._id}`)
+                        }
                       >
                         {otherUser.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                       <div className="min-w-0">
                         <p
                           className="font-bold text-slate-900 dark:text-white truncate hover:text-primary-600 transition-colors cursor-pointer"
-                          onClick={() => navigate(`/profile/${otherUser.email?.split('@')[0] || otherUser._id}`)}
+                          onClick={() =>
+                            navigate(`/profile/${otherUser.email?.split('@')[0] || otherUser._id}`)
+                          }
                         >
                           {otherUser.name || 'User'}
                         </p>
-                        <p className="text-xs text-slate-500 line-clamp-1 mb-1 font-medium">{otherUser.role} • Connected {connectedAt}</p>
-                        <p className="text-[11px] text-slate-400 italic truncate italic">Ready to collaborate on SkillSync!</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 mb-1 font-medium">
+                          {otherUser.role} • Connected {connectedAt}
+                        </p>
+                        <p className="text-[11px] text-slate-400 italic truncate italic">
+                          Ready to collaborate on SkillSync!
+                        </p>
                       </div>
                     </div>
 
@@ -188,7 +212,8 @@ export const Connections = () => {
                         <Send size={18} />
                       </Button>
                       <Button
-                        variant="ghost" size="sm"
+                        variant="ghost"
+                        size="sm"
                         className="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-[#2a2b32]"
                         onClick={() => {
                           setSelectedConnection({ id: conn._id, user: otherUser });

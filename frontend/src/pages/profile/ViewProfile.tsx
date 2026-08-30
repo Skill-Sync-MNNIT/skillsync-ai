@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Download, Eye, Cpu, UserPlus, Mail, BookOpen, GitBranch, Calendar, Award, Code2, FileText, Star, ArrowLeft } from 'lucide-react';
+import {
+  Download,
+  Eye,
+  Cpu,
+  UserPlus,
+  Mail,
+  BookOpen,
+  GitBranch,
+  Calendar,
+  Award,
+  Code2,
+  FileText,
+  Star,
+  ArrowLeft,
+} from 'lucide-react';
 import api from '../../services/api';
 import { ViewProfileSkeleton } from '../../components/skeletons/ViewProfileSkeleton';
 import { SkillBadge } from '../../components/ui/SkillBadge';
@@ -9,7 +23,6 @@ import { useToast } from '../../context/ToastContext';
 import { NoData } from '../../components/ui/NoData';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-
 
 interface StudentProfile {
   userId: string;
@@ -27,7 +40,14 @@ interface StudentProfile {
 }
 
 const getInitials = (name: string) => {
-  return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'ST';
+  return (
+    name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'ST'
+  );
 };
 
 const getYearLabel = (year: number) => {
@@ -54,7 +74,9 @@ export const ViewProfile = () => {
   const [isViewing, setIsViewing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'loading' | 'none' | 'pending' | 'accepted'>('loading');
+  const [connectionStatus, setConnectionStatus] = useState<
+    'loading' | 'none' | 'pending' | 'accepted'
+  >('loading');
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -145,7 +167,11 @@ export const ViewProfile = () => {
         title="Profile Not Found"
         description="The profile you are looking for doesn't exist or may have been restricted."
         action={
-          <Button onClick={() => navigate(-1)} variant="outline" className="group hover:border-primary-500 hover:text-primary-600 transition-all duration-300">
+          <Button
+            onClick={() => navigate(-1)}
+            variant="outline"
+            className="group hover:border-primary-500 hover:text-primary-600 transition-all duration-300"
+          >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Go Back
           </Button>
@@ -156,7 +182,6 @@ export const ViewProfile = () => {
 
   return (
     <div className="max-w-4xl mx-auto pb-20 space-y-6">
-
       {/* ── AI Match Banner ── */}
       {profile.matchScore !== undefined && (
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white shadow-lg shadow-blue-500/20 animate-fade-in-up">
@@ -175,8 +200,11 @@ export const ViewProfile = () => {
               <p className="text-blue-100 text-sm leading-relaxed">"{profile.explanation}"</p>
               {profile.matchedSkills && profile.matchedSkills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-3">
-                  {profile.matchedSkills.map(s => (
-                    <span key={s} className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold backdrop-blur-sm">
+                  {profile.matchedSkills.map((s) => (
+                    <span
+                      key={s}
+                      className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold backdrop-blur-sm"
+                    >
                       {s}
                     </span>
                   ))}
@@ -203,7 +231,10 @@ export const ViewProfile = () => {
                 {getInitials(profile.name)}
                 <div className="absolute inset-0 bg-black/5" />
               </div>
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-emerald-500 border-[6px] border-white dark:border-slate-900 shadow-xl" title="Active Student">
+              <div
+                className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-emerald-500 border-[6px] border-white dark:border-slate-900 shadow-xl"
+                title="Active Student"
+              >
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                 </div>
@@ -255,14 +286,18 @@ export const ViewProfile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Main content (Left) ── */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* ── Academic Background (Unified Section) ── */}
-          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          <div
+            className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up"
+            style={{ animationDelay: '100ms' }}
+          >
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
                 <BookOpen size={20} className="text-blue-600" />
               </div>
-              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">Academic Profile</h2>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">
+                Academic Profile
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -271,26 +306,26 @@ export const ViewProfile = () => {
                   label: 'Course & Program',
                   value: profile.course,
                   icon: <BookOpen />,
-                  sub: 'MNNIT Allahabad'
+                  sub: 'MNNIT Allahabad',
                 },
                 {
                   label: 'Department & Branch',
                   value: profile.branch === 'NA' ? 'Not Assigned' : profile.branch,
                   icon: <GitBranch />,
-                  sub: 'Faculty of Engineering'
+                  sub: 'Faculty of Engineering',
                 },
                 {
                   label: 'Current Standing',
                   value: profile.year ? getYearLabel(profile.year) : 'N/A',
                   icon: <Calendar />,
-                  sub: 'Academic Session 2023-24'
+                  sub: 'Academic Session 2023-24',
                 },
                 {
                   label: 'Academic Merit',
                   value: profile.cpi ? `${profile.cpi} / 10` : 'N/A',
                   icon: <Award />,
-                  sub: profile.cpi >= 9 ? 'Dean\'s Honor List' : 'Satisfactory Standing',
-                  highlight: profile.cpi ? getCpiColor(profile.cpi) : ''
+                  sub: profile.cpi >= 9 ? "Dean's Honor List" : 'Satisfactory Standing',
+                  highlight: profile.cpi ? getCpiColor(profile.cpi) : '',
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex items-start gap-4 group">
@@ -298,8 +333,12 @@ export const ViewProfile = () => {
                     {React.cloneElement(item.icon as React.ReactElement<any>, { size: 24 })}
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{item.label}</p>
-                    <p className={`text-lg font-black tracking-tight ${item.highlight || 'text-slate-800 dark:text-white'}`}>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                      {item.label}
+                    </p>
+                    <p
+                      className={`text-lg font-black tracking-tight ${item.highlight || 'text-slate-800 dark:text-white'}`}
+                    >
                       {item.value}
                     </p>
                     <p className="text-xs text-slate-500 font-medium">{item.sub}</p>
@@ -310,17 +349,22 @@ export const ViewProfile = () => {
           </div>
 
           {/* ── Technical Skills ── */}
-          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+          <div
+            className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl p-8 shadow-sm animate-fade-in-up"
+            style={{ animationDelay: '150ms' }}
+          >
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                 <Code2 size={20} className="text-primary-600" />
               </div>
-              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">Expertise & Skills</h2>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">
+                Expertise & Skills
+              </h2>
             </div>
 
             {profile.skills?.length ? (
               <div className="flex flex-wrap gap-2.5">
-                {profile.skills.map(skill => {
+                {profile.skills.map((skill) => {
                   const isMatched = profile.matchedSkills?.includes(skill);
                   return (
                     <SkillBadge
@@ -333,7 +377,9 @@ export const ViewProfile = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center py-6 border-2 border-dashed border-slate-100 dark:border-[#383942] rounded-2xl">
-                <p className="text-slate-400 text-sm font-medium italic">No technical skills listed yet</p>
+                <p className="text-slate-400 text-sm font-medium italic">
+                  No technical skills listed yet
+                </p>
               </div>
             )}
           </div>
@@ -342,7 +388,10 @@ export const ViewProfile = () => {
         {/* ── Sidebar (Right) ── */}
         <div className="space-y-6">
           {/* ── Resume Card ── */}
-          <div className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl pb-8 overflow-hidden shadow-sm animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <div
+            className="bg-white dark:bg-[#202123] border border-slate-200 dark:border-[#383942] rounded-3xl pb-8 overflow-hidden shadow-sm animate-fade-in-up"
+            style={{ animationDelay: '200ms' }}
+          >
             <div className="h-24 bg-slate-50 dark:bg-[#40414f] flex items-center justify-center border-b border-slate-100 dark:border-[#383942]">
               <div className="w-12 h-12 rounded-2xl bg-white dark:bg-[#202123] shadow-sm flex items-center justify-center text-slate-400">
                 <FileText size={28} />
@@ -350,7 +399,9 @@ export const ViewProfile = () => {
             </div>
             <div className="px-6 pt-6 text-center">
               <h3 className="text-lg font-black text-slate-800 dark:text-white mb-2">Resume </h3>
-              <p className="text-sm text-slate-500 mb-6 px-4">Review full details of background, projects, and achievements.</p>
+              <p className="text-sm text-slate-500 mb-6 px-4">
+                Review full details of background, projects, and achievements.
+              </p>
 
               <div className="space-y-3">
                 <Button
@@ -375,7 +426,6 @@ export const ViewProfile = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

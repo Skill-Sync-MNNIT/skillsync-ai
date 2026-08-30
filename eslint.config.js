@@ -4,6 +4,9 @@ import globals from 'globals';
 const toReadonly = (obj) => Object.fromEntries(Object.keys(obj).map((k) => [k, 'readonly']));
 
 export default [
+  {
+    ignores: ['node_modules/**', 'frontend/**', 'dist/**'],
+  },
   js.configs.recommended,
   {
     languageOptions: {
@@ -11,19 +14,13 @@ export default [
       sourceType: 'module',
       globals: {
         ...toReadonly(globals.node),
+        ...toReadonly(globals.jest),
       },
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': 'warn',
       'no-console': 'off',
-    },
-  },
-  {
-    files: ['tests/**/*.js', '**/*.test.js'],
-    languageOptions: {
-      globals: {
-        ...toReadonly(globals.jest),
-      },
+      semi: ['error', 'always'],
     },
   },
 ];

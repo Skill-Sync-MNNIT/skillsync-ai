@@ -3,7 +3,7 @@ name: Batch Resume Embedding
 on:
   schedule:
     # Runs every 2 hours
-    - cron: "0 */2 * * *"
+    - cron: '0 */2 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install Dependencies
         run: pip install -r ai-service/requirements.txt

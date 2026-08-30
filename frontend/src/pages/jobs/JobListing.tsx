@@ -61,7 +61,7 @@ export const JobListing = () => {
   }, [activeTab, toast]);
 
   // Filtering Logic
-  const filteredJobs = jobs.filter(job => {
+  const filteredJobs = jobs.filter((job) => {
     const searchLower = searchQuery.toLowerCase();
     return (
       job.title.toLowerCase().includes(searchLower) ||
@@ -72,7 +72,12 @@ export const JobListing = () => {
   });
 
   //Hook MUST be called before any early returns (React Rules of Hooks)
-  const { currentItems: currentJobs, currentPage, totalPages, setPage } = usePagination(filteredJobs, 4);
+  const {
+    currentItems: currentJobs,
+    currentPage,
+    totalPages,
+    setPage,
+  } = usePagination(filteredJobs, 4);
 
   if (isLoading) return <JobListingSkeleton />;
 
@@ -90,11 +95,11 @@ export const JobListing = () => {
                 Job Board
               </h1>
               <p className="text-primary-100 text-sm sm:text-base font-medium max-w-md opacity-90 leading-relaxed">
-                {user?.role === 'student' 
-                  ? "Discover exclusive opportunities posted by MNNIT Alumni & Professors." 
+                {user?.role === 'student'
+                  ? 'Discover exclusive opportunities posted by MNNIT Alumni & Professors.'
                   : user?.role === 'alumni'
-                  ? "Empower the community by sharing career opportunities with MNNIT students."
-                  : "Connect your students with premium research and industry opportunities."}
+                    ? 'Empower the community by sharing career opportunities with MNNIT students.'
+                    : 'Connect your students with premium research and industry opportunities.'}
               </p>
             </div>
           </div>
@@ -113,10 +118,15 @@ export const JobListing = () => {
 
       {/* ── Search Bar ────────────────────────────────────── */}
       <div className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={20} />
+        <Search
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+          size={20}
+        />
         <input
           type="text"
-          placeholder={isMobile ? "Search Jobs.." : "Search jobs by title, skills or poster name..."}
+          placeholder={
+            isMobile ? 'Search Jobs..' : 'Search jobs by title, skills or poster name...'
+          }
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full h-14 pl-12 pr-6 rounded-2xl bg-white dark:bg-[#202123] border-2 border-slate-100 dark:border-[#383942] focus:border-primary-500 transition-all outline-none font-medium shadow-sm"
@@ -161,16 +171,24 @@ export const JobListing = () => {
         </div>
 
         {filteredJobs.length === 0 ? (
-          <NoData 
+          <NoData
             type="search"
-            title={activeTab === 'my-jobs' ? "No Jobs Posted" : "No Jobs Found"}
-            description={activeTab === 'my-jobs' 
-              ? "You haven't posted any opportunities yet. Start by posting a new job to help students!" 
-              : (searchQuery ? `No opportunities match "${searchQuery}". Try a broader search.` : "There are currently no active job postings.")
+            title={activeTab === 'my-jobs' ? 'No Jobs Posted' : 'No Jobs Found'}
+            description={
+              activeTab === 'my-jobs'
+                ? "You haven't posted any opportunities yet. Start by posting a new job to help students!"
+                : searchQuery
+                  ? `No opportunities match "${searchQuery}". Try a broader search.`
+                  : 'There are currently no active job postings.'
             }
             action={
-              activeTab !== 'my-jobs' && (user?.role === 'alumni' || user?.role === 'professor') && (
-                <Button variant="outline" onClick={() => navigate('/jobs/create')} className="rounded-xl">
+              activeTab !== 'my-jobs' &&
+              (user?.role === 'alumni' || user?.role === 'professor') && (
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/jobs/create')}
+                  className="rounded-xl"
+                >
                   Post Your First Job
                 </Button>
               )
@@ -188,13 +206,18 @@ export const JobListing = () => {
                     description={job.description}
                     status={isExpired ? 'Expired' : job.status}
                     statusColor={
-                      isExpired ? 'bg-red-50 text-red-600' :
-                      job.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
-                      'bg-amber-50 text-amber-600'
+                      isExpired
+                        ? 'bg-red-50 text-red-600'
+                        : job.status === 'active'
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'bg-amber-50 text-amber-600'
                     }
                     posterName={job.postedBy?.name || 'Alumni'}
                     posterAvatar={job.postedBy?.name?.charAt(0)}
-                    date={new Date(job.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    date={new Date(job.createdAt || Date.now()).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                     skills={job.requiredSkills || []}
                     onCardClick={() => navigate(`/jobs/${job._id}`)}
                   />
@@ -203,11 +226,7 @@ export const JobListing = () => {
             </div>
 
             {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
           </>
         )}
       </div>

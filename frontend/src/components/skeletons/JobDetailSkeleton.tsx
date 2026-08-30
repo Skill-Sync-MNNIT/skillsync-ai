@@ -51,7 +51,11 @@ export const JobDetailSkeleton = () => (
           <div className="h-5 w-32 bg-slate-200 dark:bg-[#2a2b32] rounded" />
           <div className="flex flex-wrap gap-2">
             {[70, 90, 80, 100, 65].map((w, i) => (
-              <div key={i} className="h-8 bg-slate-100 dark:bg-[#40414f] rounded-lg" style={{ width: w }} />
+              <div
+                key={i}
+                className="h-8 bg-slate-100 dark:bg-[#40414f] rounded-lg"
+                style={{ width: w }}
+              />
             ))}
           </div>
         </div>

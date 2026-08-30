@@ -11,7 +11,7 @@ import { useToast } from '../../context/ToastContext';
 export const Settings = () => {
   const { user } = useAuthStore();
   const { toast } = useToast();
-  
+
   const [preferences, setPreferences] = useState<string[]>([]);
   const [newPref, setNewPref] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -82,9 +82,11 @@ export const Settings = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 bg-primary-50 dark:bg-primary-900/20 rounded-xl flex items-center justify-center text-primary-600">
-           <Sliders size={20} />
+          <Sliders size={20} />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Account Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Account Settings
+        </h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -95,9 +97,10 @@ export const Settings = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600">
-                Add skills and topics you are interested in. We use these to improve your job match accuracy and recommendations.
+                Add skills and topics you are interested in. We use these to improve your job match
+                accuracy and recommendations.
               </p>
-              
+
               <div className="flex flex-wrap gap-2 pt-2">
                 {preferences.map((pref) => (
                   <SkillBadge
@@ -108,22 +111,27 @@ export const Settings = () => {
                   />
                 ))}
               </div>
-              
-              <Input 
-                placeholder="Type a skill/topic and press Enter..." 
+
+              <Input
+                placeholder="Type a skill/topic and press Enter..."
                 value={newPref}
                 onChange={(e) => setNewPref(e.target.value)}
                 onKeyDown={handleAddPref}
               />
 
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 dark:border-[#383942]">
-                 <div className="flex items-center gap-2 text-xs text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg">
-                    <Sparkles size={14} className="animate-pulse" />
-                    Automated Job Matching is Active
-                 </div>
-                 <Button onClick={handleSave} isLoading={isSaving} size="sm" className="w-full sm:w-auto">
-                   <Save size={16} className="mr-2" /> Save Preferences
-                 </Button>
+                <div className="flex items-center gap-2 text-xs text-primary-600 dark:text-primary-400 font-semibold bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg">
+                  <Sparkles size={14} className="animate-pulse" />
+                  Automated Job Matching is Active
+                </div>
+                <Button
+                  onClick={handleSave}
+                  isLoading={isSaving}
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
+                  <Save size={16} className="mr-2" /> Save Preferences
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -135,31 +143,38 @@ export const Settings = () => {
               <CardTitle className="text-slate-700">Account Status</CardTitle>
             </CardHeader>
             <CardContent>
-               <div className="space-y-4">
-                  <div>
-                    <label className="text-xs text-slate-500 font-semibold uppercase">Role</label>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white capitalize">{user?.role}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-500 font-semibold uppercase">Email</label>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user?.email}</p>
-                  </div>
-                  
-                  {isBanned && (
-                    <div className="mt-4 p-3 bg-red-100 border border-red-200 rounded-lg flex items-start">
-                       <ShieldAlert className="h-5 w-5 text-red-600 mr-2 shrink-0 mt-0.5" />
-                       <div>
-                         <h4 className="text-sm font-bold text-red-900">Account Restricted</h4>
-                         <p className="text-xs text-red-700 mt-1">Your account has been flagged for violating community guidelines. Some features are disabled.</p>
-                       </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs text-slate-500 font-semibold uppercase">Role</label>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white capitalize">
+                    {user?.role}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500 font-semibold uppercase">Email</label>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                    {user?.email}
+                  </p>
+                </div>
+
+                {isBanned && (
+                  <div className="mt-4 p-3 bg-red-100 border border-red-200 rounded-lg flex items-start">
+                    <ShieldAlert className="h-5 w-5 text-red-600 mr-2 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-bold text-red-900">Account Restricted</h4>
+                      <p className="text-xs text-red-700 mt-1">
+                        Your account has been flagged for violating community guidelines. Some
+                        features are disabled.
+                      </p>
                     </div>
-                  )}
-                  {!isBanned && (
-                    <div className="mt-4 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
-                       Good Standing
-                    </div>
-                  )}
-               </div>
+                  </div>
+                )}
+                {!isBanned && (
+                  <div className="mt-4 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
+                    Good Standing
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

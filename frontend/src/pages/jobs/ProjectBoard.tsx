@@ -71,15 +71,17 @@ export const ProjectBoard = () => {
       return (
         project.title.toLowerCase().includes(searchLower) ||
         project.description.toLowerCase().includes(searchLower) ||
-        project.requiredSkills.some((skill: string) =>
-          skill.toLowerCase().includes(searchLower)
-        )
+        project.requiredSkills.some((skill: string) => skill.toLowerCase().includes(searchLower))
       );
     });
 
   // Pagination via hook
-  const { currentItems: currentProjects, currentPage, totalPages, setPage } =
-    usePagination(filteredProjects, 4);
+  const {
+    currentItems: currentProjects,
+    currentPage,
+    totalPages,
+    setPage,
+  } = usePagination(filteredProjects, 4);
 
   const handlePostProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,14 +91,20 @@ export const ProjectBoard = () => {
         await api.put(`/projects/${currentProject._id}`, {
           title: newProject.title,
           description: newProject.description,
-          requiredSkills: newProject.skills.split(',').map((s) => s.trim()).filter((s) => s),
+          requiredSkills: newProject.skills
+            .split(',')
+            .map((s) => s.trim())
+            .filter((s) => s),
         });
         toast('Project updated successfully!', 'success');
       } else {
         await api.post('/projects', {
           title: newProject.title,
           description: newProject.description,
-          requiredSkills: newProject.skills.split(',').map((s) => s.trim()).filter((s) => s),
+          requiredSkills: newProject.skills
+            .split(',')
+            .map((s) => s.trim())
+            .filter((s) => s),
         });
         toast('Project posted successfully!', 'success');
       }
@@ -301,11 +309,7 @@ export const ProjectBoard = () => {
                 );
               })}
             </div>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setPage}
-            />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
           </>
         )}
       </div>

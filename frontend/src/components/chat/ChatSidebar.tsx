@@ -1,4 +1,13 @@
-import { MessageSquare, Plus, Search, Users, CheckCheck, Image as ImageIcon, FileText, MessageCirclePlus } from 'lucide-react';
+import {
+  MessageSquare,
+  Plus,
+  Search,
+  Users,
+  CheckCheck,
+  Image as ImageIcon,
+  FileText,
+  MessageCirclePlus,
+} from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cn } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';

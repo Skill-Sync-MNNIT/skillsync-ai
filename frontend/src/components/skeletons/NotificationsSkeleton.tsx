@@ -22,7 +22,10 @@ export const NotificationsSkeleton = () => (
         >
           <div className="h-10 w-10 bg-slate-200 dark:bg-[#2a2b32] rounded-full shrink-0 mt-0.5" />
           <div className="flex-1 space-y-2 py-0.5">
-            <div className={`h-4 bg-slate-200 dark:bg-[#2a2b32] rounded`} style={{ width: `${60 + (i % 3) * 15}%` }} />
+            <div
+              className={`h-4 bg-slate-200 dark:bg-[#2a2b32] rounded`}
+              style={{ width: `${60 + (i % 3) * 15}%` }}
+            />
             <div className="h-3 w-28 bg-slate-100 dark:bg-[#40414f] rounded" />
           </div>
           <div className="h-5 w-5 bg-slate-100 dark:bg-[#40414f] rounded-full shrink-0 self-center" />

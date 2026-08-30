@@ -79,7 +79,7 @@ export const JobDetail = () => {
     try {
       const response = await api.post(`/jobs/${jobId}/apply`);
       toast(response.data.message || 'Application submitted successfully!', 'success');
-      setJob(prev => prev ? { ...prev, hasApplied: true } : null);
+      setJob((prev) => (prev ? { ...prev, hasApplied: true } : null));
     } catch (error: any) {
       toast(error.response?.data?.message || 'Failed to apply for this job', 'error');
     } finally {
@@ -122,7 +122,11 @@ export const JobDetail = () => {
         title="Job Opportunity Not Found"
         description="This job may have been removed, moderated, or has already closed."
         action={
-          <Button onClick={() => navigate(-1)} variant="outline" className="group hover:border-primary-500 hover:text-primary-600 transition-all duration-300">
+          <Button
+            onClick={() => navigate(-1)}
+            variant="outline"
+            className="group hover:border-primary-500 hover:text-primary-600 transition-all duration-300"
+          >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
             Go Back
           </Button>
@@ -133,7 +137,8 @@ export const JobDetail = () => {
 
   const isPoster = user?.email === job.postedBy.email;
   const isExpired = new Date(job.deadline) < new Date();
-  const isClosed = job.status === 'withdrawn' || job.status === 'expired' || job.status === 'rejected';
+  const isClosed =
+    job.status === 'withdrawn' || job.status === 'expired' || job.status === 'rejected';
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -150,11 +155,20 @@ export const JobDetail = () => {
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{job.title}</h1>
-                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${(job.status === 'active' && !isExpired) ? 'bg-green-100 text-green-700' :
-                  (job.status === 'withdrawn' || job.status === 'expired' || isExpired) ? 'bg-red-100 text-red-700' :
-                    'bg-amber-100 text-amber-700'
-                  }`}>
-                  {(isExpired || job.status === 'expired') ? 'Expired' : job.status === 'withdrawn' ? 'Closed' : job.status.replace('_', ' ')}
+                <span
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${
+                    job.status === 'active' && !isExpired
+                      ? 'bg-green-100 text-green-700'
+                      : job.status === 'withdrawn' || job.status === 'expired' || isExpired
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-amber-100 text-amber-700'
+                  }`}
+                >
+                  {isExpired || job.status === 'expired'
+                    ? 'Expired'
+                    : job.status === 'withdrawn'
+                      ? 'Closed'
+                      : job.status.replace('_', ' ')}
                 </span>
               </div>
 
@@ -173,8 +187,11 @@ export const JobDetail = () => {
                   <Calendar className="h-5 w-5 mr-3 text-slate-400" />
                   <div>
                     <p className="text-xs text-slate-500 font-medium">Deadline</p>
-                    <p className={`text-sm font-semibold ${isExpired || isClosed ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
-                      {new Date(job.deadline).toLocaleDateString()} {(isExpired || isClosed) && `(${isExpired ? 'Expired' : 'Closed'})`}
+                    <p
+                      className={`text-sm font-semibold ${isExpired || isClosed ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}
+                    >
+                      {new Date(job.deadline).toLocaleDateString()}{' '}
+                      {(isExpired || isClosed) && `(${isExpired ? 'Expired' : 'Closed'})`}
                     </p>
                   </div>
                 </div>
@@ -198,11 +215,15 @@ export const JobDetail = () => {
                   onClick={handleApply}
                   isLoading={isApplying}
                   disabled={job.hasApplied}
-                  variant={job.hasApplied ? "outline" : "primary"}
+                  variant={job.hasApplied ? 'outline' : 'primary'}
                   className={`w-full shadow-sm ${job.hasApplied ? 'border-emerald-200 text-emerald-600 bg-emerald-50/50' : ''}`}
                 >
                   <Send size={18} className="mr-2" />
-                  {job.hasApplied ? 'Already Applied' : job.jobLink ? 'Apply on External Site' : 'Apply Now'}
+                  {job.hasApplied
+                    ? 'Already Applied'
+                    : job.jobLink
+                      ? 'Apply on External Site'
+                      : 'Apply Now'}
                 </Button>
               )}
               {isPoster && !isClosed && (
@@ -240,9 +261,11 @@ export const JobDetail = () => {
             </section>
 
             <section>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Required Skills</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+                Required Skills
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {job.requiredSkills.map(skill => (
+                {job.requiredSkills.map((skill) => (
                   <SkillBadge key={skill} label={skill} />
                 ))}
               </div>
@@ -250,21 +273,30 @@ export const JobDetail = () => {
 
             {isPoster && (
               <section className="pt-8 border-t border-slate-200">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Applicants ({applications.length})</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
+                  Applicants ({applications.length})
+                </h3>
                 {applications.length === 0 ? (
                   <div className="text-center py-12 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                    <p className="text-slate-500">No students have applied for this position yet.</p>
+                    <p className="text-slate-500">
+                      No students have applied for this position yet.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {applications.map((app) => (
-                      <div key={app._id} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-primary-200 transition-colors">
+                      <div
+                        key={app._id}
+                        className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-primary-200 transition-colors"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 font-bold">
                             {app.studentId.name?.[0] || app.studentId.email[0]}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-900 dark:text-white">{app.studentId.name || app.studentId.email}</p>
+                            <p className="font-bold text-slate-900 dark:text-white">
+                              {app.studentId.name || app.studentId.email}
+                            </p>
                             <p className="text-xs text-slate-500 capitalize">{app.status}</p>
                           </div>
                         </div>

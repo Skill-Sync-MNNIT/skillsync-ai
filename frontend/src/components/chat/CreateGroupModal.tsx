@@ -40,9 +40,7 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
   };
 
   const toggleParticipant = (id: string) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const handleCreateGroup = async (e: React.FormEvent) => {
@@ -75,7 +73,10 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Users className="text-primary-600" size={24} /> New Group Chat
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-full transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-slate-100 rounded-full transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
@@ -98,10 +99,13 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
                 {isLoading ? (
                   <p className="text-center text-slate-400 py-4 italic">Loading connections...</p>
                 ) : connections.length === 0 ? (
-                  <p className="text-center text-slate-400 py-4 italic">No connections found. Connect with peers first!</p>
+                  <p className="text-center text-slate-400 py-4 italic">
+                    No connections found. Connect with peers first!
+                  </p>
                 ) : (
                   connections.map((conn) => {
-                    const otherUser = conn.requester._id === currentUser?._id ? conn.recipient : conn.requester;
+                    const otherUser =
+                      conn.requester._id === currentUser?._id ? conn.recipient : conn.requester;
                     const isSelected = selectedIds.includes(otherUser._id);
 
                     return (
@@ -109,8 +113,8 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
                         key={otherUser._id}
                         onClick={() => toggleParticipant(otherUser._id)}
                         className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' 
+                          isSelected
+                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
                             : 'border-white dark:border-[#383942] bg-white dark:bg-[#2a2b32]'
                         }`}
                       >
@@ -119,7 +123,9 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
                             <User size={20} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{otherUser.name}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                              {otherUser.name}
+                            </p>
                             <p className="text-xs text-slate-500 capitalize">{otherUser.role}</p>
                           </div>
                         </div>
@@ -133,8 +139,15 @@ export const CreateGroupModal = ({ isOpen, onClose, onSuccess }: CreateGroupModa
           </div>
 
           <div className="p-4 border-t bg-white dark:bg-[#2a2b32] flex gap-3">
-            <Button variant="ghost" className="flex-1" type="button" onClick={onClose}>Cancel</Button>
-            <Button className="flex-1" type="submit" isLoading={isSubmitting} disabled={selectedIds.length === 0 || !groupName.trim()}>
+            <Button variant="ghost" className="flex-1" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              type="submit"
+              isLoading={isSubmitting}
+              disabled={selectedIds.length === 0 || !groupName.trim()}
+            >
               Create Group
             </Button>
           </div>

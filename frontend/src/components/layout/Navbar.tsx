@@ -1,7 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
 import {
-  LogOut, User as UserIcon, ChevronDown, Menu, X, Sun, Moon,
-  LayoutDashboard, Search, Briefcase, Users, MessageSquare, Rocket, Bell, Settings,
+  LogOut,
+  User as UserIcon,
+  ChevronDown,
+  Menu,
+  X,
+  Sun,
+  Moon,
+  LayoutDashboard,
+  Search,
+  Briefcase,
+  Users,
+  MessageSquare,
+  Rocket,
+  Bell,
+  Settings,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
@@ -49,7 +62,13 @@ export const Navbar = () => {
   };
 
   const userName = user?.name || user?.email?.split('@')[0] || '';
-  const initials = userName.split(/[\s.]+/).map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) || 'U';
+  const initials =
+    userName
+      .split(/[\s.]+/)
+      .map((w: string) => w[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || 'U';
   const isLoggedIn = isAuthenticated();
 
   // Mobile nav links
@@ -103,7 +122,10 @@ export const Navbar = () => {
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-200 max-w-[120px] truncate">
                     {userName}
                   </span>
-                  <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    size={14}
+                    className={`text-slate-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -111,7 +133,9 @@ export const Navbar = () => {
                   <div className="absolute right-0 mt-2 w-60 bg-white dark:bg-[#202123] rounded-2xl border border-slate-100 dark:border-[#383942] ambient-shadow py-1.5 animate-scale-in origin-top-right z-50">
                     {/* User info header */}
                     <div className="px-4 py-3 border-b border-slate-100 dark:border-[#383942]">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{userName}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {userName}
+                      </p>
                       <p className="text-xs text-slate-500 mt-0.5">{user?.email}</p>
                       <span className="mt-1.5 inline-flex items-center rounded-lg bg-primary-50 dark:bg-primary-900/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
                         {user?.role}
@@ -155,7 +179,9 @@ export const Navbar = () => {
           ) : (
             <div className="flex items-center gap-2">
               <Link to="/auth/login">
-                <Button variant="ghost" size="sm">Sign In</Button>
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
               </Link>
               <Link to="/auth/register">
                 <Button size="sm">Get Started</Button>
@@ -180,22 +206,30 @@ export const Navbar = () => {
             </div>
           </div>
           <div className="py-2">
-            {mobileNavLinks.filter(l => l.show).map((link) => {
-              const active = location.pathname === link.to || (link.to === '/jobs' && location.pathname.startsWith('/jobs'));
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${active
-                    ? 'text-primary-700 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/10'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#2a2b32]'
+            {mobileNavLinks
+              .filter((l) => l.show)
+              .map((link) => {
+                const active =
+                  location.pathname === link.to ||
+                  (link.to === '/jobs' && location.pathname.startsWith('/jobs'));
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
+                      active
+                        ? 'text-primary-700 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/10'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#2a2b32]'
                     }`}
-                >
-                  <link.icon size={18} className={active ? 'text-primary-600' : 'text-slate-400'} />
-                  {link.label}
-                </Link>
-              );
-            })}
+                  >
+                    <link.icon
+                      size={18}
+                      className={active ? 'text-primary-600' : 'text-slate-400'}
+                    />
+                    {link.label}
+                  </Link>
+                );
+              })}
             <button
               onClick={handleLogout}
               className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors border-t border-slate-100 dark:border-[#383942] mt-1"

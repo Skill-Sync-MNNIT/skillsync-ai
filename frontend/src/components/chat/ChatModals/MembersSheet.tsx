@@ -9,7 +9,11 @@ interface MembersSheetProps {
   user: any;
   memberSearch: string;
   setMemberSearch: (val: string) => void;
-  onManageMember: (participantId: string, action: 'promote' | 'demote' | 'remove', isAdmin: boolean) => void;
+  onManageMember: (
+    participantId: string,
+    action: 'promote' | 'demote' | 'remove',
+    isAdmin: boolean
+  ) => void;
 }
 
 /**
@@ -25,18 +29,20 @@ export const MembersSheet = ({
   setMemberSearch,
   onManageMember,
 }: MembersSheetProps) => {
-  const filteredParticipants = currentRoom?.participants?.filter(
-    (p: any) => p.name.toLowerCase().includes(memberSearch.toLowerCase())
-  ) || [];
+  const filteredParticipants =
+    currentRoom?.participants?.filter((p: any) =>
+      p.name.toLowerCase().includes(memberSearch.toLowerCase())
+    ) || [];
 
-  const isCurrentUserAdmin = currentRoom?.admins?.some(
-    (a: any) => (a._id || a) === user?._id
-  );
+  const isCurrentUserAdmin = currentRoom?.admins?.some((a: any) => (a._id || a) === user?._id);
 
   return (
     <BottomSheet
       isOpen={isOpen}
-      onClose={() => { onClose(); setMemberSearch(''); }}
+      onClose={() => {
+        onClose();
+        setMemberSearch('');
+      }}
       title="Group Members"
     >
       <div className="flex flex-col h-[70vh] max-h-[600px]">
@@ -55,9 +61,7 @@ export const MembersSheet = ({
 
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {filteredParticipants.map((participant: any) => {
-            const isAdmin = currentRoom?.admins?.some(
-              (a: any) => (a._id || a) === participant._id
-            );
+            const isAdmin = currentRoom?.admins?.some((a: any) => (a._id || a) === participant._id);
             const isMe = participant._id === user?._id;
 
             return (
@@ -92,7 +96,9 @@ export const MembersSheet = ({
                   {isCurrentUserAdmin && !isMe && (
                     <div className="flex gap-1">
                       <button
-                        onClick={() => onManageMember(participant._id, isAdmin ? 'demote' : 'promote', isAdmin)}
+                        onClick={() =>
+                          onManageMember(participant._id, isAdmin ? 'demote' : 'promote', isAdmin)
+                        }
                         className="p-2 hover:bg-slate-100 dark:hover:bg-[#343541] rounded-lg text-slate-400 hover:text-primary-600 transition-colors"
                         title={isAdmin ? 'Dismiss as Admin' : 'Make Group Admin'}
                       >

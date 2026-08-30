@@ -42,13 +42,13 @@ class EmbeddingService:
 
         # LLM chain for skill extraction (Groq – free tier)
         llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
+            model=settings.llm_model_primary,
             api_key=settings.groq_api_key,
             temperature=0.1,
         )
         if getattr(settings, "groq_api_key_2", ""):
             f_llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
+                model=settings.llm_model_primary,
                 api_key=settings.groq_api_key_2,
                 temperature=0.1,
             )

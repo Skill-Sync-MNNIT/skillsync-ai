@@ -10,11 +10,7 @@ interface ProjectDetailsModalProps {
  * Read-only detail view for a single project listing.
  * Extracted from ProjectBoard.tsx lines 362–416.
  */
-export const ProjectDetailsModal = ({
-  isOpen,
-  viewProject,
-  onClose,
-}: ProjectDetailsModalProps) => {
+export const ProjectDetailsModal = ({ isOpen, viewProject, onClose }: ProjectDetailsModalProps) => {
   if (!isOpen || !viewProject) return null;
 
   return (

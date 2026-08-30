@@ -40,14 +40,15 @@ export const GroupSettingsSheet = ({
   onLeaveGroup,
   onDeleteChat,
 }: GroupSettingsSheetProps) => {
-  const isAdmin = currentRoom?.admins?.some(
-    (a: any) => String(a._id || a) === String(user?._id)
-  );
+  const isAdmin = currentRoom?.admins?.some((a: any) => String(a._id || a) === String(user?._id));
 
   return (
     <BottomSheet
       isOpen={isOpen}
-      onClose={() => { onClose(); setIsRenaming(false); }}
+      onClose={() => {
+        onClose();
+        setIsRenaming(false);
+      }}
       title={currentRoom?.isGroup ? 'Group Settings' : 'Chat Settings'}
     >
       <div className="p-4 space-y-4">
@@ -82,14 +83,21 @@ export const GroupSettingsSheet = ({
                     placeholder="Enter new group name..."
                     autoFocus
                   />
-                  <Button size="sm" onClick={onRename} className="px-5 shadow-lg shadow-primary-500/25">
+                  <Button
+                    size="sm"
+                    onClick={onRename}
+                    className="px-5 shadow-lg shadow-primary-500/25"
+                  >
                     Save
                   </Button>
                 </div>
               </div>
             ) : (
               <button
-                onClick={() => { setIsRenaming(true); setNewNameInput(currentRoom?.name || ''); }}
+                onClick={() => {
+                  setIsRenaming(true);
+                  setNewNameInput(currentRoom?.name || '');
+                }}
                 className="w-full flex items-center gap-4 text-slate-700 dark:text-slate-300 hover:text-primary-600 transition-all group/rename py-1"
               >
                 <div className="p-2 bg-white dark:bg-[#202123] rounded-lg shadow-sm group-hover/rename:scale-110 transition-transform">
@@ -102,7 +110,10 @@ export const GroupSettingsSheet = ({
         )}
 
         <button
-          onClick={() => { onClearChat(); onClose(); }}
+          onClick={() => {
+            onClearChat();
+            onClose();
+          }}
           className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
         >
           <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
@@ -113,7 +124,10 @@ export const GroupSettingsSheet = ({
 
         {currentRoom?.isGroup && (
           <button
-            onClick={() => { onViewMembers(); onClose(); }}
+            onClick={() => {
+              onViewMembers();
+              onClose();
+            }}
             className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
           >
             <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
@@ -125,7 +139,10 @@ export const GroupSettingsSheet = ({
 
         {currentRoom?.isGroup && isAdmin && (
           <button
-            onClick={() => { onAddMembers(); onClose(); }}
+            onClick={() => {
+              onAddMembers();
+              onClose();
+            }}
             className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-[#2a2b32] transition-colors text-slate-700 dark:text-slate-300 group"
           >
             <div className="p-2.5 bg-slate-100 dark:bg-[#2a2b32] rounded-xl group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
@@ -152,7 +169,10 @@ export const GroupSettingsSheet = ({
 
         {currentRoom?.isGroup && isAdmin && (
           <button
-            onClick={() => { onDeleteChat(); onClose(); }}
+            onClick={() => {
+              onDeleteChat();
+              onClose();
+            }}
             className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-red-600 group"
           >
             <div className="p-2.5 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">
@@ -164,7 +184,10 @@ export const GroupSettingsSheet = ({
 
         {!currentRoom?.isGroup && (
           <button
-            onClick={() => { onDeleteChat(); onClose(); }}
+            onClick={() => {
+              onDeleteChat();
+              onClose();
+            }}
             className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-red-600 group"
           >
             <div className="p-2.5 bg-red-50 dark:bg-red-900/20 rounded-xl transition-colors">

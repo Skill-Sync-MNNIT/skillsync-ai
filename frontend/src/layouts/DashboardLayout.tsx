@@ -13,12 +13,12 @@ export const DashboardLayout = () => {
       <div className="flex">
         <NavSidebar />
         <main className="flex-1 min-w-0">
-          <div className={cn(
-            "mx-auto transition-all duration-300",
-            isMessagesPage
-              ? "max-w-none px-0 py-0"
-              : "max-w-[1200px] px-6 py-8 lg:px-8 pb-20"
-          )}>
+          <div
+            className={cn(
+              'mx-auto transition-all duration-300',
+              isMessagesPage ? 'max-w-none px-0 py-0' : 'max-w-[1200px] px-6 py-8 lg:px-8 pb-20'
+            )}
+          >
             <Outlet />
           </div>
         </main>

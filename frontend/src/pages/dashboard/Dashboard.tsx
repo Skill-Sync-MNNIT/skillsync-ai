@@ -1,9 +1,6 @@
 import { useAuthStore } from '../../store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import {
-  Briefcase, Bell, Users, ArrowUpRight,
-  Flame, BarChart3, Lightbulb,
-} from 'lucide-react';
+import { Briefcase, Bell, Users, ArrowUpRight, Flame, BarChart3, Lightbulb } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
@@ -32,7 +29,7 @@ const SKILL_COLORS = [
   'bg-green-500',
   'bg-cyan-500',
   'bg-lime-500',
-  'bg-sky-500'
+  'bg-sky-500',
 ];
 
 interface TrendingSkill {
@@ -42,26 +39,95 @@ interface TrendingSkill {
 
 const ROLE_CARDS = {
   student: [
-    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
-    { label: 'Browse Jobs', sublabel: 'Opportunities for you', icon: Briefcase, color: 'emerald', to: '/jobs' },
-    { label: 'Search Network', sublabel: 'Find alumni & professors', icon: Users, color: 'teal', to: '/search' },
+    {
+      label: 'Notifications',
+      sublabel: 'Check your inbox',
+      icon: Bell,
+      color: 'amber',
+      to: '/notifications',
+    },
+    {
+      label: 'Browse Jobs',
+      sublabel: 'Opportunities for you',
+      icon: Briefcase,
+      color: 'emerald',
+      to: '/jobs',
+    },
+    {
+      label: 'Search Network',
+      sublabel: 'Find alumni & professors',
+      icon: Users,
+      color: 'teal',
+      to: '/search',
+    },
   ],
   alumni: [
-    { label: 'Browse Jobs', sublabel: 'Explore MNNIT opportunities', icon: Briefcase, color: 'emerald', to: '/jobs' },
-    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
-    { label: 'Search Students', sublabel: 'Browse AI-ranked profiles', icon: Users, color: 'teal', to: '/search' },
+    {
+      label: 'Browse Jobs',
+      sublabel: 'Explore MNNIT opportunities',
+      icon: Briefcase,
+      color: 'emerald',
+      to: '/jobs',
+    },
+    {
+      label: 'Notifications',
+      sublabel: 'Check your inbox',
+      icon: Bell,
+      color: 'amber',
+      to: '/notifications',
+    },
+    {
+      label: 'Search Students',
+      sublabel: 'Browse AI-ranked profiles',
+      icon: Users,
+      color: 'teal',
+      to: '/search',
+    },
   ],
   professor: [
-    { label: 'Browse Jobs', sublabel: 'View all active postings', icon: Briefcase, color: 'emerald', to: '/jobs' },
-    { label: 'Notifications', sublabel: 'Check your inbox', icon: Bell, color: 'amber', to: '/notifications' },
-    { label: 'Find Students', sublabel: 'Browse by skills', icon: Users, color: 'teal', to: '/search' },
+    {
+      label: 'Browse Jobs',
+      sublabel: 'View all active postings',
+      icon: Briefcase,
+      color: 'emerald',
+      to: '/jobs',
+    },
+    {
+      label: 'Notifications',
+      sublabel: 'Check your inbox',
+      icon: Bell,
+      color: 'amber',
+      to: '/notifications',
+    },
+    {
+      label: 'Find Students',
+      sublabel: 'Browse by skills',
+      icon: Users,
+      color: 'teal',
+      to: '/search',
+    },
   ],
 };
 
 const COLOR_MAP: Record<string, { bg: string; iconBg: string; text: string; border: string }> = {
-  emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/50', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-100 dark:border-emerald-900/30' },
-  amber: { bg: 'bg-amber-50 dark:bg-amber-950/50', iconBg: 'bg-amber-100 dark:bg-amber-900/50', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-100 dark:border-amber-900/30' },
-  teal: { bg: 'bg-teal-50 dark:bg-teal-950/50', iconBg: 'bg-teal-100 dark:bg-teal-900/50', text: 'text-teal-600 dark:text-teal-400', border: 'border-teal-100 dark:border-teal-900/30' },
+  emerald: {
+    bg: 'bg-emerald-50 dark:bg-emerald-950/50',
+    iconBg: 'bg-emerald-100 dark:bg-emerald-900/50',
+    text: 'text-emerald-600 dark:text-emerald-400',
+    border: 'border-emerald-100 dark:border-emerald-900/30',
+  },
+  amber: {
+    bg: 'bg-amber-50 dark:bg-amber-950/50',
+    iconBg: 'bg-amber-100 dark:bg-amber-900/50',
+    text: 'text-amber-600 dark:text-amber-400',
+    border: 'border-amber-100 dark:border-amber-900/30',
+  },
+  teal: {
+    bg: 'bg-teal-50 dark:bg-teal-950/50',
+    iconBg: 'bg-teal-100 dark:bg-teal-900/50',
+    text: 'text-teal-600 dark:text-teal-400',
+    border: 'border-teal-100 dark:border-teal-900/30',
+  },
 };
 
 // ─── Nav card ─────────────────────────────────────────────────
@@ -82,14 +148,21 @@ const NavCard = ({ label, sublabel, icon: Icon, color, to, delay }: NavCardProps
         className={`group flex items-center gap-4 p-5 cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${c.border} animate-fade-in-up`}
         style={{ animationDelay: `${delay}ms` }}
       >
-        <div className={`h-11 w-11 rounded-xl ${c.iconBg} flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110`}>
+        <div
+          className={`h-11 w-11 rounded-xl ${c.iconBg} flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110`}
+        >
           <Icon size={20} className={c.text} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 group-hover:text-primary-600 transition-colors">{label}</p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 group-hover:text-primary-600 transition-colors">
+            {label}
+          </p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{sublabel}</p>
         </div>
-        <ArrowUpRight size={15} className="text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors shrink-0" />
+        <ArrowUpRight
+          size={15}
+          className="text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors shrink-0"
+        />
       </Card>
     </Link>
   );
@@ -123,10 +196,8 @@ export const Dashboard = () => {
   const cards = ROLE_CARDS[user.role] ?? ROLE_CARDS.student;
   const userName = user.name || user.email.split('@')[0];
 
-
   return (
     <div className="space-y-8 pb-8">
-
       {/* ── Hero ─────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#22c55e] via-[#16a34a] to-[#14b8a6] p-8 md:p-12 animate-fade-in-up shadow-[0_20px_48px_rgba(34,197,94,0.15)]">
         {/* Decorative orbs */}
@@ -176,10 +247,13 @@ export const Dashboard = () => {
           <div className="grid gap-5 sm:grid-cols-2">
             {trendingSkills.length > 0 ? (
               trendingSkills.map((skill, i) => {
-                const maxCount = Math.max(...trendingSkills.map(s => s.count), 1);
+                const maxCount = Math.max(...trendingSkills.map((s) => s.count), 1);
                 const demand = Math.round((skill.count / maxCount) * 100);
                 const badge = i === 0 ? 'Hot' : i === 1 ? 'Rising' : null;
-                const badgeColor = i === 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                const badgeColor =
+                  i === 0
+                    ? 'bg-red-50 text-red-600 border-red-100'
+                    : 'bg-emerald-50 text-emerald-600 border-emerald-100';
 
                 return (
                   <div key={skill.name} className="group">
@@ -189,12 +263,16 @@ export const Dashboard = () => {
                           {skill.name}
                         </span>
                         {badge && (
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${badgeColor} dark:bg-opacity-20`}>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${badgeColor} dark:bg-opacity-20`}
+                          >
                             {badge}
                           </span>
                         )}
                       </div>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{demand}%</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
+                        {demand}%
+                      </span>
                     </div>
                     <div className="h-2 w-full bg-slate-100 dark:bg-[#2a2b32] rounded-full overflow-hidden">
                       <div
@@ -215,14 +293,12 @@ export const Dashboard = () => {
           <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-slate-50 dark:from-slate-900 to-emerald-50/50 dark:to-emerald-900/10 border border-slate-100 dark:border-[#383942] flex items-start gap-3">
             <Lightbulb size={16} className="text-amber-500 mt-0.5 shrink-0" />
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              <span className="font-semibold text-slate-700 dark:text-slate-300">Tip:</span>{' '}
-              Adding in-demand skills to your profile boosts your visibility in AI-powered searches.
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Tip:</span> Adding
+              in-demand skills to your profile boosts your visibility in AI-powered searches.
             </p>
           </div>
-
         </CardContent>
       </Card>
-
     </div>
   );
 };

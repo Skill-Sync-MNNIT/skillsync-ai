@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';  
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,21 +10,26 @@ import { Select } from '../../components/ui/Select';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 
-const registerSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.string().refine((val) => ['student', 'professor', 'alumni'].includes(val), {
-    message: 'Please select a valid role',
-  }),
-}).refine((data) => {
-  if (data.role === 'student') {
-    return data.email.endsWith('@mnnit.ac.in');
-  }
-  return true;
-}, {
-  message: "Students must use their official @mnnit.ac.in email address.",
-  path: ['email'],
-});
+const registerSchema = z
+  .object({
+    email: z.string().email('Please enter a valid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    role: z.string().refine((val) => ['student', 'professor', 'alumni'].includes(val), {
+      message: 'Please select a valid role',
+    }),
+  })
+  .refine(
+    (data) => {
+      if (data.role === 'student') {
+        return data.email.endsWith('@mnnit.ac.in');
+      }
+      return true;
+    },
+    {
+      message: 'Students must use their official @mnnit.ac.in email address.',
+      path: ['email'],
+    }
+  );
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
@@ -49,20 +54,24 @@ export const Register = () => {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       role: 'student',
-    }
+    },
   });
 
   const selectedRole = watch('role');
 
   const onSubmit = async (data: RegisterForm) => {
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
+    try {
       const response = await api.post('/auth/register', data);
       toast(response.data.message || 'Verification code sent to your email!', 'success');
       navigate('/auth/verify-otp', { state: { email: data.email } });
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message || "Registration failed";
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        'Registration failed';
       toast(errorMsg, 'error');
     } finally {
       setIsLoading(false);
@@ -76,7 +85,9 @@ export const Register = () => {
           <div className="mx-auto h-12 w-12 bg-primary-100 dark:bg-primary-900/30 text-primary-600 rounded-full flex items-center justify-center mb-4 shadow-inner ring-1 ring-primary-200/50 dark:ring-primary-800/50">
             <UserPlus size={24} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Create Account
+          </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Join the MNNIT academic talent network
           </p>
@@ -116,10 +127,13 @@ export const Register = () => {
               Sign Up
             </Button>
           </div>
-          
+
           <div className="text-sm text-center">
             <span className="text-slate-500 dark:text-slate-400">Already have an account? </span>
-            <Link to="/auth/login" className="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-500">
+            <Link
+              to="/auth/login"
+              className="font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-500"
+            >
               Sign In
             </Link>
           </div>

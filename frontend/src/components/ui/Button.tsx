@@ -25,13 +25,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
           {
-            'bg-primary-600 text-white hover:bg-primary-700 hover:shadow-[0_8px_24px_rgba(34,197,94,0.2)] active:scale-[0.98]': variant === 'primary',
-            'btn-gradient hover:shadow-[0_8px_24px_rgba(34,197,94,0.25)] active:scale-[0.98]': variant === 'gradient',
-            'bg-slate-50 text-slate-900 hover:bg-slate-100 dark:bg-[#2a2b32] dark:text-slate-100 dark:hover:bg-[#343541]': variant === 'secondary',
+            'bg-primary-600 text-white hover:bg-primary-700 hover:shadow-[0_8px_24px_rgba(34,197,94,0.2)] active:scale-[0.98]':
+              variant === 'primary',
+            'btn-gradient hover:shadow-[0_8px_24px_rgba(34,197,94,0.25)] active:scale-[0.98]':
+              variant === 'gradient',
+            'bg-slate-50 text-slate-900 hover:bg-slate-100 dark:bg-[#2a2b32] dark:text-slate-100 dark:hover:bg-[#343541]':
+              variant === 'secondary',
             'ghost-border bg-transparent hover:bg-slate-50 dark:hover:bg-[#2a2b32] text-slate-700 dark:text-slate-300':
               variant === 'outline',
-            'bg-transparent hover:bg-slate-50 dark:hover:bg-[#2a2b32] text-slate-600 dark:text-slate-400': variant === 'ghost',
-            'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/30 hover:shadow-[0_8px_24px_rgba(239,68,68,0.2)]': variant === 'danger',
+            'bg-transparent hover:bg-slate-50 dark:hover:bg-[#2a2b32] text-slate-600 dark:text-slate-400':
+              variant === 'ghost',
+            'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500/30 hover:shadow-[0_8px_24px_rgba(239,68,68,0.2)]':
+              variant === 'danger',
             'h-8 px-3 text-sm gap-1.5': size === 'sm',
             'h-10 px-5 py-2 gap-2': size === 'md',
             'h-12 px-6 text-base gap-2': size === 'lg',

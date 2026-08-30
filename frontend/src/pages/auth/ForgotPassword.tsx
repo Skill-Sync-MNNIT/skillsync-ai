@@ -20,13 +20,15 @@ const otpSchema = z.object({
 });
 
 // ─── Step 3: New password schema ────────────────────────────────────────
-const resetSchema = z.object({
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(6, 'Please confirm your password'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+const resetSchema = z
+  .object({
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string().min(6, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 type EmailForm = z.infer<typeof emailSchema>;
 type OTPForm = z.infer<typeof otpSchema>;
@@ -49,17 +51,14 @@ const StepIndicator = ({ currentStep }: { currentStep: Step }) => {
           <div
             className={`
               flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-all duration-300
-              ${currentStep >= step.num
-                ? 'bg-primary-600 text-white shadow-md shadow-primary-200'
-                : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-300'
+              ${
+                currentStep >= step.num
+                  ? 'bg-primary-600 text-white shadow-md shadow-primary-200'
+                  : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-300'
               }
             `}
           >
-            {currentStep > step.num ? (
-              <CheckCircle2 size={16} />
-            ) : (
-              step.num
-            )}
+            {currentStep > step.num ? <CheckCircle2 size={16} /> : step.num}
           </div>
           <span
             className={`text-xs font-medium transition-colors duration-300 ${
@@ -112,7 +111,10 @@ export const ForgotPassword = () => {
     try {
       const response = await api.post('/auth/forgot-password', { email: data.email });
       setEmail(data.email);
-      toast(response.data.message || 'A 6-digit reset code has been sent to your email.', 'success');
+      toast(
+        response.data.message || 'A 6-digit reset code has been sent to your email.',
+        'success'
+      );
       setStep(2);
     } catch (error: any) {
       toast(error.response?.data?.message || 'Something went wrong. Please try again.', 'error');
@@ -150,7 +152,10 @@ export const ForgotPassword = () => {
       toast(response.data.message || 'Password reset successfully!', 'success');
       setTimeout(() => navigate('/auth/login', { replace: true }), 2000);
     } catch (error: any) {
-      toast(error.response?.data?.message || 'Failed to reset password. Please try again.', 'error');
+      toast(
+        error.response?.data?.message || 'Failed to reset password. Please try again.',
+        'error'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +175,8 @@ export const ForgotPassword = () => {
       title: 'Enter Verification Code',
       subtitle: (
         <>
-          We sent a 6-digit code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
+          We sent a 6-digit code to{' '}
+          <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
         </>
       ),
     },
@@ -187,20 +193,21 @@ export const ForgotPassword = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#202123] px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-6 bg-white dark:bg-[#2a2b32] p-8 rounded-xl shadow-lg border border-slate-100 dark:border-[#565869]">
-        
         {/* Step Indicator */}
         <StepIndicator currentStep={step} />
 
         {/* Header */}
         <div className="text-center animate-fade-in-up" key={step}>
-          <div className={`mx-auto h-12 w-12 ${current.iconBg} rounded-full flex items-center justify-center mb-4 shadow-inner`}>
+          <div
+            className={`mx-auto h-12 w-12 ${current.iconBg} rounded-full flex items-center justify-center mb-4 shadow-inner`}
+          >
             {current.icon}
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{current.title}</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {current.title}
+          </h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{current.subtitle}</p>
         </div>
-
-
 
         {/* ─── Step 1: Email Form ─────────────────────────────────────── */}
         {step === 1 && (
@@ -237,7 +244,9 @@ export const ForgotPassword = () => {
             </Button>
             <button
               type="button"
-              onClick={() => { setStep(1); }}
+              onClick={() => {
+                setStep(1);
+              }}
               className="w-full flex items-center justify-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               <ArrowLeft size={14} />
@@ -274,7 +283,10 @@ export const ForgotPassword = () => {
         {/* Bottom link */}
         <div className="text-sm text-center pt-2">
           <span className="text-slate-600 dark:text-slate-400">Remember your password? </span>
-          <Link to="/auth/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 transition-colors">
+          <Link
+            to="/auth/login"
+            className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 transition-colors"
+          >
             Sign In
           </Link>
         </div>
